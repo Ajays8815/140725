@@ -19,8 +19,6 @@ def get_equipment():
         cursor.execute('SELECT * FROM equipment')
         equipment = cursor.fetchall()
         conn.close()
-        
-        # Convert to list of dictionaries
         equipment_list = []
         for item in equipment:
             equipment_list.append({
@@ -30,7 +28,6 @@ def get_equipment():
                 'capacity': item[3],
                 'specifications': item[4]
             })
-        
         return jsonify(equipment_list)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -53,13 +50,15 @@ def equipment_selection():
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    """Health check endpoint (legacy)"""
+    """Legacy health check endpoint"""
     return jsonify({'status': 'healthy'})
 
 @app.route('/healthz', methods=['GET'])
 def healthz():
-    """Health check endpoint for Render dashboard"""
+    """Render platform health check endpoint"""
     return jsonify({'status': 'healthy'})
 
+# DO NOT USE DEBUG MODE IN PRODUCTION!
+# Bind to 0.0.0.0 for Render
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
