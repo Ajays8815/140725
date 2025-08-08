@@ -53,8 +53,13 @@ def equipment_selection():
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    """Health check endpoint"""
+    """Health check endpoint (legacy)"""
+    return jsonify({'status': 'healthy'})
+
+@app.route('/healthz', methods=['GET'])
+def healthz():
+    """Health check endpoint for Render dashboard"""
     return jsonify({'status': 'healthy'})
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
