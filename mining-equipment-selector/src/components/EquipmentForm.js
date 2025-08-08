@@ -17,8 +17,6 @@ const EquipmentForm = ({ onResults, loading, setLoading }) => {
       ...prev,
       [name]: value
     }));
-    
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -29,38 +27,22 @@ const EquipmentForm = ({ onResults, loading, setLoading }) => {
 
   const validateForm = () => {
     const newErrors = {};
-
-    if (!formData.operation_type) {
-      newErrors.operation_type = 'Operation type is required';
-    }
-
-    if (!formData.material_type) {
-      newErrors.material_type = 'Material type is required';
-    }
-
+    if (!formData.operation_type) newErrors.operation_type = 'Operation type is required';
+    if (!formData.material_type) newErrors.material_type = 'Material type is required';
     if (!formData.production_target) {
       newErrors.production_target = 'Production target is required';
     } else if (isNaN(formData.production_target) || Number(formData.production_target) <= 0) {
       newErrors.production_target = 'Production target must be a positive number';
     }
-
-    if (!formData.working_conditions) {
-      newErrors.working_conditions = 'Working conditions are required';
-    }
-
+    if (!formData.working_conditions) newErrors.working_conditions = 'Working conditions are required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
     setLoading(true);
-    
     try {
       const results = await equipmentAPI.selectEquipment(formData);
       onResults(results);
@@ -94,7 +76,6 @@ const EquipmentForm = ({ onResults, loading, setLoading }) => {
             <div className="invalid-feedback">{errors.operation_type}</div>
           )}
         </div>
-
         <div className="col-md-6 mb-3">
           <label htmlFor="material_type" className="form-label">Material Type</label>
           <select
@@ -118,7 +99,6 @@ const EquipmentForm = ({ onResults, loading, setLoading }) => {
           )}
         </div>
       </div>
-
       <div className="row">
         <div className="col-md-6 mb-3">
           <label htmlFor="production_target" className="form-label">Production Target (tons/day)</label>
@@ -135,7 +115,6 @@ const EquipmentForm = ({ onResults, loading, setLoading }) => {
             <div className="invalid-feedback">{errors.production_target}</div>
           )}
         </div>
-
         <div className="col-md-6 mb-3">
           <label htmlFor="working_conditions" className="form-label">Working Conditions</label>
           <select
@@ -157,7 +136,6 @@ const EquipmentForm = ({ onResults, loading, setLoading }) => {
           )}
         </div>
       </div>
-
       <div className="row">
         <div className="col-12">
           <button
