@@ -8,6 +8,7 @@ const EquipmentTable = () => {
 
   useEffect(() => {
     fetchEquipment();
+    // eslint-disable-next-line
   }, []);
 
   const fetchEquipment = async () => {
