@@ -58,7 +58,10 @@ def healthz():
     """Render platform health check endpoint"""
     return jsonify({'status': 'healthy'})
 
-# DO NOT USE DEBUG MODE IN PRODUCTION!
-# Bind to 0.0.0.0 for Render
+# Homepage route to avoid 404 at "/"
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({"message": "Mining Equipment Selector API is running."})
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
