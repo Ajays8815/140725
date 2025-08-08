@@ -40,18 +40,13 @@ def equipment_selection():
     """Select equipment based on requirements"""
     try:
         data = request.get_json()
-        
-        # Extract requirements from request
         requirements = {
             'operation_type': data.get('operation_type'),
             'material_type': data.get('material_type'),
             'production_target': data.get('production_target'),
             'working_conditions': data.get('working_conditions')
         }
-        
-        # Get equipment recommendations
         recommendations = select_equipment(requirements)
-        
         return jsonify(recommendations)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
