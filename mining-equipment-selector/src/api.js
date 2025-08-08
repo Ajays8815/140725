@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://mining-equipment-selection.onrender.com/api';
+// Use environment variable injected by Netlify
+const API_BASE_URL = process.env.REACT_APP_API_URL + '/api';
 
 // Create axios instance with default config
 const api = axios.create({
