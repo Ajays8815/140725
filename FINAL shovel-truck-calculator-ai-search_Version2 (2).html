@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ultimate Shovel-Truck Production Calculator</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body {
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      color: #222;
+    }
+    .container {
+      max-width: 620px;
+      margin: 2em auto;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 16px #0002;
+      padding: 2em 1.2em;
+    }
+    h1 {
+      color: #1a237e;
+      font-size: 1.8em;
+      text-align: center;
+      margin-bottom: 1.3em;
+      letter-spacing: 0.02em;
+    }
+    h2 {
+      color: #283593;
+      font-size: 1.18em;
+      margin-top: 1em;
+      margin-bottom: 0.75em;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+    .inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1em 1.5em;
+      margin-bottom: 1em;
+    }
+    label {
+      font-size: 1em;
+      color: #233;
+      font-weight: 500;
+      margin-bottom: 0.1em;
+    }
+    input[type=number], input[type=text], input[type=email] {
+      width: 100%;
+      padding: 0.38em;
+      font-size: 1em;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #f8fafd;
+      margin-top: 0.13em;
+      box-sizing: border-box;
+      transition: border 0.2s;
+    }
+    input:focus {
+      border: 1.5px solid #283593;
+      outline: none;
+      background: #fff;
+    }
+
+    select {
+      width: 100%;
+      padding: 0.38em;
+      font-size: 1em;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #f8fafd;
+      margin-top: 0.13em;
+      box-sizing: border-box;
+      transition: border 0.2s;
+      appearance: none;
+    }
+    select:focus {
+      border: 1.5px solid #283593;
+      outline: none;
+      background: #fff;
+    }
+    .full {
+      grid-column: span 2;
+    }
+    .btn-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1em;
+      margin-top: 0.7em;
+    }
+    button {
+      background: #283593;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.7em 1.2em;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 6px #0001;
+      transition: background 0.2s;
+    }
+    button:hover, button:focus {
+      background: #1a237e;
+    }
+    .page {
+      display: none;
+    }
+    .active {
+      display: block;
+    }
+    .mf-result, .prod-result, .sum-result {
+      background: #e8eaf6;
+      border-radius: 11px;
+      padding: 1em 1em;
+      margin: 1em 0;
+      font-size: 1.1em;
+      color: #222;
+      box-shadow: 0 1px 7px #0001;
+    }
+    .mf.ideal { color: #388e3c; font-weight: 600; }
+    .mf.low { color: #c62828; font-weight: 600; }
+    .mf.high { color: #f9a825; font-weight: 600; }
+    .form-panel {
+      margin-top: 1.1em;
+      background: #e8eaf6;
+      border-radius: 11px;
+      padding: 1em 0.7em;
+    }
+    .form-panel label {
+      font-weight: 600;
+      margin-bottom: 0.11em;
+    }
+    .form-panel input {
+      width: 100%;
+      padding: 0.55em;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #fff;
+      margin-bottom: 0.7em;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+    .form-panel button {
+      margin-top: 0.2em;
+    }
+    .success {
+      color: #388e3c;
+      margin: 1em 0;
+      display: none;
+      font-weight: 600;
+    }
+    .error {
+      color: #c62828;
+      margin: 1em 0;
+      display: none;
+      font-weight: 600;
+    }
+    .hidden { display: none; }
+    .stepnote {
+      font-size: 0.97em;
+      color: #444;
+      margin-bottom: 0.5em;
+      background: #f5f7fa;
+      border-left: 3px solid #283593;
+      border-radius: 6px;
+      padding: 0.45em 0.8em;
+    }
+    .search-result {
+      background: #f8fafd;
+      border-radius: 8px;
+      padding: 0.9em;
+      margin: 0.7em 0;
+      font-size: 0.99em;
+      border: 1px solid #d3d6e2;
+      color: #222;
+    }
+    .search-result strong {
+      color: #283593;
+    }
+
+    h3 {
+      color: #283593;
+      font-size: 1.05em;
+      margin-top: 1.2em;
+      margin-bottom: 0.5em;
+      font-weight: 600;
+    }
+    @media (max-width:650px) { .container{padding:0.6em;} }
+    @media (max-width:500px) { .inputs{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Ultimate Shovel-Truck Production Calculator</h1>
+
+  <!-- Step 0: Discover Available Shovels & Trucks -->
+  <div id="page0" class="page active">
+    <h2>Step 0: Discover Available Shovels & Trucks</h2>
+    <div class="stepnote">
+      Use our AI engine to search for shovels or trucks worldwide. Pick a type and OEM to see suggestions, or type a model name yourself. When you select a model we'll pre‑fill the specs on the next step.
+    </div>
+    <form id="searchForm" autocomplete="off" onsubmit="return false;">
+      <!-- Shovel selection -->
+      <h3>Shovel</h3>
+      <div class="inputs">
+        <label>
+          OEM (Shovel)
+          <select id="shovel_oem">
+            <option value="">Select</option>
+            <!-- Options populated by script -->
+          </select>
+        </label>
+        <label class="full">
+          Shovel Model or Query
+          <input type="text" id="shovel_query" placeholder="e.g. PC7000, 6060, R9400">
+        </label>
+      </div>
+      <div id="shovel_suggestions" class="search-result hidden"></div>
+      <!-- Truck selection -->
+      <h3>Truck</h3>
+      <div class="inputs">
+        <label>
+          OEM (Truck)
+          <select id="truck_oem">
+            <option value="">Select</option>
+            <!-- Options populated by script -->
+          </select>
+        </label>
+        <label class="full">
+          Truck Model or Query
+          <input type="text" id="truck_query" placeholder="e.g. 793F, HD785-7, 75131">
+        </label>
+      </div>
+      <div id="truck_suggestions" class="search-result hidden"></div>
+      <div class="btn-row">
+        <button type="button" id="searchShovelBtn">Search Shovel</button>
+        <button type="button" id="searchTruckBtn">Search Truck</button>
+        <button type="button" id="toPage1Btn">Next: Enter Fleet Data</button>
+      </div>
+    </form>
+    <!-- Combined search result messages -->
+    <div id="searchResult" class="search-result hidden"></div>
+  </div>
+  <!-- Page 4: Total Cost of Ownership (with Salvage) -->
+  <div id="page4" class="page">
+    <h2>Step 4: Cost of Ownership (with Salvage)</h2>
+    <div class="stepnote">
+      Uses the same formulas as your Excel: depreciation with salvage, average yearly investment,
+      15% IIT (editable), and operating costs (manpower, power, lube, maintenance, breakdown).
+    </div>
+    <form id="tcoForm" onsubmit="return false;">
+      <h3>Equipment Details</h3>
+      <div class="inputs">
+        <label>Equipment 1 Name
+          <input type="text" id="eq1_name" placeholder="e.g., Komatsu PC1000-1">
+        </label>
+        <label>Equipment 2 Name
+          <input type="text" id="eq2_name" placeholder="e.g., Komatsu HD785-7">
+        </label>
+        <label>Initial Cost 1 (€)
+          <input type="number" id="eq1_cost" value="700000" step="0.01" min="0">
+        </label>
+        <label>Initial Cost 2 (€)
+          <!-- Cost per unit.  The total cost will be multiplied by the number of units -->
+          <input type="number" id="eq2_cost" value="900000" step="0.01" min="0">
+        </label>
+        <label>Life 1 (years)
+          <input type="number" id="eq1_life" value="10" min="1">
+        </label>
+        <label>Life 2 (years)
+          <input type="number" id="eq2_life" value="17" min="1">
+        </label>
+        <label>Salvage 1 (€)
+          <input type="number" id="eq1_salvage" value="0" step="0.01" min="0">
+        </label>
+        <label>Salvage 2 (€)
+          <input type="number" id="eq2_salvage" value="0" step="0.01" min="0">
+        </label>
+        <!-- Number of units for each equipment.  These fields specify how many
+             identical machines of each type are included in the cost analysis.
+             Cost, power, manpower and other parameters will be multiplied
+             accordingly.  They default to 1 but will be pre‑filled based on
+             your fleet size from Step 1 when you navigate to this page. -->
+        <label>Units of Equipment 1
+          <input type="number" id="eq1_units_count" value="1" min="1">
+        </label>
+        <label>Units of Equipment 2
+          <input type="number" id="eq2_units_count" value="1" min="1">
+        </label>
+      </div>
+      <h3>Operating Assumptions</h3>
+      <div class="inputs">
+        <label>Hours per shift
+          <input type="number" id="op_hours" value="8" step="0.1">
+        </label>
+        <label>Shifts per day
+          <input type="number" id="op_shifts" value="3" step="0.1">
+        </label>
+        <label>Operating days per year
+          <input type="number" id="op_days" value="240" step="0.1">
+        </label>
+        <label>Annual hours (auto)
+          <input type="number" id="op_annual" value="5760" step="1">
+        </label>
+        <label>Interest, Insurance & Tax (%)
+          <input type="number" id="rate_iit" value="15" step="0.01">
+        </label>
+        <label>Discount Rate (%)
+          <input type="number" id="rate_disc" value="10" step="0.01">
+        </label>
+      </div>
+      <h3>Manpower</h3>
+      <div class="inputs">
+        <label>Operators (Eq1)
+          <input type="number" id="op1_ops" value="3" min="0">
+        </label>
+        <label>Operators (Eq2)
+          <input type="number" id="op2_ops" value="3" min="0">
+        </label>
+        <label>Operator Monthly Wage (€)
+          <input type="number" id="op_wage" value="600" step="0.01" min="0">
+        </label>
+        <label>Helper Monthly Wage (€)
+          <input type="number" id="help_wage" value="400" step="0.01" min="0">
+        </label>
+        <label>Helpers (Eq1)
+          <input type="number" id="op1_help" value="3" min="0">
+        </label>
+        <label>Helpers (Eq2)
+          <input type="number" id="op2_help" value="3" min="0">
+        </label>
+      </div>
+      <h3>Power & Consumption</h3>
+      <div class="inputs">
+        <label>Power per hour (Eq1)
+          <input type="number" id="pwr1" value="70" step="0.01" min="0">
+        </label>
+        <label>Power per hour (Eq2)
+          <input type="number" id="pwr2" value="140" step="0.01" min="0">
+        </label>
+        <label>Energy Unit Cost (€ per unit)
+          <input type="number" id="unit_cost" value="1" step="0.0001" min="0">
+        </label>
+      </div>
+      <h3>Cost Percentages</h3>
+      <div class="inputs">
+        <label>Lubrication (% of power)
+          <input type="number" id="lube_pct" value="30" step="0.1" min="0">
+        </label>
+        <label>Maintenance (% of depreciation)
+          <input type="number" id="maint_pct" value="50" step="0.1" min="0">
+        </label>
+        <label>Breakdown (% of cost)
+          <input type="number" id="break_pct" value="2" step="0.1" min="0">
+        </label>
+        <label class="full"></label>
+      </div>
+      <div class="btn-row" style="justify-content:flex-start">
+        <button type="button" id="btnCalcTCO">Calculate Costs</button>
+        <button type="button" id="btnBackToSummary">Back to Summary</button>
+        <!-- Print button allows users to print or save the cost analysis results.  It triggers the browser print dialog. -->
+        <button type="button" id="btnPrintCost">Print Cost Analysis</button>
+        <!-- Download button lets users save a detailed text report of the cost analysis. -->
+        <button type="button" id="btnDownloadCost">Download Cost Report</button>
+      </div>
+    </form>
+    <div id="tcoResult" class="prod-result" style="overflow-x:auto"></div>
+
+    <!-- Button to proceed to Project Economics (Step 5) -->
+    <div class="btn-row" style="justify-content:flex-start;margin-top:0.8em;">
+      <button type="button" id="toEconBtn">Next: Project Economics</button>
+    </div>
+  </div>
+
+  <!-- Page 5: Project Economics -->
+  <div id="page5" class="page">
+    <h2>Step 5: Project Economics</h2>
+    <div class="stepnote">
+      Combine annual costs from Step 4 with production from earlier steps to get cost per cubic metre, INR per cubic metre,
+      ore tonnage, revenue, and annual profit.
+    </div>
+    <form id="econForm" onsubmit="return false;">
+      <div class="inputs">
+        <label>Sets of Equipment 1 (pre‑aggregated)
+          <!--
+            The total annual cost for Equipment 1 computed in Step 4 already
+            reflects all units selected (for example, the number of shovels
+            specified in your fleet).  Use this input to scale that
+            aggregated cost up or down if you want to consider multiple
+            identical fleets of Equipment 1.  Leave at 1 for the default.
+          -->
+          <input type="number" id="eq1_units" value="1" min="0">
+        </label>
+        <label>Sets of Equipment 2 (pre‑aggregated)
+          <!--
+            Step 4 calculates the total annual cost for Equipment 2 based on
+            all units selected in your fleet (e.g., two trucks).  This input
+            represents how many of those pre‑aggregated sets you want to
+            consider in the economics calculation.  Leave it as 1 to use the
+            cost derived in Step 4 without further scaling, or increase it to
+            model additional identical fleets of Equipment 2.
+          -->
+          <input type="number" id="eq2_units" value="1" min="0">
+        </label>
+        <label>EUR → INR rate
+          <input type="number" id="eur_inr" value="100" step="0.01" min="0">
+        </label>
+        <label>Material density (t/m³)
+          <input type="number" id="density" value="1.6" step="0.01" min="0.1">
+        </label>
+        <label>Stripping Ratio (waste:ore)
+          <input type="number" id="sr" value="7" step="0.1" min="0.1">
+        </label>
+        <label>Production basis
+          <select id="basis">
+            <option value="waste">Total production is WASTE only</option>
+            <option value="total">Total production includes ORE + WASTE</option>
+          </select>
+        </label>
+        <label>Ore price (€/t)
+          <input type="number" id="ore_price" value="10" step="0.01" min="0">
+        </label>
+        <label class="full">(Read-only) Annual production (m³/yr)
+          <input type="number" id="annual_prod_m3" readonly>
+        </label>
+      </div>
+      <div class="btn-row" style="justify-content:flex-start">
+        <button type="button" id="btnCalcEcon">Calculate Economics</button>
+        <button type="button" id="btnBackToStep4">Back to Step 4</button>
+        <button type="button" id="btnDownloadEcon">Download Economics Report</button>
+        <!-- New button for full project report including all steps -->
+        <button type="button" id="btnDownloadProject">Download Full Project Report</button>
+      </div>
+    </form>
+    <div class="prod-result hidden" id="econResult"></div>
+  </div>
+
+  <!-- Page 1: Inputs + MF -->
+  <div id="page1" class="page">
+    <h2>Step 1: Enter Your Fleet Data</h2>
+    <div class="stepnote">Fill in shovel and truck info. <b>Matching Factor (MF)</b> will update instantly to help you balance your fleet.</div>
+    <form id="calcForm1" autocomplete="off" onsubmit="return false;">
+      <div class="inputs">
+        <label>Number of Shovels <input type="number" id="shovel_count" value="1" min="1"></label>
+        <label>Shovel Bucket (m³) <input type="number" id="bucket_capacity" value="5.4" step="0.01" min="0.1"></label>
+        <label>Shovel Cycle Time (sec) <input type="number" id="shovel_cycle_time" value="27" min="1"></label>
+        <label>Truck Capacity (m³) <input type="number" id="truck_capacity" value="60" step="0.1" min="1"></label>
+        <label>Haul Distance (km) <input type="number" id="haul_distance" value="0.2" step="0.01" min="0"></label>
+        <label>Haul Speed (km/h) <input type="number" id="haul_speed" value="10" step="0.1" min="1"></label>
+        <label>Return Speed (km/h) <input type="number" id="return_speed" value="15" step="0.1" min="1"></label>
+        <label>Dump Time (sec) <input type="number" id="dump_time" value="54" min="0"></label>
+        <label>Idle Time (sec) <input type="number" id="idle_time" value="127" min="0"></label>
+        <label class="full">Number of Trucks <input type="number" id="truck_count" value="1" min="1"></label>
+      </div>
+      <div class="btn-row">
+        <button type="button" id="toPage2Btn">Next: Production</button>
+      </div>
+    </form>
+    <div class="mf-result hidden" id="mfResult"></div>
+  </div>
+
+  <!-- Page 2: Production Calculation -->
+  <div id="page2" class="page">
+    <h2>Step 2: Production Factors</h2>
+    <div class="stepnote">
+      Adjust production factors to match real field conditions and see your estimated outputs.  For simplicity the calculator assumes that the rated capacities provided by the OEM are in bank cubic metres (BCM).  To estimate loose production, both the shovel and truck capacities are multiplied by the swell factor and the bucket fill factor before calculating hourly production.  The machine travel &amp; positioning factor (M) further adjusts output to account for repositioning during each cycle.
+    </div>
+    <form id="calcForm2" autocomplete="off" onsubmit="return false;">
+      <div class="inputs">
+        <label>Swell Factor <input type="number" id="swell_factor" value="1.2" step="0.01" min="1"></label>
+        <label>Bucket Fill Factor <input type="number" id="bucket_fill_factor" value="1.15" step="0.01" min="0.1" max="1.2"></label>
+        <!-- Machine travel and positioning factor (M) accounts for the time spent moving and positioning the excavator or dragline during each cycle.  Dragline productivity analyses recommend a value around 0.8【279026639092705†L101-L105】; however, for general shovel–truck systems the effect is often minimal, so a default of 1.0 is provided. -->
+        <label>Machine Travel &amp; Positioning Factor (M) <input type="number" id="machine_factor" value="1" step="0.01" min="0.1" max="1"></label>
+        <label>Shovel Availability <input type="number" id="shovel_avail" value="0.73" step="0.01" min="0" max="1"></label>
+        <label>Shovel Utilization <input type="number" id="shovel_util" value="0.6958" step="0.0001" min="0" max="1"></label>
+        <label>Truck Availability <input type="number" id="truck_avail" value="0.73" step="0.01" min="0" max="1"></label>
+        <label>Truck Utilization <input type="number" id="truck_util" value="0.6958" step="0.0001" min="0" max="1"></label>
+        <label>Working Hours/Shift <input type="number" id="work_hr_shift" value="8" step="0.1" min="1"></label>
+        <label>Shifts/Day <input type="number" id="num_shifts" value="3" min="1"></label>
+        <label>Total Working Days <input type="number" id="work_days" value="240" min="1"></label>
+        <!-- Removed advanced basis and loading controls for simplicity.  Capacities are assumed to be given in BCM. -->
+      </div>
+      <div class="btn-row">
+        <button type="button" id="toPage3Btn">Next: Summary</button>
+      </div>
+    </form>
+    <div class="prod-result hidden" id="prodResult"></div>
+  </div>
+
+  <!-- Page 3: Summary + Get Full Report -->
+  <div id="page3" class="page">
+    <h2>Step 3: Summary & Request Full Report</h2>
+    <div class="stepnote">Review your fleet highlights. Submit below to receive a detailed report in your email.</div>
+    <div class="sum-result" id="sumResult"></div>
+    <!-- Buttons for report download and proceeding to cost of ownership analysis -->
+    <div class="btn-row" style="justify-content:flex-start;margin-bottom:0.8em;">
+      <button type="button" id="downloadReportBtn">Download Complete Report</button>
+      <button type="button" id="toCostBtn">Next: Cost of Ownership</button>
+    </div>
+    <div class="form-panel" id="requestPanel">
+      <form id="requestForm">
+        <label for="name">Name *</label>
+        <input type="text" id="name" name="name" required>
+        <label for="surname">Surname *</label>
+        <input type="text" id="surname" name="surname" required>
+        <label for="email">Email *</label>
+        <input type="email" id="email" name="email" required>
+        <button type="submit">Get Full Report</button>
+      </form>
+      <div class="success" id="successMsg">Report sent! Please check your email.<br>For more details, contact <b>AJAYS8815@gmail.com</b></div>
+      <div class="error" id="errorMsg">There was a problem sending your report. Please try again.</div>
+    </div>
+  </div>
+</div>
+<script>
+function $(id) { return document.getElementById(id); }
+let inputData = {}, prodData = {}, mfData = {};
+
+// ----------- Step 0: AI search and suggestions -----------
+function showPage(page) {
+  // Hide all pages then show the requested page.  Include page4 for cost analysis
+  // and page5 for project economics.
+  ['page0','page1','page2','page3','page4','page5'].forEach(x => {
+    const el = $(x);
+    if (el) el.classList.remove('active');
+  });
+  const target = $(page);
+  if (target) target.classList.add('active');
+}
+
+// Dataset of known equipment specs. Values are approximate and serve as a starting point.
+const oemData = {
+  "Liebherr": [
+    {type: "Shovel", model: "R9100", bucket: 7.5, cycle: 30, capacity: 60, hp: 940},
+    {type: "Shovel", model: "R9150", bucket: 8.5, cycle: 32, capacity: 70, hp: 1029},
+    {type: "Shovel", model: "R9350", bucket: 18, cycle: 35, capacity: 180, hp: 1675},
+    {type: "Shovel", model: "R9400", bucket: 22, cycle: 30, capacity: 240, hp: 1810},
+    {type: "Shovel", model: "R996B", bucket: 36, cycle: 35, capacity: 360, hp: 2240},
+    {type: "Shovel", model: "R9800", bucket: 42, cycle: 38, capacity: 400, hp: 4000},
+    {type: "Shovel", model: "HS8300", bucket: 10, cycle: 28, capacity: 120, hp: 1675}
+  ],
+  "Caterpillar": [
+    {type: "Shovel", model: "6060", bucket: 38, cycle: 35, capacity: 230, hp: 3360},
+    {type: "Shovel", model: "6015", bucket: 12, cycle: 32, capacity: 150, hp: 810},
+    {type: "Shovel", model: "6090", bucket: 52, cycle: 30, capacity: 360, hp: 4500},
+    {type: "Truck",  model: "793F", bucket: null, cycle: null, capacity: 110, hp: 2500}
+  ],
+  "Komatsu": [
+    {type: "Shovel", model: "PC7000", bucket: 38, cycle: 38, capacity: 230, hp: 3350},
+    {type: "Shovel", model: "PC5500", bucket: 29, cycle: 35, capacity: 200, hp: 2520},
+    {type: "Shovel", model: "PC2000-8", bucket: 15, cycle: 28, capacity: 100, hp: 1046},
+    {type: "Shovel", model: "PC1000-1", bucket: 5, cycle: 30, capacity: 60, hp: 450,
+      cost: 700000, life: 10, power: 70},
+    // For the HD785‑7 truck we store the cost and life per unit.  The user may have multiple
+    // trucks, so the total equipment cost will be cost × truck count.  Power is per unit.
+    {type: "Truck",  model: "HD785-7", bucket: null, cycle: null, capacity: 60, hp: 1200,
+      cost: 900000, life: 17, power: 70}
+  ],
+  "Hitachi": [
+    {type: "Shovel", model: "EX5600", bucket: 29, cycle: 37, capacity: 180, hp: 2700},
+    {type: "Shovel", model: "EX2600", bucket: 17, cycle: 33, capacity: 120, hp: 1880},
+    {type: "Truck",  model: "EH5000AC-3", bucket: null, cycle: null, capacity: 170, hp: 2500}
+  ],
+  "Belaz": [
+    {type: "Truck", model: "75131", bucket: null, cycle: null, capacity: 110, hp: 2330},
+    {type: "Truck", model: "75306", bucket: null, cycle: null, capacity: 136, hp: 2850},
+    {type: "Truck", model: "75605", bucket: null, cycle: null, capacity: 290, hp: 3600}
+  ]
+};
+
+// Variables to hold user selections from Step 0
+let selectedShovel = null;
+let selectedTruck = null;
+
+// Populate OEM dropdowns for both shovel and truck
+function initDropdowns() {
+  const shOem = $('shovel_oem');
+  const trOem = $('truck_oem');
+  // Remove existing options except the first placeholder
+  while (shOem.options.length > 1) shOem.remove(1);
+  while (trOem.options.length > 1) trOem.remove(1);
+  Object.keys(oemData).forEach(oem => {
+    const opt1 = document.createElement('option');
+    opt1.value = oem;
+    opt1.textContent = oem;
+    shOem.appendChild(opt1);
+    const opt2 = document.createElement('option');
+    opt2.value = oem;
+    opt2.textContent = oem;
+    trOem.appendChild(opt2);
+  });
+}
+
+// Display shovel suggestions based on selected OEM
+function displayShovelSuggestions() {
+  const oem = $('shovel_oem').value;
+  const suggDiv = $('shovel_suggestions');
+  suggDiv.innerHTML = '';
+  if (!oem) {
+    suggDiv.classList.add('hidden');
+    return;
+  }
+  const models = (oemData[oem] || []).filter(item => item.type === 'Shovel');
+  if (models.length === 0) {
+    suggDiv.textContent = 'No known shovels for this OEM.';
+    suggDiv.classList.remove('hidden');
+    return;
+  }
+  const list = document.createElement('ul');
+  list.style.listStyleType = 'none';
+  list.style.paddingLeft = '0';
+  models.forEach(item => {
+    const li = document.createElement('li');
+    li.style.cursor = 'pointer';
+    li.style.padding = '0.25em 0';
+    li.style.color = '#283593';
+    li.textContent = item.model;
+    li.onclick = () => applyShovelSpecs(oem, item.model);
+    list.appendChild(li);
+  });
+  suggDiv.innerHTML = '<strong>Suggested Shovels:</strong>';
+  suggDiv.appendChild(list);
+  suggDiv.classList.remove('hidden');
+}
+
+// Display truck suggestions based on selected OEM
+function displayTruckSuggestions() {
+  const oem = $('truck_oem').value;
+  const suggDiv = $('truck_suggestions');
+  suggDiv.innerHTML = '';
+  if (!oem) {
+    suggDiv.classList.add('hidden');
+    return;
+  }
+  const models = (oemData[oem] || []).filter(item => item.type === 'Truck');
+  if (models.length === 0) {
+    suggDiv.textContent = 'No known trucks for this OEM.';
+    suggDiv.classList.remove('hidden');
+    return;
+  }
+  const list = document.createElement('ul');
+  list.style.listStyleType = 'none';
+  list.style.paddingLeft = '0';
+  models.forEach(item => {
+    const li = document.createElement('li');
+    li.style.cursor = 'pointer';
+    li.style.padding = '0.25em 0';
+    li.style.color = '#283593';
+    li.textContent = item.model;
+    li.onclick = () => applyTruckSpecs(oem, item.model);
+    list.appendChild(li);
+  });
+  suggDiv.innerHTML = '<strong>Suggested Trucks:</strong>';
+  suggDiv.appendChild(list);
+  suggDiv.classList.remove('hidden');
+}
+
+// Apply shovel specs and store selection
+function applyShovelSpecs(oem, modelName) {
+  const entry = (oemData[oem] || []).find(item => item.model.toLowerCase() === modelName.toLowerCase());
+  if (!entry) return;
+  selectedShovel = entry;
+  // Pre-fill fields but do not navigate
+  if (entry.bucket != null) $('bucket_capacity').value = entry.bucket;
+  if (entry.cycle != null) $('shovel_cycle_time').value = entry.cycle;
+  // If no truck selected, use this shovel's matched capacity as a default for truck capacity
+  if (!selectedTruck && entry.capacity != null) $('truck_capacity').value = entry.capacity;
+  $('shovel_query').value = entry.model;
+  $('shovel_suggestions').classList.add('hidden');
+  $('searchResult').classList.add('hidden');
+}
+
+// Apply truck specs and store selection
+function applyTruckSpecs(oem, modelName) {
+  const entry = (oemData[oem] || []).find(item => item.model.toLowerCase() === modelName.toLowerCase());
+  if (!entry) return;
+  selectedTruck = entry;
+  // Pre-fill truck capacity
+  if (entry.capacity != null) $('truck_capacity').value = entry.capacity;
+  $('truck_query').value = entry.model;
+  $('truck_suggestions').classList.add('hidden');
+  $('searchResult').classList.add('hidden');
+}
+
+// Search dataset or online for a shovel
+function searchShovel() {
+  const query = $('shovel_query').value.trim().toLowerCase();
+  const resultDiv = $('searchResult');
+  resultDiv.classList.remove('hidden');
+  resultDiv.innerHTML = '';
+  if (!query) {
+    resultDiv.innerHTML = 'Please enter a shovel model or select an OEM for suggestions.';
+    return;
+  }
+  // Search dataset for any shovel that matches query
+  let found = null;
+  for (const [oKey, models] of Object.entries(oemData)) {
+    for (const item of models) {
+      if (item.type === 'Shovel' && item.model.toLowerCase().includes(query)) {
+        found = {oem: oKey, entry: item};
+        break;
+      }
+    }
+    if (found) break;
+  }
+  if (found) {
+    applyShovelSpecs(found.oem, found.entry.model);
+    resultDiv.innerHTML = `<strong>Found shovel:</strong> ${found.entry.model} (OEM: ${found.oem})`;
+    return;
+  }
+  // If not found in dataset, fetch from DuckDuckGo as fallback
+  resultDiv.innerHTML = `Searching for <strong>${query}</strong> shovel specs online...`;
+  fetch("https://api.duckduckgo.com/?q=" + encodeURIComponent(query + " shovel specs cycle time bucket size capacity") + "&format=json")
+    .then(resp => resp.json())
+    .then(data => {
+      let result = "";
+      if (data && data.RelatedTopics && data.RelatedTopics.length > 0) {
+        result += data.RelatedTopics[0].Text || "";
+      }
+      if (!result && data && data.Heading) {
+        result = data.Heading;
+      }
+      if (!result) result = "No direct specs found. Please try a different query.";
+      resultDiv.innerHTML = `<strong>Result:</strong> ${result}`;
+      // Try to parse numbers for bucket, cycle, capacity
+      let bucket = result.match(/bucket[\s:]+(\d+(\.\d+)?)/i);
+      let cycle = result.match(/cycle[\s:]+(\d+(\.\d+)?)/i);
+      let cap = result.match(/capacity[\s:]+(\d+(\.\d+)?)/i);
+      if (bucket) $('bucket_capacity').value = bucket[1];
+      if (cycle) $('shovel_cycle_time').value = cycle[1];
+      if (cap && !selectedTruck) $('truck_capacity').value = cap[1];
+    })
+    .catch(() => {
+      resultDiv.innerHTML = 'Could not retrieve specs. Please try again.';
+    });
+}
+
+// Search dataset or online for a truck
+function searchTruck() {
+  const query = $('truck_query').value.trim().toLowerCase();
+  const resultDiv = $('searchResult');
+  resultDiv.classList.remove('hidden');
+  resultDiv.innerHTML = '';
+  if (!query) {
+    resultDiv.innerHTML = 'Please enter a truck model or select an OEM for suggestions.';
+    return;
+  }
+  let found = null;
+  for (const [oKey, models] of Object.entries(oemData)) {
+    for (const item of models) {
+      if (item.type === 'Truck' && item.model.toLowerCase().includes(query)) {
+        found = {oem: oKey, entry: item};
+        break;
+      }
+    }
+    if (found) break;
+  }
+  if (found) {
+    applyTruckSpecs(found.oem, found.entry.model);
+    resultDiv.innerHTML = `<strong>Found truck:</strong> ${found.entry.model} (OEM: ${found.oem})`;
+    return;
+  }
+  resultDiv.innerHTML = `Searching for <strong>${query}</strong> truck specs online...`;
+  fetch("https://api.duckduckgo.com/?q=" + encodeURIComponent(query + " dump truck specs capacity horsepower") + "&format=json")
+    .then(resp => resp.json())
+    .then(data => {
+      let result = "";
+      if (data && data.RelatedTopics && data.RelatedTopics.length > 0) {
+        result += data.RelatedTopics[0].Text || "";
+      }
+      if (!result && data && data.Heading) {
+        result = data.Heading;
+      }
+      if (!result) result = "No direct specs found. Please try a different query.";
+      resultDiv.innerHTML = `<strong>Result:</strong> ${result}`;
+      // Attempt to extract capacity
+      let cap = result.match(/capacity[\s:]+(\d+(\.\d+)?)/i);
+      if (cap) $('truck_capacity').value = cap[1];
+    })
+    .catch(() => {
+      resultDiv.innerHTML = 'Could not retrieve specs. Please try again.';
+    });
+}
+
+// Update suggestions when OEM dropdowns change
+$('shovel_oem').addEventListener('change', () => {
+  $('shovel_query').value = '';
+  displayShovelSuggestions();
+  $('searchResult').classList.add('hidden');
+});
+$('truck_oem').addEventListener('change', () => {
+  $('truck_query').value = '';
+  displayTruckSuggestions();
+  $('searchResult').classList.add('hidden');
+});
+
+// Bind search buttons
+$('searchShovelBtn').onclick = function() {
+  searchShovel();
+};
+$('searchTruckBtn').onclick = function() {
+  searchTruck();
+};
+
+// Proceed to Step 1, applying selected specs
+$('toPage1Btn').onclick = function() {
+  // If the user selected a shovel, ensure its specs are applied
+  if (selectedShovel) {
+    if (selectedShovel.bucket != null) $('bucket_capacity').value = selectedShovel.bucket;
+    if (selectedShovel.cycle != null) $('shovel_cycle_time').value = selectedShovel.cycle;
+    // Use its default truck capacity only if no truck selected yet
+    if (!selectedTruck && selectedShovel.capacity != null) $('truck_capacity').value = selectedShovel.capacity;
+  }
+  // If the user selected a truck, apply its capacity
+  if (selectedTruck && selectedTruck.capacity != null) {
+    $('truck_capacity').value = selectedTruck.capacity;
+  }
+  $('searchResult').classList.add('hidden');
+  $('shovel_suggestions').classList.add('hidden');
+  $('truck_suggestions').classList.add('hidden');
+  showPage('page1');
+  calculateMF();
+};
+
+// Initialize dropdowns on page load
+document.addEventListener('DOMContentLoaded', initDropdowns);
+
+// ----------- Step 1: MF calculation -----------
+function calculateMF() {
+  inputData = {
+    shovelCount: parseFloat($('shovel_count').value),
+    bucketCap: parseFloat($('bucket_capacity').value),
+    cycle: parseFloat($('shovel_cycle_time').value),
+    truckCap: parseFloat($('truck_capacity').value),
+    haulDist: parseFloat($('haul_distance').value),
+    haulSpeed: parseFloat($('haul_speed').value),
+    returnSpeed: parseFloat($('return_speed').value),
+    dump: parseFloat($('dump_time').value),
+    idle: parseFloat($('idle_time').value),
+    trucks: parseInt($('truck_count').value)
+  };
+  const buckets = inputData.truckCap / inputData.bucketCap;
+  const loadTime = buckets * inputData.cycle;
+  const haulTime = (inputData.haulDist / inputData.haulSpeed) * 3600;
+  const returnTime = (inputData.haulDist / inputData.returnSpeed) * 3600;
+  const cycleTime = loadTime + haulTime + inputData.dump + inputData.idle + returnTime;
+  const mf = (inputData.trucks * loadTime) / (cycleTime * inputData.shovelCount);
+  let mfClass = "ideal", mfMsg = "Fleet perfectly matched (MF ≈ 1).", suggestion = "Your fleet is balanced for optimal productivity.";
+  if (mf < 0.95) { mfClass = "low"; mfMsg = "Shovel idle risk (MF < 1)."; suggestion = "Increase truck count or speed to optimize shovel utilization."; }
+  else if (mf > 1.05) { mfClass = "high"; mfMsg = "Truck idle risk (MF > 1)."; suggestion = "Reduce truck count or increase shovel parameters for better utilization."; }
+  mfData = {mf: mf.toFixed(2), mfClass, mfMsg, suggestion, buckets: buckets.toFixed(2), loadTime: loadTime.toFixed(1), haulTime: haulTime.toFixed(1), returnTime: returnTime.toFixed(1), cycleTime: cycleTime.toFixed(1)};
+  $('mfResult').classList.remove("hidden");
+  $('mfResult').innerHTML = `<div class="mf ${mfClass}">Matching Factor (MF): <b>${mf.toFixed(2)}</b> &mdash; ${mfMsg}</div>
+    <div style="color:#466;">${suggestion}</div>`;
+}
+
+// Auto-calculate MF as user types
+document.querySelectorAll('#calcForm1 input').forEach(el => {
+  el.addEventListener('input', calculateMF);
+});
+
+$('toPage2Btn').onclick = function() {
+  calculateMF();
+  showPage('page2');
+};
+$('toPage3Btn').onclick = function() {
+  calculateProduction();
+  showPage('page3');
+  showSummary();
+};
+
+// -------------------- Report generation (Step 3) --------------------
+// When the user clicks the "Download Complete Report" button, compile all inputs and outputs
+// from Step 0 through Step 3 into a plain text report.  This report includes selected equipment,
+// user‑entered inputs, calculated matching factor and production details, the formulas used, and
+// personalized suggestions based on the results.  The report is packaged as a downloadable
+// text file using a Blob and data URI.
+
+function downloadReport() {
+  // Ensure the latest calculations are available.  Calling these functions populates
+  // mfData and prodData if they have not been computed yet.
+  try {
+    calculateMF();
+    calculateProduction();
+    showSummary();
+  } catch (e) {
+    // If an error occurs (e.g. missing inputs), ignore and proceed with available data.
+  }
+  // Compile report text
+  let report = '';
+  report += 'Ultimate Shovel‑Truck Production Calculator Report\n';
+  report += '====================================================\n\n';
+  // Step 0: equipment selection
+  report += 'Step 0 – Equipment Selection\n';
+  const shovelName = (selectedShovel && selectedShovel.model) ? selectedShovel.model : ($('shovel_query').value || 'N/A');
+  const shovelOEM = $('shovel_oem').value || 'N/A';
+  report += '  Shovel OEM: ' + shovelOEM + '\n';
+  report += '  Shovel Model: ' + shovelName + '\n';
+  if (selectedShovel) {
+    report += '    Bucket Capacity: ' + (selectedShovel.bucket != null ? selectedShovel.bucket + ' m³' : 'N/A') + '\n';
+    report += '    Cycle Time: ' + (selectedShovel.cycle != null ? selectedShovel.cycle + ' sec' : 'N/A') + '\n';
+    report += '    Recommended Truck Capacity: ' + (selectedShovel.capacity != null ? selectedShovel.capacity + ' m³' : 'N/A') + '\n';
+    report += '    Engine Power: ' + (selectedShovel.hp != null ? selectedShovel.hp + ' hp' : 'N/A') + '\n';
+  }
+  const truckName = (selectedTruck && selectedTruck.model) ? selectedTruck.model : ($('truck_query').value || 'N/A');
+  const truckOEM = $('truck_oem').value || 'N/A';
+  report += '  Truck OEM: ' + truckOEM + '\n';
+  report += '  Truck Model: ' + truckName + '\n';
+  if (selectedTruck) {
+    report += '    Capacity: ' + (selectedTruck.capacity != null ? selectedTruck.capacity + ' m³' : 'N/A') + '\n';
+    report += '    Engine Power: ' + (selectedTruck.hp != null ? selectedTruck.hp + ' hp' : 'N/A') + '\n';
+  }
+  report += '\n';
+  // Step 1: user inputs and matching factor calculations
+  report += 'Step 1 – Fleet Data & Matching Factor\n';
+  report += '  Number of Shovels: ' + $('shovel_count').value + '\n';
+  report += '  Shovel Bucket Capacity: ' + $('bucket_capacity').value + ' m³\n';
+  report += '  Shovel Cycle Time: ' + $('shovel_cycle_time').value + ' sec\n';
+  report += '  Truck Capacity: ' + $('truck_capacity').value + ' m³\n';
+  report += '  Haul Distance: ' + $('haul_distance').value + ' km\n';
+  report += '  Haul Speed: ' + $('haul_speed').value + ' km/h\n';
+  report += '  Return Speed: ' + $('return_speed').value + ' km/h\n';
+  report += '  Dump Time: ' + $('dump_time').value + ' sec\n';
+  report += '  Idle Time: ' + $('idle_time').value + ' sec\n';
+  report += '  Number of Trucks: ' + $('truck_count').value + '\n\n';
+  // Matching Factor results (if available)
+  if (typeof mfData !== 'undefined' && mfData.mf) {
+    report += '  Matching Factor (MF): ' + mfData.mf + '\n';
+    report += '    Classification: ' + mfData.mfMsg + '\n';
+    report += '    Suggestion: ' + mfData.suggestion + '\n';
+    report += '  Cycle Calculations:\n';
+    report += '    Buckets per Truck = truck capacity / shovel bucket capacity\n';
+    report += '    Buckets per Truck: ' + mfData.buckets + '\n';
+    report += '    Load Time (sec) = buckets * cycle time = ' + mfData.loadTime + '\n';
+    report += '    Haul Time (sec) = (haul distance / haul speed) * 3600 = ' + mfData.haulTime + '\n';
+    report += '    Return Time (sec) = (haul distance / return speed) * 3600 = ' + mfData.returnTime + '\n';
+    report += '    Cycle Time (sec) = load time + haul time + dump time + idle time + return time = ' + mfData.cycleTime + '\n\n';
+  }
+  // Step 2: production factors and results
+  report += 'Step 2 – Production Factors & Outputs\n';
+  report += '  Swell Factor: ' + $('swell_factor').value + '\n';
+  report += '  Bucket Fill Factor: ' + $('bucket_fill_factor').value + '\n';
+  report += '  Shovel Availability: ' + $('shovel_avail').value + '\n';
+  report += '  Shovel Utilization: ' + $('shovel_util').value + '\n';
+  report += '  Truck Availability: ' + $('truck_avail').value + '\n';
+  report += '  Truck Utilization: ' + $('truck_util').value + '\n';
+  report += '  Working Hours per Shift: ' + $('work_hr_shift').value + ' h\n';
+  report += '  Shifts per Day: ' + $('num_shifts').value + '\n';
+  report += '  Total Working Days: ' + $('work_days').value + '\n';
+  // OEM capacities are assumed to be provided in bank cubic metres (BCM) and are converted once to loose volumes using the swell factor.\n\n
+  if (typeof prodData !== 'undefined' && prodData.Q_shovel_adj != null) {
+    report += '  Production Rates:\n';
+    report += '    Shovel Hourly Production (adjusted): ' + prodData.Q_shovel_adj.toFixed(2) + ' m³/hr\n';
+    report += '    Truck Hourly Production (all trucks): ' + prodData.Q_truck_adj.toFixed(2) + ' m³/hr\n';
+    report += '    Shovel Production per Shift: ' + prodData.Q_shovel_shift.toFixed(2) + ' m³\n';
+    report += '    Shovel Production per Day: ' + prodData.Q_shovel_day.toFixed(2) + ' m³\n';
+    report += '    Shovel Production per Year: ' + prodData.Q_shovel_year.toFixed(2) + ' m³\n';
+    report += '    Truck Production per Shift: ' + prodData.Q_truck_shift.toFixed(2) + ' m³\n';
+    report += '    Truck Production per Day: ' + prodData.Q_truck_day.toFixed(2) + ' m³\n';
+    report += '    Truck Production per Year: ' + prodData.Q_truck_year.toFixed(2) + ' m³\n\n';
+    report += '  System Bottleneck: ' + prodData.bottleneck + '\n';
+    report += '  System‑Limiting Annual Production: ' + prodData.sys_total.toFixed(2) + ' m³\n\n';
+  }
+  // Summary and personalized recommendation
+  report += 'Step 3 – Summary & Expert Recommendation\n';
+  if (typeof mfData !== 'undefined' && mfData.mf) {
+    report += '  The Matching Factor (MF) is ' + mfData.mf + ', indicating ' + mfData.mfMsg + '\n';
+    if (mfData.mfClass === 'low') {
+      report += '  Recommendation: Increase the number of trucks or improve haul speed to reduce shovel idle time.\n';
+    } else if (mfData.mfClass === 'high') {
+      report += '  Recommendation: Reduce the number of trucks or increase shovel productivity to reduce truck idle time.\n';
+    } else {
+      report += '  Recommendation: Your fleet is well balanced. Maintain current parameters for optimal efficiency.\n';
+    }
+  }
+  if (typeof prodData !== 'undefined' && prodData.bottleneck) {
+    report += '  Bottleneck Analysis: The system bottleneck is the ' + prodData.bottleneck.toLowerCase() + '.\n';
+    report += '  Focus on optimizing this bottleneck to increase overall production.\n';
+  }
+  report += '\nAs the world’s most awarded mining engineer, my aim is to provide you with precise and actionable insights.\n';
+  report += 'This report covers every measurement and calculation used, ensuring accuracy and transparency.\n\n';
+  // Create and download the report as a text file
+  const blob = new Blob([report], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'shovel_truck_report.txt';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+// Bind the download button when the DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  const reportBtn = document.getElementById('downloadReportBtn');
+  if (reportBtn) {
+    reportBtn.addEventListener('click', downloadReport);
+  }
+  const toCostBtn = document.getElementById('toCostBtn');
+  if (toCostBtn) {
+    toCostBtn.addEventListener('click', function() {
+      // Preload operating hours from Step 2 fields if available
+      if ($('work_hr_shift') && $('num_shifts') && $('work_days')) {
+        const h = parseFloat($('work_hr_shift').value) || 8;
+        const s = parseFloat($('num_shifts').value) || 3;
+        const d = parseFloat($('work_days').value) || 240;
+        const annual = h * s * d;
+        if ($('op_hours')) $('op_hours').value = h;
+        if ($('op_shifts')) $('op_shifts').value = s;
+        if ($('op_days')) $('op_days').value = d;
+        if ($('op_annual')) $('op_annual').value = annual;
+      }
+      // Pre-fill number of units based on Step 1 inputs, if available
+      if ($('shovel_count') && $('eq1_units_count')) {
+        const sc = parseFloat($('shovel_count').value) || 1;
+        $('eq1_units_count').value = sc;
+      }
+      if ($('truck_count') && $('eq2_units_count')) {
+        const tc = parseFloat($('truck_count').value) || 1;
+        $('eq2_units_count').value = tc;
+      }
+      // Show the cost of ownership page (now Step 4)
+      showPage('page4');
+    });
+  }
+  // Back button for the interactive cost page
+  const backBtnNew = document.getElementById('btnBackToSummary');
+  if (backBtnNew) {
+    backBtnNew.addEventListener('click', function() {
+      showPage('page3');
+    });
+  }
+});
+
+// ----------- Step 2: Production calculation -----------
+function calculateProduction() {
+  prodData = {
+    SF: parseFloat($('swell_factor').value),
+    BF: parseFloat($('bucket_fill_factor').value),
+    AvSh: parseFloat($('shovel_avail').value),
+    UtSh: parseFloat($('shovel_util').value),
+    AvTr: parseFloat($('truck_avail').value),
+    UtTr: parseFloat($('truck_util').value),
+    H_shift: parseFloat($('work_hr_shift').value),
+    N_shifts: parseInt($('num_shifts').value),
+    D_working: parseInt($('work_days').value)
+  };
+  // Machine travel & positioning factor: reduces production to account for time spent moving and
+  // positioning the equipment.  Defaults to 1 if not provided.  According to dragline
+  // productivity studies a typical value is 0.8【279026639092705†L101-L105】.
+  const M = parseFloat($('machine_factor') ? $('machine_factor').value : '1') || 1;
+  // Convert capacities to loose volumes by multiplying by swell and fill factors once.
+  // Because OEM specifications are assumed to be in bank cubic metres (BCM), both
+  // the shovel bucket and the truck body capacities are converted to loose cubic
+  // metres (LCM) by multiplying by the swell factor.  The bucket fill factor
+  // accounts for how fully the bucket is filled and is applied to both
+  // capacities here for consistency with user expectations.
+  const bucketLCM = inputData.bucketCap * prodData.BF * prodData.SF;
+  const bodyLCM   = inputData.truckCap  * prodData.BF * prodData.SF;
+  // Hourly shovel and truck production in LCM
+  const Q_shovel_hr = (bucketLCM * 3600) / inputData.cycle;
+  const Q_truck_hr  = (bodyLCM  * 3600) / mfData.cycleTime;
+  // Adjust for availability, utilisation, number of units and machine factor
+  let Q_shovel_adj = Q_shovel_hr * prodData.AvSh * prodData.UtSh * inputData.shovelCount * M;
+  let Q_truck_adj  = Q_truck_hr  * prodData.AvTr * prodData.UtTr  * inputData.trucks      * M;
+  const Q_shovel_shift = Q_shovel_adj * prodData.H_shift;
+  const Q_shovel_day = Q_shovel_shift * prodData.N_shifts;
+  const Q_shovel_year = Q_shovel_day * prodData.D_working;
+  const Q_truck_shift = Q_truck_adj * prodData.H_shift;
+  const Q_truck_day = Q_truck_shift * prodData.N_shifts;
+  const Q_truck_year = Q_truck_day * prodData.D_working;
+  const bottleneck = Q_shovel_year < Q_truck_year ? "Shovel" : "Truck";
+  const sys_total = Math.min(Q_shovel_year, Q_truck_year);
+
+  prodData.Q_shovel_adj = Q_shovel_adj;
+  prodData.Q_truck_adj = Q_truck_adj;
+  prodData.Q_shovel_shift = Q_shovel_shift;
+  prodData.Q_shovel_day = Q_shovel_day;
+  prodData.Q_shovel_year = Q_shovel_year;
+  prodData.Q_truck_shift = Q_truck_shift;
+  prodData.Q_truck_day = Q_truck_day;
+  prodData.Q_truck_year = Q_truck_year;
+  prodData.bottleneck = bottleneck;
+  prodData.sys_total = sys_total;
+
+  // Store machine factor for reporting
+  prodData.M_factor = M;
+
+  $('prodResult').classList.remove("hidden");
+  $('prodResult').innerHTML =
+    `<b>Production Figures</b><br>
+    Shovel Hourly: <b>${Q_shovel_adj.toLocaleString(undefined,{maximumFractionDigits:2})} m³/hr</b><br>
+    Truck Hourly (All Trucks): <b>${Q_truck_adj.toLocaleString(undefined,{maximumFractionDigits:2})} m³/hr</b><br>
+    <br>Shovel Shift/Day/Year: <b>${Q_shovel_shift.toLocaleString(undefined,{maximumFractionDigits:2})} m³</b> /
+    <b>${Q_shovel_day.toLocaleString(undefined,{maximumFractionDigits:2})} m³</b> /
+    <b>${Q_shovel_year.toLocaleString(undefined,{maximumFractionDigits:2})} m³</b>
+    <br>Truck Shift/Day/Year: <b>${Q_truck_shift.toLocaleString(undefined,{maximumFractionDigits:2})} m³</b> /
+    <b>${Q_truck_day.toLocaleString(undefined,{maximumFractionDigits:2})} m³</b> /
+    <b>${Q_truck_year.toLocaleString(undefined,{maximumFractionDigits:2})} m³</b>
+    <br><b>System Bottleneck:</b> ${bottleneck}
+    <br><b>System-Limiting Annual Production:</b> <span style="color:#1a237e;font-weight:700">${sys_total.toLocaleString(undefined,{maximumFractionDigits:2})} m³</span>
+    <br><b>Fleet Match Factor (MF):</b> ${mfData.mf} (${mfData.mf < 0.95 ? "Shovel idle risk" : mfData.mf > 1.05 ? "Truck idle risk" : "Fleet balanced"})`;
+}
+
+// ----------- Step 3: Summary/request report -----------
+function showSummary() {
+  $('sumResult').innerHTML = `
+    <div class="mf ${mfData.mfClass}">Matching Factor (MF): <b>${mfData.mf}</b> &mdash; ${mfData.mfMsg}</div>
+    <div><b>System Bottleneck:</b> ${prodData.bottleneck}</div>
+    <div><b>System-Limiting Annual Production:</b> <span style="color:#1a237e;font-weight:700">${prodData.sys_total.toLocaleString(undefined,{maximumFractionDigits:2})} m³</span></div>
+    <div style="color:#466;">${mfData.suggestion}</div>
+    <div style="margin-top:1em;color:#666;font-size:0.98em;">For more details, contact <b>AJAYS8815@gmail.com</b></div>
+  `;
+}
+
+// ----------- Step 4: Cost of ownership calculation -----------
+// Helper to format numbers with commas and up to two decimal places
+function formatNum(num) {
+  return (typeof num === 'number' && !isNaN(num)) ? num.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '0';
+}
+
+// Compute annual cost of ownership and operation for the selected equipment.
+// This function uses purchase cost, life, interest, manpower, power consumption,
+// lubrication, maintenance and breakdown percentages to estimate yearly expenses.
+function calculateCost() {
+  // Determine selected entries.  If the user has not selected a model via
+  // suggestions, attempt to match the typed query against the dataset.
+  function findEntry(type, query) {
+    if (!query) return null;
+    const q = query.toLowerCase();
+    for (const [oKey, list] of Object.entries(oemData)) {
+      for (const item of list) {
+        if (item.type === type && item.model.toLowerCase().includes(q)) {
+          return item;
+        }
+      }
+    }
+    return null;
+  }
+  // Use selected entries if available, else fallback to typed query match
+  let shEntry = selectedShovel;
+  if (!shEntry) {
+    const q = $('shovel_query').value.trim();
+    shEntry = findEntry('Shovel', q);
+  }
+  let trEntry = selectedTruck;
+  if (!trEntry) {
+    const q = $('truck_query').value.trim();
+    trEntry = findEntry('Truck', q);
+  }
+  // Counts from Step 1
+  const shovelCount = parseFloat($('shovel_count').value) || 0;
+  const truckCount = parseFloat($('truck_count').value) || 0;
+  // Determine hours per year.  Use production data if available; otherwise derive
+  // from Step 2 inputs (working hours/shift × shifts/day × working days).  If
+  // still unavailable, fall back to 5760 hours (240 days × 24 hours).
+  let hoursPerYear = 0;
+  if (prodData && prodData.H_shift) {
+    hoursPerYear = prodData.H_shift * prodData.N_shifts * prodData.D_working;
+  }
+  if (!hoursPerYear) {
+    const hShift = parseFloat($('work_hr_shift').value) || 8;
+    const nShifts = parseFloat($('num_shifts').value) || 1;
+    const dWork = parseFloat($('work_days').value) || 240;
+    hoursPerYear = hShift * nShifts * dWork;
+  }
+  if (!hoursPerYear) hoursPerYear = 5760;
+  // 15% interest rate on average investment
+  const interestRate = 0.15;
+  // Cost breakdown rows
+  const rows = [];
+  let grandTotal = 0;
+  // Helper to compute metrics for a given entry and count
+  function computeFor(entry, count, label) {
+    if (!entry || !count) return;
+    // Use cost per unit; if not specified, treat as zero
+    const costPerUnit = entry.cost || 0;
+    const life = entry.life || 1;
+    const powerPerUnit = entry.power || 0;
+    // Multiply cost by count to get total equipment cost
+    const equipmentCost = costPerUnit * count;
+    // Straight‑line depreciation (salvage assumed 0) per unit and total
+    const depreciationPerUnit = costPerUnit / life;
+    const depreciation = depreciationPerUnit * count;
+    // Average yearly investment per unit: ((life + 1) × cost) / (2 × life)
+    const avgInvPerUnit = ((life + 1) * costPerUnit) / (2 * life);
+    const avgInvestment = avgInvPerUnit * count;
+    // Interest, insurance & tax (15% of average investment)
+    const interest = avgInvestment * interestRate;
+    // Cost of ownership (depreciation + interest)
+    const costOwnership = depreciation + interest;
+    // Manpower: 3 operators and 3 helpers per machine; operators at €600/month, helpers at €400/month
+    const manpowerPerUnit = (3 * 600 * 12) + (3 * 400 * 12);
+    const manpower = manpowerPerUnit * count;
+    // Power and consumption: power requirement per unit × hours per year.  Power cost per kWh is assumed at 1€ for simplicity.
+    const totalPower = powerPerUnit * count;
+    const powerCost = totalPower * hoursPerYear;
+    // Lubrication cost: 30% of power cost
+    const lubrication = 0.30 * powerCost;
+    // Maintenance cost: 20% of depreciation
+    const maintenance = 0.20 * depreciation;
+    // Breakdown cost: 2% of equipment cost
+    const breakdown = 0.02 * equipmentCost;
+    // Total operating cost
+    const operating = manpower + powerCost + lubrication + maintenance + breakdown;
+    // Total yearly cost
+    const total = costOwnership + operating;
+    grandTotal += total;
+    rows.push({ label, equipmentCost, life, depreciation, avgInvestment, interest, costOwnership, manpower, powerCost, lubrication, maintenance, breakdown, operating, total });
+  }
+  // Compute for shovel and truck
+  if (shEntry && shovelCount > 0) {
+    computeFor(shEntry, shovelCount, 'Shovel (' + (shEntry.model || 'N/A') + ')');
+  }
+  if (trEntry && truckCount > 0) {
+    computeFor(trEntry, truckCount, 'Truck (' + (trEntry.model || 'N/A') + ')');
+  }
+  // Build HTML table for results
+  let table = '<table style="width:100%;border-collapse:collapse;font-size:0.9em;">';
+  table += '<thead><tr style="background:#e8eaf6;">';
+  table += '<th style="text-align:left;padding:0.4em 0.3em;">Equipment</th>';
+  table += '<th>Cost (€)</th><th>Life (yr)</th><th>Depreciation (€)</th><th>Avg Invest (€)</th><th>Interest (€)</th><th>Ownership Cost (€)</th>';
+  table += '<th>Manpower (€)</th><th>Power (€)</th><th>Lubrication (€)</th><th>Maintenance (€)</th><th>Breakdown (€)</th><th>Operating (€)</th><th>Total (€)</th>';
+  table += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    table += '<tr>';
+    table += '<td style="padding:0.3em 0.3em;">' + r.label + '</td>';
+    table += '<td style="text-align:right;padding:0.3em;">' + formatNum(r.equipmentCost) + '</td>';
+    table += '<td style="text-align:center;padding:0.3em;">' + r.life + '</td>';
+    table += '<td style="text-align:right;padding:0.3em;">' + formatNum(r.depreciation) + '</td>';
+    table += '<td style="text-align:right;padding:0.3em;">' + formatNum(r.avgInvestment) + '</td>';
+    table += '<td style="text-align:right;padding:0.3em;">' + formatNum(r.interest) + '</td>';
+    table += '<td style="text-align:right;padding:0.3em;">' + formatNum(r.costOwnership) + '</td>';
+    table += '<td style="text-align:right;padding:0.3em;">' + formatNum(r.manpower) + '</td>';
+    table += '<td style="text-align:right;padding:0.3em;">' + formatNum(r.powerCost) + '</td>';
+    table += '<td style="text-align:right;padding:0.3em;">' + formatNum(r.lubrication) + '</td>';
+    table += '<td style="text-align:right;padding:0.3em;">' + formatNum(r.maintenance) + '</td>';
+    table += '<td style="text-align:right;padding:0.3em;">' + formatNum(r.breakdown) + '</td>';
+    table += '<td style="text-align:right;padding:0.3em;">' + formatNum(r.operating) + '</td>';
+    table += '<td style="text-align:right;padding:0.3em;font-weight:600;">' + formatNum(r.total) + '</td>';
+    table += '</tr>';
+  });
+  table += '</tbody>';
+  table += '<tfoot><tr style="background:#f0f2fb;font-weight:700;"><td colspan="13" style="text-align:right;padding:0.4em 0.3em;">Grand Total</td><td style="text-align:right;padding:0.4em 0.3em;">' + formatNum(grandTotal) + '</td></tr></tfoot>';
+  table += '</table>';
+  $('costResult').innerHTML = table;
+}
+
+// Handle Send Report
+document.getElementById('requestForm').onsubmit = function(e) {
+  e.preventDefault();
+  $('successMsg').style.display = 'none';
+  $('errorMsg').style.display = 'none';
+
+  const formData = new FormData();
+  formData.append('name', $('name').value);
+  formData.append('surname', $('surname').value);
+  formData.append('email', $('email').value);
+  formData.append('inputData', JSON.stringify(inputData));
+  formData.append('prodData', JSON.stringify(prodData));
+  formData.append('mfData', JSON.stringify(mfData));
+
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyr5SSG9TFRrYLoHtZ207qZkGclo_bhFpGVo6rBvZmvYcTpDRbiPTx8rX6edaboLWWZSg/exec';
+  fetch(scriptURL, { method: 'POST', body: formData })
+    .then(response => response.ok ? $('successMsg').style.display = 'block' : $('errorMsg').style.display = 'block')
+    .catch(error => $('errorMsg').style.display = 'block');
+};
+
+// -----------------------------------------------------------------------------
+// Additional helper and cost-of-ownership functions for Step 4 (interactive TCO)
+// These helpers mirror the Excel formulas for depreciation with salvage and
+// compute annual ownership and operating costs for two pieces of equipment.
+//
+// Convert element value to a floating-point number or 0 if invalid
+function num(id){ return parseFloat($(id).value)||0; }
+// Format numbers with thousands separators and up to two decimals
+function fmt(n){ return n.toLocaleString(undefined,{maximumFractionDigits:2}); }
+// Compute annual operating hours and update the auto field
+function annualHours(){
+  const h=num('op_hours'), s=num('op_shifts'), d=num('op_days');
+  const ah = h*s*d;
+  if ($('op_annual')) $('op_annual').value = isFinite(ah) ? ah : 0;
+  return ah;
+}
+// Present value factor for discount rate and years
+function pvf(ratePct, n){ const r=ratePct/100; return 1/Math.pow(1+r,n); }
+// Capital recovery factor
+function crf(ratePct, n){
+  const r=ratePct/100;
+  return (r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
+}
+
+// Attach event listeners for Step 4 after DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  // Button to calculate total cost of ownership
+  const calc = document.getElementById('btnCalcTCO');
+  if (calc) {
+    calc.addEventListener('click', calculateTCO);
+  }
+  // Keep annual hours updated when any of the time inputs change
+  ['op_hours','op_shifts','op_days'].forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', annualHours);
+  });
+
+  // When the user clicks the "Print Cost Analysis" button on Step 4, open the
+  // browser's print dialog.  This allows them to save the cost results as a PDF
+  // or send it directly to a printer.  No calculation is performed here.
+  const printBtn = document.getElementById('btnPrintCost');
+  if (printBtn) {
+    printBtn.addEventListener('click', () => {
+      window.print();
+    });
+  }
+
+  // When the user clicks the "Download Cost Report" button on Step 4, build
+  // a text report summarizing all inputs, calculated results, and formulas
+  // used in the cost analysis.  This report also explains the payback period
+  // metric and downloads the report as a plain text file.
+  const downloadCostBtn = document.getElementById('btnDownloadCost');
+  if (downloadCostBtn) {
+    downloadCostBtn.addEventListener('click', downloadCostReport);
+  }
+});
+
+// Main function to compute the interactive TCO table
+function calculateTCO(){
+  const N1=num('eq1_life'), N2=num('eq2_life');
+  // Read per‑unit cost and salvage
+  const C1_unit = num('eq1_cost'), C2_unit = num('eq2_cost');
+  const S1_unit = num('eq1_salvage'), S2_unit = num('eq2_salvage');
+  // Read number of units for each equipment.  Use at least 1 to avoid divide‑by‑zero
+  const U1 = Math.max(1, num('eq1_units_count'));
+  const U2 = Math.max(1, num('eq2_units_count'));
+  // Aggregate cost and salvage across all units
+  const C1 = C1_unit * U1;
+  const C2 = C2_unit * U2;
+  const S1 = S1_unit * U1;
+  const S2 = S2_unit * U2;
+  const IIT=num('rate_iit');     // interest/insurance/tax percent
+  const DR =num('rate_disc');    // discount rate percent
+  const AH = num('op_annual')||annualHours();
+  // Ownership
+  const Dep1=(C1-S1)/Math.max(1,N1);
+  const Dep2=(C2-S2)/Math.max(1,N2);
+  const AYI1=(C1*(N1+1)+S1*(N1-1))/(2*Math.max(1,N1));
+  const AYI2=(C2*(N2+1)+S2*(N2-1))/(2*Math.max(1,N2));
+  const IIT1=AYI1*IIT/100;
+  const IIT2=AYI2*IIT/100;
+  const Own1=Dep1+IIT1;
+  const Own2=Dep2+IIT2;
+  // Manpower (scale per‑unit counts by number of units)
+  const opsW = num('op_wage'), helpW=num('help_wage');
+  // Operators and helpers per unit
+  const op1_per = num('op1_ops'), op2_per = num('op2_ops');
+  const hp1_per = num('op1_help'), hp2_per = num('op2_help');
+  // Annual manpower cost per equipment: (operators per unit × units × wage × 12) + (helpers per unit × units × wage × 12)
+  const opCost1 = op1_per * U1 * opsW * 12;
+  const opCost2 = op2_per * U2 * opsW * 12;
+  const hpCost1 = hp1_per * U1 * helpW * 12;
+  const hpCost2 = hp2_per * U2 * helpW * 12;
+  const Man1 = opCost1 + hpCost1;
+  const Man2 = opCost2 + hpCost2;
+  // Power (scale per‑unit power by number of units)
+  const Pw1_per=num('pwr1'), Pw2_per=num('pwr2');
+  const Unit=num('unit_cost');
+  const Pwr1 = Pw1_per * U1 * AH * Unit;
+  const Pwr2 = Pw2_per * U2 * AH * Unit;
+  // Cost percentages (as decimals) for lubrication, maintenance and breakdown
+  const lubePct  = num('lube_pct')/100;
+  const maintPct = num('maint_pct')/100;
+  const breakPct = num('break_pct')/100;
+  // Costs computed using user-defined percentages.  Percentages are applied to
+  // aggregated values.  Lubrication is a percentage of power.  Maintenance is
+  // a percentage of depreciation.  Breakdown is a percentage of total cost.
+  const Lube1 = lubePct * Pwr1;
+  const Lube2 = lubePct * Pwr2;
+  const Maint1 = maintPct * Dep1;
+  const Maint2 = maintPct * Dep2;
+  const Brk1  = breakPct * C1;
+  const Brk2  = breakPct * C2;
+  const Opr1 = Man1 + Pwr1 + Lube1 + Maint1 + Brk1;
+  const Opr2 = Man2 + Pwr2 + Lube2 + Maint2 + Brk2;
+  // Totals (aggregated across units)
+  const Tot1 = Own1 + Opr1;
+  const Tot2 = Own2 + Opr2;
+  // Expose totals globally so Step 5 can access them.  tot1 and tot2 now
+  // represent the total annual cost for all units of each equipment as
+  // computed in this function.
+  window.costData = { tot1: Tot1, tot2: Tot2 };
+  // Payback period (years) calculated as (Cost − Salvage) / Annual operating cost
+  const Pay1 = Opr1 > 0 ? (C1 - S1) / Opr1 : 0;
+  const Pay2 = Opr2 > 0 ? (C2 - S2) / Opr2 : 0;
+  // PVF / CRF / EAC
+  const PVF1=pvf(DR,N1), PVF2=pvf(DR,N2);
+  const CRF1=crf(DR,N1), CRF2=crf(DR,N2);
+  const EAC1 = (C1 - S1*PVF1)*CRF1 + Opr1;
+  const EAC2 = (C2 - S2*PVF2)*CRF2 + Opr2;
+  // Names for equipment
+  const name1 = $('eq1_name').value || 'Equipment 1';
+  const name2 = $('eq2_name').value || 'Equipment 2';
+  // Build dynamic labels for cost percentages
+  const lubeTitle  = 'Lubrication (' + (lubePct*100).toLocaleString(undefined,{maximumFractionDigits:2}) + '% of power)';
+  const maintTitle = 'Maintenance (' + (maintPct*100).toLocaleString(undefined,{maximumFractionDigits:2}) + '% of depreciation)';
+  const breakTitle = 'Breakdown (' + (breakPct*100).toLocaleString(undefined,{maximumFractionDigits:2}) + '% of cost)';
+  // Build HTML table
+  $('tcoResult').innerHTML = `
+  <b>Inputs</b><br>
+  Annual Hours: <b>${fmt(AH)}</b> | IIT: <b>${fmt(IIT)}%</b> | Discount: <b>${fmt(DR)}%</b>
+  <div style="overflow-x:auto;margin-top:10px">
+    <table style="border-collapse:collapse;min-width:640px">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:6px;border-bottom:1px solid #ccd"></th>
+          <th style="text-align:right;padding:6px;border-bottom:1px solid #ccd">${name1}</th>
+          <th style="text-align:right;padding:6px;border-bottom:1px solid #ccd">${name2}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding:6px">Initial Cost (€)</td><td style="text-align:right;padding:6px">${fmt(C1)}</td><td style="text-align:right;padding:6px">${fmt(C2)}</td></tr>
+        <tr><td style="padding:6px">Life (years)</td><td style="text-align:right;padding:6px">${fmt(N1)}</td><td style="text-align:right;padding:6px">${fmt(N2)}</td></tr>
+        <tr><td style="padding:6px">Salvage (€)</td><td style="text-align:right;padding:6px">${fmt(S1)}</td><td style="text-align:right;padding:6px">${fmt(S2)}</td></tr>
+        <tr><td colspan="3" style="padding:6px;border-top:1px solid #ccd"><b>Ownership</b></td></tr>
+        <tr><td style="padding:6px">Depreciation / yr</td><td style="text-align:right;padding:6px">${fmt(Dep1)}</td><td style="text-align:right;padding:6px">${fmt(Dep2)}</td></tr>
+        <tr><td style="padding:6px">Average Yearly Investment</td><td style="text-align:right;padding:6px">${fmt(AYI1)}</td><td style="text-align:right;padding:6px">${fmt(AYI2)}</td></tr>
+        <tr><td style="padding:6px">IIT / yr</td><td style="text-align:right;padding:6px">${fmt(IIT1)}</td><td style="text-align:right;padding:6px">${fmt(IIT2)}</td></tr>
+        <tr><td style="padding:6px"><b>Annual Ownership Cost</b></td><td style="text-align:right;padding:6px"><b>${fmt(Own1)}</b></td><td style="text-align:right;padding:6px"><b>${fmt(Own2)}</b></td></tr>
+        <tr><td colspan="3" style="padding:6px;border-top:1px solid #ccd"><b>Operating</b></td></tr>
+        <tr><td style="padding:6px">Manpower / yr</td><td style="text-align:right;padding:6px">${fmt(Man1)}</td><td style="text-align:right;padding:6px">${fmt(Man2)}</td></tr>
+        <tr><td style="padding:6px">Power / yr</td><td style="text-align:right;padding:6px">${fmt(Pwr1)}</td><td style="text-align:right;padding:6px">${fmt(Pwr2)}</td></tr>
+        <tr><td style="padding:6px">${lubeTitle}</td><td style="text-align:right;padding:6px">${fmt(Lube1)}</td><td style="text-align:right;padding:6px">${fmt(Lube2)}</td></tr>
+        <tr><td style="padding:6px">${maintTitle}</td><td style="text-align:right;padding:6px">${fmt(Maint1)}</td><td style="text-align:right;padding:6px">${fmt(Maint2)}</td></tr>
+        <tr><td style="padding:6px">${breakTitle}</td><td style="text-align:right;padding:6px">${fmt(Brk1)}</td><td style="text-align:right;padding:6px">${fmt(Brk2)}</td></tr>
+        <tr><td style="padding:6px"><b>Annual Operating Cost</b></td><td style="text-align:right;padding:6px"><b>${fmt(Opr1)}</b></td><td style="text-align:right;padding:6px"><b>${fmt(Opr2)}</b></td></tr>
+        <tr><td colspan="3" style="padding:6px;border-top:1px solid #ccd"><b>Totals</b></td></tr>
+        <tr><td style="padding:6px">Total Annual Cost</td><td style="text-align:right;padding:6px">${fmt(Tot1)}</td><td style="text-align:right;padding:6px">${fmt(Tot2)}</td></tr>
+        <tr><td style="padding:6px">Cost per Operating Hour</td><td style="text-align:right;padding:6px">${AH?fmt(Tot1/AH):'—'}</td><td style="text-align:right;padding:6px">${AH?fmt(Tot2/AH):'—'}</td></tr>
+        <tr><td colspan="3" style="padding:6px;border-top:1px solid #ccd"><b>Economic Factors</b></td></tr>
+        <tr><td style="padding:6px">PVF</td><td style="text-align:right;padding:6px">${fmt(PVF1)}</td><td style="text-align:right;padding:6px">${fmt(PVF2)}</td></tr>
+        <tr><td style="padding:6px">CRF</td><td style="text-align:right;padding:6px">${fmt(CRF1)}</td><td style="text-align:right;padding:6px">${fmt(CRF2)}</td></tr>
+        <tr><td style="padding:6px"><b>EAC</b> = (Cost − Salvage×PVF)×CRF + Operating</td>
+            <td style="text-align:right;padding:6px"><b>${fmt(EAC1)}</b></td>
+            <td style="text-align:right;padding:6px"><b>${fmt(EAC2)}</b></td></tr>
+        <tr><td style="padding:6px">Payback Period (years)</td><td style="text-align:right;padding:6px">${fmt(Pay1)}</td><td style="text-align:right;padding:6px">${fmt(Pay2)}</td></tr>
+      </tbody>
+    </table>
+  </div>`;
+}
+
+// Generate a comprehensive cost analysis report and trigger download.  This
+// function compiles all user inputs (equipment details, operating
+// assumptions, manpower, power consumption, and cost percentages) along
+// with the computed ownership, operating, total costs, PVF, CRF, EAC,
+// and payback period for each piece of equipment.  It also explains
+// each formula used and the significance of the payback period.  The
+// report is saved as a plain text file that the user can download.
+function downloadCostReport() {
+  // Ensure calculations are up-to-date
+  try { calculateTCO(); } catch (e) {}
+  // Read basic inputs
+  const name1 = $('eq1_name').value || 'Equipment 1';
+  const name2 = $('eq2_name').value || 'Equipment 2';
+  // Read per‑unit cost and salvage and unit counts
+  const C1_unit = num('eq1_cost'), C2_unit = num('eq2_cost');
+  const N1 = num('eq1_life'), N2 = num('eq2_life');
+  const S1_unit = num('eq1_salvage'), S2_unit = num('eq2_salvage');
+  const U1 = Math.max(1, num('eq1_units_count'));
+  const U2 = Math.max(1, num('eq2_units_count'));
+  // Aggregate cost and salvage across units
+  const C1 = C1_unit * U1;
+  const C2 = C2_unit * U2;
+  const S1 = S1_unit * U1;
+  const S2 = S2_unit * U2;
+  const hours = num('op_hours'), shifts = num('op_shifts'), days = num('op_days');
+  const AH = num('op_annual') || (hours * shifts * days);
+  const IIT = num('rate_iit');
+  const DR  = num('rate_disc');
+  // Manpower inputs (per unit)
+  const op1_per = num('op1_ops'), op2_per = num('op2_ops');
+  const hp1_per = num('op1_help'), hp2_per = num('op2_help');
+  const opsW = num('op_wage'), helpW = num('help_wage');
+  // Power & cost inputs (per unit)
+  const Pw1_per = num('pwr1'), Pw2_per = num('pwr2');
+  const unitCost = num('unit_cost');
+  // Cost percentage inputs (entered as percents in the form)
+  const lubePct = num('lube_pct')/100;
+  const maintPct = num('maint_pct')/100;
+  const breakPct = num('break_pct')/100;
+  // Ownership calculations
+  const Dep1 = (C1 - S1) / Math.max(1, N1);
+  const Dep2 = (C2 - S2) / Math.max(1, N2);
+  const AYI1 = (C1*(N1+1) + S1*(N1-1)) / (2*Math.max(1,N1));
+  const AYI2 = (C2*(N2+1) + S2*(N2-1)) / (2*Math.max(1,N2));
+  const IIT1 = AYI1 * IIT / 100;
+  const IIT2 = AYI2 * IIT / 100;
+  const Own1 = Dep1 + IIT1;
+  const Own2 = Dep2 + IIT2;
+  // Operating calculations (aggregate across units)
+  const Man1 = op1_per * U1 * opsW * 12 + hp1_per * U1 * helpW * 12;
+  const Man2 = op2_per * U2 * opsW * 12 + hp2_per * U2 * helpW * 12;
+  const PwrCost1 = Pw1_per * U1 * AH * unitCost;
+  const PwrCost2 = Pw2_per * U2 * AH * unitCost;
+  const Lube1 = lubePct * PwrCost1;
+  const Lube2 = lubePct * PwrCost2;
+  const Maint1 = maintPct * Dep1;
+  const Maint2 = maintPct * Dep2;
+  const Brk1 = breakPct * C1;
+  const Brk2 = breakPct * C2;
+  const Opr1 = Man1 + PwrCost1 + Lube1 + Maint1 + Brk1;
+  const Opr2 = Man2 + PwrCost2 + Lube2 + Maint2 + Brk2;
+  const Tot1 = Own1 + Opr1;
+  const Tot2 = Own2 + Opr2;
+  const CPH1 = AH > 0 ? Tot1 / AH : 0;
+  const CPH2 = AH > 0 ? Tot2 / AH : 0;
+  // Economic factors
+  const PVF1 = pvf(DR, N1);
+  const PVF2 = pvf(DR, N2);
+  const CRF1 = crf(DR, N1);
+  const CRF2 = crf(DR, N2);
+  const EAC1 = (C1 - S1*PVF1) * CRF1 + Opr1;
+  const EAC2 = (C2 - S2*PVF2) * CRF2 + Opr2;
+  // Payback period (years)
+  const Pay1 = Opr1 > 0 ? (C1 - S1) / Opr1 : 0;
+  const Pay2 = Opr2 > 0 ? (C2 - S2) / Opr2 : 0;
+  // Helper to format numbers to 2 decimals
+  const fmtR = n => Number.isFinite(n) ? n.toLocaleString(undefined, {maximumFractionDigits:2}) : '—';
+  // Build report text
+  let report = '';
+  report += 'Cost Analysis Report\n';
+  report += '====================\n\n';
+  report += 'Equipment Details:\n';
+  report += '  Equipment 1: ' + name1 + '\n';
+  report += '    Cost: ' + fmtR(C1) + '\n';
+  report += '    Life: ' + fmtR(N1) + ' years\n';
+  report += '    Salvage: ' + fmtR(S1) + '\n';
+  report += '  Equipment 2: ' + name2 + '\n';
+  report += '    Cost: ' + fmtR(C2) + '\n';
+  report += '    Life: ' + fmtR(N2) + ' years\n';
+  report += '    Salvage: ' + fmtR(S2) + '\n\n';
+  report += 'Operating Assumptions:\n';
+  report += '  Hours per shift: ' + fmtR(hours) + '\n';
+  report += '  Shifts per day: ' + fmtR(shifts) + '\n';
+  report += '  Operating days per year: ' + fmtR(days) + '\n';
+  report += '  Annual operating hours: ' + fmtR(AH) + '\n';
+  report += '  IIT rate: ' + fmtR(IIT) + '%\n';
+  report += '  Discount rate: ' + fmtR(DR) + '%\n\n';
+  report += 'Manpower:\n';
+  report += '  Operators (Eq1/Eq2): ' + fmtR(op1) + ' / ' + fmtR(op2) + '\n';
+  report += '  Helpers (Eq1/Eq2): ' + fmtR(hp1) + ' / ' + fmtR(hp2) + '\n';
+  report += '  Operator monthly wage: ' + fmtR(opsW) + '\n';
+  report += '  Helper monthly wage: ' + fmtR(helpW) + '\n\n';
+  report += 'Power & Consumption:\n';
+  report += '  Power per hour (Eq1/Eq2): ' + fmtR(Pw1) + ' / ' + fmtR(Pw2) + '\n';
+  report += '  Energy unit cost: ' + fmtR(unitCost) + '\n\n';
+  report += 'Cost Percentages:\n';
+  report += '  Lubrication: ' + fmtR(lubePct*100) + '% of power\n';
+  report += '  Maintenance: ' + fmtR(maintPct*100) + '% of depreciation\n';
+  report += '  Breakdown: ' + fmtR(breakPct*100) + '% of cost\n\n';
+  // Results table
+  report += 'Computation Results:\n';
+  report += 'Metric                       Eq1               Eq2\n';
+  report += 'Depreciation (€/yr)          ' + fmtR(Dep1).padStart(12) + '      ' + fmtR(Dep2) + '\n';
+  report += 'Average yearly investment    ' + fmtR(AYI1).padStart(12) + '      ' + fmtR(AYI2) + '\n';
+  report += 'Interest / yr (€/yr)         ' + fmtR(IIT1).padStart(12) + '      ' + fmtR(IIT2) + '\n';
+  report += 'Ownership cost (€/yr)        ' + fmtR(Own1).padStart(12) + '      ' + fmtR(Own2) + '\n';
+  report += 'Manpower cost (€/yr)         ' + fmtR(Man1).padStart(12) + '      ' + fmtR(Man2) + '\n';
+  report += 'Power cost (€/yr)            ' + fmtR(PwrCost1).padStart(12) + '      ' + fmtR(PwrCost2) + '\n';
+  report += 'Lubrication cost (€/yr)      ' + fmtR(Lube1).padStart(12) + '      ' + fmtR(Lube2) + '\n';
+  report += 'Maintenance cost (€/yr)      ' + fmtR(Maint1).padStart(12) + '      ' + fmtR(Maint2) + '\n';
+  report += 'Breakdown cost (€/yr)        ' + fmtR(Brk1).padStart(12) + '      ' + fmtR(Brk2) + '\n';
+  report += 'Annual operating cost (€/yr) ' + fmtR(Opr1).padStart(12) + '      ' + fmtR(Opr2) + '\n';
+  report += 'Total annual cost (€/yr)     ' + fmtR(Tot1).padStart(12) + '      ' + fmtR(Tot2) + '\n';
+  report += 'Cost per hour (€/h)          ' + fmtR(CPH1).padStart(12) + '      ' + fmtR(CPH2) + '\n';
+  report += 'PVF                          ' + fmtR(PVF1).padStart(12) + '      ' + fmtR(PVF2) + '\n';
+  report += 'CRF                          ' + fmtR(CRF1).padStart(12) + '      ' + fmtR(CRF2) + '\n';
+  report += 'Equivalent Annual Cost (EAC) ' + fmtR(EAC1).padStart(12) + '      ' + fmtR(EAC2) + '\n';
+  report += 'Payback period (years)       ' + fmtR(Pay1).padStart(12) + '      ' + fmtR(Pay2) + '\n\n';
+  // Formulas used section
+  report += 'Formulas Used:\n';
+  report += '- Depreciation: (Cost − Salvage) / Life\n';
+  report += '- Average Yearly Investment: ((Life+1)×Cost + (Life−1)×Salvage) / (2×Life)\n';
+  report += '- Interest (IIT): Average Yearly Investment × IIT%\n';
+  report += '- Ownership Cost: Depreciation + Interest\n';
+  report += '- Manpower Cost: (Operators×Operator Wage + Helpers×Helper Wage) × 12\n';
+  report += '- Power Cost: Power Requirement × Annual Hours × Unit Cost\n';
+  report += '- Lubrication Cost: Lubrication % × Power Cost\n';
+  report += '- Maintenance Cost: Maintenance % × Depreciation\n';
+  report += '- Breakdown Cost: Breakdown % × Cost\n';
+  report += '- Operating Cost: Manpower + Power + Lubrication + Maintenance + Breakdown\n';
+  report += '- Total Annual Cost: Ownership Cost + Operating Cost\n';
+  report += '- Cost per Operating Hour: Total Annual Cost / Annual Hours\n';
+  report += '- PVF: 1 / (1 + Discount Rate)^Life\n';
+  report += '- CRF: (r×(1+r)^Life) / ((1+r)^Life − 1)\n';
+  report += '- EAC: (Cost − Salvage×PVF) × CRF + Operating Cost\n';
+  report += '- Payback Period: (Cost − Salvage) / Annual Operating Cost\n\n';
+  // Explain significance of payback period
+  report += 'Significance of Payback Period:\n';
+  report += 'The payback period measures how quickly the initial investment is recovered through annual operating cash flows.\n';
+  report += 'A shorter payback indicates faster recovery of capital, which can aid in comparing alternatives.\n';
+  report += 'However, it ignores cash flows after the payback point and does not account for the time value of money.\n';
+  report += 'Therefore, it should be considered alongside metrics like EAC and NPV for a comprehensive financial evaluation.\n';
+  // Create and trigger file download
+  const blob = new Blob([report], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cost_analysis_report.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// -----------------------------------------------------------------------------
+// Step 5: Project Economics calculations and report generation
+//
+// Global store for economics results.  When calculateEcon() runs it populates
+// this object, which is later used by downloadEconReport() to build the
+// summary.  It stores values such as total cost, production, cost per m³,
+// density, stripping ratio, ore tons, revenue and profit.
+let econData = {};
+
+// Attach event listeners for Step 5 navigation and actions when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  // Jump to Project Economics (Step 5) from Step 4
+  const econBtn = document.getElementById('toEconBtn');
+  if (econBtn) {
+    econBtn.addEventListener('click', () => {
+      // Pre-fill annual production from prodData if available
+      try {
+        if (prodData && prodData.sys_total) {
+          $('annual_prod_m3').value = +prodData.sys_total.toFixed(2);
+        }
+      } catch (e) {}
+      showPage('page5');
+    });
+  }
+  // Back to Step 4 from Step 5
+  const back5 = document.getElementById('btnBackToStep4');
+  if (back5) {
+    back5.addEventListener('click', () => showPage('page4'));
+  }
+  // Calculate economics when user clicks button
+  const calcEcon = document.getElementById('btnCalcEcon');
+  if (calcEcon) {
+    calcEcon.addEventListener('click', calculateEcon);
+  }
+  // Download economics report
+  const dlEcon = document.getElementById('btnDownloadEcon');
+  if (dlEcon) {
+    dlEcon.addEventListener('click', downloadEconReport);
+  }
+  // Download full project report
+  const dlProj = document.getElementById('btnDownloadProject');
+  if (dlProj) {
+    dlProj.addEventListener('click', downloadProjectReport);
+  }
+});
+
+// Compute project economics combining total costs from Step 4 and annual
+// production from previous steps.  It calculates cost per cubic metre in
+// both EUR and INR, converts production into tons using the density, derives
+// ore tonnage based on the stripping ratio and chosen basis, computes the
+// revenue from ore sales, and finally determines annual profit.  Results are
+// stored in econData and displayed in the econResult element.
+function calculateEcon() {
+  // Retrieve annual cost totals from Step 4
+  const tot1 = (window.costData && window.costData.tot1) ? window.costData.tot1 : 0;
+  const tot2 = (window.costData && window.costData.tot2) ? window.costData.tot2 : 0;
+  // Unit counts for each equipment
+  const u1 = parseFloat($('eq1_units').value) || 0;
+  const u2 = parseFloat($('eq2_units').value) || 0;
+  // Combined annual cost in EUR
+  const totalCostEUR = u1 * tot1 + u2 * tot2;
+  // Production volume in cubic metres per year
+  const prod_m3 = parseFloat($('annual_prod_m3').value) || (prodData && prodData.sys_total) || 0;
+  // Conversion and economic parameters
+  const eur_inr = parseFloat($('eur_inr').value) || 0;
+  const density = parseFloat($('density').value) || 0;
+  const sr = parseFloat($('sr').value) || 0;
+  const basis = $('basis').value || 'waste';
+  const orePrice = parseFloat($('ore_price').value) || 0;
+  // Cost per cubic metre
+  const costPerM3_EUR = prod_m3 > 0 ? totalCostEUR / prod_m3 : 0;
+  const costPerM3_INR = costPerM3_EUR * eur_inr;
+  // Convert production volume to tonnage
+  const total_tons = prod_m3 * density;
+  // Determine ore tonnage depending on basis (waste-only or total)
+  let ore_tons;
+  if (basis === 'total') {
+    ore_tons = sr >= 0 ? total_tons / (sr + 1) : 0;
+  } else {
+    ore_tons = sr > 0 ? total_tons / sr : 0;
+  }
+  // Revenue from ore sales in EUR
+  const ore_revenue_EUR = ore_tons * orePrice;
+  // Estimated annual profit
+  const annual_profit_EUR = ore_revenue_EUR - totalCostEUR;
+  // Store results globally for reporting
+  econData = {
+    totalCostEUR,
+    prod_m3,
+    costPerM3_EUR,
+    costPerM3_INR,
+    total_tons,
+    ore_tons,
+    ore_revenue_EUR,
+    annual_profit_EUR,
+    eur_inr,
+    density,
+    sr,
+    basis,
+    orePrice,
+    u1,
+    u2,
+    tot1,
+    tot2
+  };
+  // Construct descriptive text for basis
+  const basisText = (basis === 'total') ? 'Production includes ORE + WASTE' : 'Production is WASTE only';
+  // Format the result and inject into DOM
+  const resultEl = $('econResult');
+  if (resultEl) {
+    resultEl.classList.remove('hidden');
+    resultEl.innerHTML = `
+      <b>Annual Totals</b><br>
+      Total Cost (€/yr): <b>${totalCostEUR.toLocaleString()}</b><br>
+      Total Production (m³/yr): <b>${prod_m3.toLocaleString()}</b><br>
+      Dragline/Truck Cost per m³: <b>${costPerM3_EUR.toFixed(2)} €</b> | <b>${costPerM3_INR.toFixed(0)} INR</b><br>
+      <br><b>Conversions & Economics</b><br>
+      Density: <b>${density}</b> t/m³ → Total Tons: <b>${total_tons.toLocaleString(undefined,{maximumFractionDigits:2})}</b><br>
+      Stripping Ratio: <b>${sr}:1</b> (${basisText}) → Recoverable ore: <b>${ore_tons.toLocaleString(undefined,{maximumFractionDigits:2})} t</b><br>
+      Ore price: <b>${orePrice} €/t</b> → Ore Revenue: <b>${ore_revenue_EUR.toLocaleString(undefined,{maximumFractionDigits:2})} €</b><br>
+      <span style="color:#1a237e;font-weight:700">Estimated Profit: ${annual_profit_EUR.toLocaleString(undefined,{maximumFractionDigits:2})} € / year</span>
+    `;
+  }
+}
+
+// Build a text report for project economics and trigger a download.  This
+// function ensures that econData is populated, then composes a summary of all
+// inputs, outputs, and notes about how ore tonnage is derived.  It finally
+// downloads the report as a plain text file.
+function downloadEconReport() {
+  // Ensure the data exists by running the calculation if needed
+  if (!econData || !econData.prod_m3) {
+    calculateEcon();
+  }
+  const bDesc = (econData.basis === 'total') ? 'TOTAL (ore + waste)' : 'WASTE only';
+  const lines = [];
+  lines.push('PROJECT ECONOMICS (Step 5) — Annual Summary');
+  lines.push('');
+  lines.push(`Equipment 1 units: ${econData.u1} | Equipment 2 units: ${econData.u2}`);
+  lines.push(`Total cost: ${econData.totalCostEUR.toFixed(2)} EUR/year`);
+  lines.push(`Production: ${econData.prod_m3.toFixed(2)} m³/year`);
+  lines.push(`Cost per m³: ${econData.costPerM3_EUR.toFixed(2)} EUR (${econData.costPerM3_INR.toFixed(0)} INR @ ${econData.eur_inr}/EUR)`);
+  lines.push('');
+  lines.push(`Density: ${econData.density} t/m³ → Total tons: ${econData.total_tons.toFixed(2)} t/year`);
+  lines.push(`Stripping ratio: ${econData.sr}:1, Basis: ${bDesc}`);
+  lines.push(`Recoverable ore: ${econData.ore_tons.toFixed(2)} t/year`);
+  lines.push(`Ore price: ${econData.orePrice} EUR/t → Revenue: ${econData.ore_revenue_EUR.toFixed(2)} EUR/year`);
+  lines.push(`Estimated profit: ${econData.annual_profit_EUR.toFixed(2)} EUR/year`);
+  lines.push('');
+  lines.push('Notes:');
+  lines.push('- If production is total (ore + waste), ore tons = total_tons / (SR + 1).');
+  lines.push('- If production is waste-only, ore tons = total_tons / SR.');
+  // Create and download the file
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'step5_economics_report.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Compile a comprehensive text report covering Steps 0 through 5.
+// This function runs all necessary calculations to populate mfData, prodData,
+// costData and econData, then assembles a report with inputs, outputs,
+// formulas, concepts and factual suggestions.  The report is downloaded as
+// a plain text file.
+function downloadProjectReport() {
+  // Ensure all calculations are current
+  try {
+    calculateMF();
+    calculateProduction();
+    showSummary();
+    calculateTCO();
+    calculateEcon();
+  } catch (e) {
+    // ignore errors and use whatever data is available
+  }
+  // Helpers for formatting numbers
+  const fmt2 = n => (typeof n === 'number' && !isNaN(n)) ? n.toLocaleString(undefined, {maximumFractionDigits:2}) : '—';
+  const fmt0 = n => (typeof n === 'number' && !isNaN(n)) ? n.toLocaleString(undefined, {maximumFractionDigits:0}) : '—';
+  // Start building the report
+  let report = '';
+  report += 'Shovel–Truck Project Report\n';
+  report += '==============================\n\n';
+  // Step 0
+  report += 'STEP 0: Equipment Selection\n';
+  const shovelName = (typeof selectedShovel !== 'undefined' && selectedShovel && selectedShovel.model) ? selectedShovel.model : ($('shovel_query') ? $('shovel_query').value : 'N/A');
+  const shovelOEM = $('shovel_oem') ? $('shovel_oem').value : 'N/A';
+  report += '  Shovel OEM: ' + shovelOEM + '\n';
+  report += '  Shovel Model: ' + shovelName + '\n';
+  if (typeof selectedShovel !== 'undefined' && selectedShovel) {
+    report += '    Bucket Capacity: ' + (selectedShovel.bucket != null ? selectedShovel.bucket + ' m³' : 'N/A') + '\n';
+    report += '    Cycle Time: ' + (selectedShovel.cycle != null ? selectedShovel.cycle + ' sec' : 'N/A') + '\n';
+    report += '    Recommended Truck Capacity: ' + (selectedShovel.capacity != null ? selectedShovel.capacity + ' m³' : 'N/A') + '\n';
+    report += '    Engine Power: ' + (selectedShovel.hp != null ? selectedShovel.hp + ' hp' : 'N/A') + '\n';
+  }
+  const truckName = (typeof selectedTruck !== 'undefined' && selectedTruck && selectedTruck.model) ? selectedTruck.model : ($('truck_query') ? $('truck_query').value : 'N/A');
+  const truckOEM = $('truck_oem') ? $('truck_oem').value : 'N/A';
+  report += '  Truck OEM: ' + truckOEM + '\n';
+  report += '  Truck Model: ' + truckName + '\n';
+  if (typeof selectedTruck !== 'undefined' && selectedTruck) {
+    report += '    Capacity: ' + (selectedTruck.capacity != null ? selectedTruck.capacity + ' m³' : 'N/A') + '\n';
+    report += '    Engine Power: ' + (selectedTruck.hp != null ? selectedTruck.hp + ' hp' : 'N/A') + '\n';
+  }
+  report += '\n';
+  // Step 1
+  report += 'STEP 1: Fleet Data & Matching Factor\n';
+  report += '  Inputs:\n';
+  report += '    Number of shovels: ' + ($('shovel_count') ? $('shovel_count').value : 'N/A') + '\n';
+  report += '    Shovel bucket capacity: ' + ($('bucket_capacity') ? $('bucket_capacity').value : 'N/A') + ' m³\n';
+  report += '    Shovel cycle time: ' + ($('shovel_cycle_time') ? $('shovel_cycle_time').value : 'N/A') + ' sec\n';
+  report += '    Truck capacity: ' + ($('truck_capacity') ? $('truck_capacity').value : 'N/A') + ' m³\n';
+  report += '    Haul distance: ' + ($('haul_distance') ? $('haul_distance').value : 'N/A') + ' km\n';
+  report += '    Haul speed: ' + ($('haul_speed') ? $('haul_speed').value : 'N/A') + ' km/h\n';
+  report += '    Return speed: ' + ($('return_speed') ? $('return_speed').value : 'N/A') + ' km/h\n';
+  report += '    Dump time: ' + ($('dump_time') ? $('dump_time').value : 'N/A') + ' sec\n';
+  report += '    Idle time: ' + ($('idle_time') ? $('idle_time').value : 'N/A') + ' sec\n';
+  report += '    Number of trucks: ' + ($('truck_count') ? $('truck_count').value : 'N/A') + '\n\n';
+  report += '  Calculations & Outputs:\n';
+  if (typeof mfData !== 'undefined' && mfData.mf) {
+    report += '    Matching Factor (MF): ' + mfData.mf + '\n';
+    report += '      Classification: ' + mfData.mfMsg + '\n';
+    report += '      Suggestion: ' + mfData.suggestion + '\n';
+    report += '    Buckets per truck = truck capacity / shovel bucket capacity = ' + mfData.buckets + '\n';
+    report += '    Load time (sec) = buckets × cycle time = ' + mfData.loadTime + '\n';
+    report += '    Haul time (sec) = (haul distance / haul speed) × 3600 = ' + mfData.haulTime + '\n';
+    report += '    Return time (sec) = (haul distance / return speed) × 3600 = ' + mfData.returnTime + '\n';
+    report += '    Cycle time (sec) = load + haul + dump + idle + return = ' + mfData.cycleTime + '\n';
+    report += '    Formula: MF = (number of trucks × load time) / (cycle time × number of shovels)\n';
+  } else {
+    report += '    Matching Factor calculation not available (incomplete inputs).\n';
+  }
+  report += '  Concept: The matching factor compares how well the fleet of trucks is matched to the shovel(s).  A value near 1 means balanced utilisation; values below 1 indicate potential shovel idling (too few trucks or long haul cycles); values above 1 indicate truck idling (excess trucks or slow shovels).\n\n';
+  // Step 2
+  report += 'STEP 2: Production Factors & Outputs\n';
+  report += '  Inputs:\n';
+  report += '    Swell factor: ' + ($('swell_factor') ? $('swell_factor').value : 'N/A') + '\n';
+  report += '    Machine travel & positioning factor (M): ' + ($('machine_factor') ? $('machine_factor').value : 'N/A') + '\n';
+  report += '    Bucket fill factor: ' + ($('bucket_fill_factor') ? $('bucket_fill_factor').value : 'N/A') + '\n';
+  report += '    Shovel availability: ' + ($('shovel_avail') ? $('shovel_avail').value : 'N/A') + '\n';
+  report += '    Shovel utilisation: ' + ($('shovel_util') ? $('shovel_util').value : 'N/A') + '\n';
+  report += '    Truck availability: ' + ($('truck_avail') ? $('truck_avail').value : 'N/A') + '\n';
+  report += '    Truck utilisation: ' + ($('truck_util') ? $('truck_util').value : 'N/A') + '\n';
+  report += '    Hours per shift: ' + ($('work_hr_shift') ? $('work_hr_shift').value : 'N/A') + '\n';
+  report += '    Shifts per day: ' + ($('num_shifts') ? $('num_shifts').value : 'N/A') + '\n';
+  report += '    Working days per year: ' + ($('work_days') ? $('work_days').value : 'N/A') + '\n\n';
+  report += '  Calculations & Outputs:\n';
+  if (typeof prodData !== 'undefined' && prodData.Q_shovel_adj != null) {
+    report += '    Shovel hourly production (adjusted): ' + fmt2(prodData.Q_shovel_adj) + ' m³/hr\n';
+    report += '    Truck hourly production (all trucks): ' + fmt2(prodData.Q_truck_adj) + ' m³/hr\n';
+    report += '    Shovel shift/day/year production: ' + fmt2(prodData.Q_shovel_shift) + ' / ' + fmt2(prodData.Q_shovel_day) + ' / ' + fmt2(prodData.Q_shovel_year) + ' m³\n';
+    report += '    Truck shift/day/year production: ' + fmt2(prodData.Q_truck_shift) + ' / ' + fmt2(prodData.Q_truck_day) + ' / ' + fmt2(prodData.Q_truck_year) + ' m³\n';
+    report += '    System bottleneck: ' + prodData.bottleneck + '\n';
+    report += '    System-limiting annual production: ' + fmt2(prodData.sys_total) + ' m³\n';
+    report += '    Formulas:\n';
+    report += '      Hourly shovel production = bucket × fill factor × swell factor × machine factor × 3600 / cycle time × availability × utilisation × number of shovels\n';
+    report += '      Hourly truck production = truck capacity × fill factor × swell factor × machine factor × 3600 / cycle time × availability × utilisation × number of trucks\n';
+    report += '      Shift/Day/Year production = hourly production × hours per shift × shifts per day × working days per year\n';
+    report += '      System‑limiting production = min(shovel yearly production, truck yearly production)\n';
+  } else {
+    report += '    Production calculations not available (incomplete inputs).\n';
+  }
+  report += '  Concept: Production estimates account for bucket fill, material swell, machine travel & positioning (M), equipment availability and utilisation, and shift schedule.  Because OEM capacities are treated as bank volumes (BCM), both shovel and truck capacities are first converted to loose volume (LCM) by multiplying by the swell factor and the fill factor.  The machine factor reduces effective production to reflect time spent repositioning the equipment during each cycle【279026639092705†L101-L105】.  The system bottleneck is whichever equipment (shovel or trucks) has the lower annual production, because production cannot exceed its capacity.\n\n';
+  // Step 3
+  report += 'STEP 3: Summary & Fleet Matching\n';
+  report += '  System bottleneck: ' + (prodData && prodData.bottleneck ? prodData.bottleneck : 'N/A') + '\n';
+  report += '  System-limiting production: ' + (prodData && prodData.sys_total ? fmt2(prodData.sys_total) + ' m³/year' : 'N/A') + '\n';
+  report += '  Matching Factor classification: ' + (mfData && mfData.mfMsg ? mfData.mfMsg : 'N/A') + '\n';
+  report += '  Suggestion: ' + (mfData && mfData.suggestion ? mfData.suggestion : 'N/A') + '\n';
+  report += '  Concept: The summary restates the key performance indicators – the bottleneck and the fleet match.  Adjusting equipment numbers or improving cycle times can shift the bottleneck and improve utilisation.\n\n';
+  // Step 4
+  report += 'STEP 4: Cost of Ownership\n';
+  const eq1Name = $('eq1_name') ? $('eq1_name').value || 'Equipment 1' : 'Equipment 1';
+  const eq2Name2 = $('eq2_name') ? $('eq2_name').value || 'Equipment 2' : 'Equipment 2';
+  const eq1Units = $('eq1_units_count') ? (parseFloat($('eq1_units_count').value) || 1) : 1;
+  const eq2Units = $('eq2_units_count') ? (parseFloat($('eq2_units_count').value) || 1) : 1;
+  report += '  Inputs:\n';
+  report += '    ' + eq1Name + ':\n';
+  report += '      Units: ' + eq1Units + '\n';
+  report += '      Cost per unit: ' + ($('eq1_cost') ? fmt2(parseFloat($('eq1_cost').value)) : 'N/A') + ' €\n';
+  report += '      Life: ' + ($('eq1_life') ? fmt2(parseFloat($('eq1_life').value)) : 'N/A') + ' years\n';
+  report += '      Salvage per unit: ' + ($('eq1_salvage') ? fmt2(parseFloat($('eq1_salvage').value)) : 'N/A') + ' €\n';
+  report += '    ' + eq2Name2 + ':\n';
+  report += '      Units: ' + eq2Units + '\n';
+  report += '      Cost per unit: ' + ($('eq2_cost') ? fmt2(parseFloat($('eq2_cost').value)) : 'N/A') + ' €\n';
+  report += '      Life: ' + ($('eq2_life') ? fmt2(parseFloat($('eq2_life').value)) : 'N/A') + ' years\n';
+  report += '      Salvage per unit: ' + ($('eq2_salvage') ? fmt2(parseFloat($('eq2_salvage').value)) : 'N/A') + ' €\n';
+  report += '    Operating assumptions:\n';
+  report += '      Hours per shift: ' + ($('op_hours') ? fmt2(parseFloat($('op_hours').value)) : 'N/A') + '\n';
+  report += '      Shifts per day: ' + ($('op_shifts') ? fmt2(parseFloat($('op_shifts').value)) : 'N/A') + '\n';
+  report += '      Operating days per year: ' + ($('op_days') ? fmt2(parseFloat($('op_days').value)) : 'N/A') + '\n';
+  report += '      Annual hours: ' + ($('op_annual') ? fmt2(parseFloat($('op_annual').value)) : 'N/A') + '\n';
+  report += '      IIT rate: ' + ($('rate_iit') ? fmt2(parseFloat($('rate_iit').value)) : 'N/A') + ' %\n';
+  report += '      Discount rate: ' + ($('rate_disc') ? fmt2(parseFloat($('rate_disc').value)) : 'N/A') + ' %\n';
+  report += '    Manpower assumptions:\n';
+  report += '      Operators per unit (Eq1/Eq2): ' + ($('op1_ops') ? fmt2(parseFloat($('op1_ops').value)) : 'N/A') + ' / ' + ($('op2_ops') ? fmt2(parseFloat($('op2_ops').value)) : 'N/A') + '\n';
+  report += '      Helpers per unit (Eq1/Eq2): ' + ($('op1_help') ? fmt2(parseFloat($('op1_help').value)) : 'N/A') + ' / ' + ($('op2_help') ? fmt2(parseFloat($('op2_help').value)) : 'N/A') + '\n';
+  report += '      Operator monthly wage: ' + ($('op_wage') ? fmt2(parseFloat($('op_wage').value)) : 'N/A') + ' €\n';
+  report += '      Helper monthly wage: ' + ($('help_wage') ? fmt2(parseFloat($('help_wage').value)) : 'N/A') + ' €\n';
+  report += '    Power & consumption:\n';
+  report += '      Power per hour (Eq1/Eq2): ' + ($('pwr1') ? fmt2(parseFloat($('pwr1').value)) : 'N/A') + ' / ' + ($('pwr2') ? fmt2(parseFloat($('pwr2').value)) : 'N/A') + '\n';
+  report += '      Energy unit cost: ' + ($('unit_cost') ? fmt2(parseFloat($('unit_cost').value)) : 'N/A') + ' €/unit\n';
+  report += '    Cost percentages:\n';
+  report += '      Lubrication: ' + ($('lube_pct') ? fmt2(parseFloat($('lube_pct').value)) : 'N/A') + ' % of power\n';
+  report += '      Maintenance: ' + ($('maint_pct') ? fmt2(parseFloat($('maint_pct').value)) : 'N/A') + ' % of depreciation\n';
+  report += '      Breakdown: ' + ($('break_pct') ? fmt2(parseFloat($('break_pct').value)) : 'N/A') + ' % of cost\n\n';
+  // outputs for Step 4 (using aggregated costData)
+  if (typeof costData !== 'undefined' && costData.tot1 != null) {
+    // aggregated totals from costData
+    const Tot1 = costData.tot1;
+    const Tot2 = costData.tot2;
+    const totalAnnualCost = Tot1 + Tot2;
+    const AH4 = ($('op_annual') ? parseFloat($('op_annual').value) : 0) || (( $('op_hours') && $('op_shifts') && $('op_days') ) ? parseFloat($('op_hours').value) * parseFloat($('op_shifts').value) * parseFloat($('op_days').value) : 0);
+    report += '  Outputs:\n';
+    report += '    Total annual cost for ' + eq1Name + ': ' + fmt2(Tot1) + ' €\n';
+    report += '    Total annual cost for ' + eq2Name2 + ': ' + fmt2(Tot2) + ' €\n';
+    report += '    Combined annual cost: ' + fmt2(totalAnnualCost) + ' €\n';
+    report += '    Cost per operating hour (Eq1/Eq2): ' + (AH4>0 ? fmt2(Tot1 / AH4) : '—') + ' / ' + (AH4>0 ? fmt2(Tot2 / AH4) : '—') + ' €\n';
+  } else {
+    report += '  Outputs:\n    Cost calculations not available (incomplete inputs).\n';
+  }
+  report += '  Concept: Ownership costs comprise depreciation of the purchase price (minus salvage) and interest/insurance/tax on the average annual investment.  Operating costs are labour, power, lubrication, maintenance (as a percentage of depreciation), and breakdown allowances.  Total annual cost is ownership plus operating cost.  Equivalent annual cost (EAC) annualises the capital cost.  Payback period shows how long it takes for operating cost savings to recover the initial outlay.\n\n';
+  // Step 5
+  report += 'STEP 5: Project Economics\n';
+  report += '  Inputs:\n';
+  report += '    Sets of ' + eq1Name + ': ' + ($('eq1_units') ? $('eq1_units').value : '1') + '\n';
+  report += '    Sets of ' + eq2Name2 + ': ' + ($('eq2_units') ? $('eq2_units').value : '1') + '\n';
+  report += '    EUR→INR rate: ' + ($('eur_inr') ? $('eur_inr').value : 'N/A') + '\n';
+  report += '    Material density: ' + ($('density') ? $('density').value : 'N/A') + ' t/m³\n';
+  report += '    Stripping ratio: ' + ($('sr') ? $('sr').value : 'N/A') + '\n';
+  report += '    Production basis: ' + ($('basis') && $('basis').value === 'total' ? 'Total (ore + waste)' : 'Waste only') + '\n';
+  report += '    Ore price: ' + ($('ore_price') ? $('ore_price').value : 'N/A') + ' €/t\n';
+  report += '    Annual production: ' + ($('annual_prod_m3') ? $('annual_prod_m3').value : 'N/A') + ' m³/year\n\n';
+  report += '  Outputs:\n';
+  if (typeof econData !== 'undefined' && econData.totalCostEUR != null) {
+    report += '    Total annual cost: ' + fmt2(econData.totalCostEUR) + ' €\n';
+    report += '    Total annual production: ' + fmt2(econData.prod_m3) + ' m³\n';
+    report += '    Cost per m³: ' + fmt2(econData.costPerM3_EUR) + ' €\n';
+    report += '    Cost per m³ in INR: ' + fmt0(econData.costPerM3_INR) + ' INR\n';
+    report += '    Total tons: ' + fmt2(econData.total_tons) + ' t\n';
+    report += '    Recoverable ore: ' + fmt2(econData.ore_tons) + ' t\n';
+    report += '    Ore revenue: ' + fmt2(econData.ore_revenue_EUR) + ' €\n';
+    report += '    Estimated annual profit: ' + fmt2(econData.annual_profit_EUR) + ' €\n';
+  } else {
+    report += '    Economics calculations not available (incomplete inputs).\n';
+  }
+  report += '  Concept: Project economics turn production and cost figures into financial metrics.  Dividing annual cost by annual production yields cost per cubic metre in € and INR.  Using material density converts volume to tons.  Dividing by the stripping ratio (or SR+1 for total basis) estimates recoverable ore.  Multiplying by ore price gives revenue, and subtracting total cost yields profit.\n\n';
+  // Overall suggestions
+  report += 'OVERALL SUGGESTIONS:\n';
+  report += '  • Balance your fleet by matching truck cycles to shovel cycles (MF ≈ 1); adjust equipment numbers or cycle times accordingly.\n';
+  report += '  • Maximise availability and utilisation through preventive maintenance and efficient scheduling.\n';
+  report += '  • Optimise bucket fill and minimise swell to enhance volumetric efficiency.\n';
+  report += '  • Evaluate equipment life and salvage values to reduce depreciation and ownership costs.\n';
+  report += '  • Control power, lubrication, maintenance and breakdown costs via energy efficiency and regular servicing.\n';
+  report += '  • Use project economics to assess profitability: adjust production volume, monitor ore price and stripping ratio, and consider sensitivity analyses.\n';
+  report += '  • Consider payback, EAC, and system bottleneck together when making investment decisions.\n\n';
+  // Download file
+  const blob = new Blob([report], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'project_report.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
