@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ultimate Dragline Production Calculator</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body {
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      color: #222;
+    }
+    .container {
+      max-width: 620px;
+      margin: 2em auto;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 16px #0002;
+      padding: 2em 1.2em;
+    }
+    h1 {
+      color: #1a237e;
+      font-size: 1.8em;
+      text-align: center;
+      margin-bottom: 1.3em;
+      letter-spacing: 0.02em;
+    }
+    h2 {
+      color: #283593;
+      font-size: 1.18em;
+      margin-top: 1em;
+      margin-bottom: 0.75em;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+    .inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1em 1.5em;
+      margin-bottom: 1em;
+    }
+    label {
+      font-size: 1em;
+      color: #233;
+      font-weight: 500;
+      margin-bottom: 0.1em;
+    }
+    input[type=number], input[type=text], input[type=email] {
+      width: 100%;
+      padding: 0.38em;
+      font-size: 1em;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #f8fafd;
+      margin-top: 0.13em;
+      box-sizing: border-box;
+      transition: border 0.2s;
+    }
+    input:focus {
+      border: 1.5px solid #283593;
+      outline: none;
+      background: #fff;
+    }
+    select {
+      width: 100%;
+      padding: 0.38em;
+      font-size: 1em;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #f8fafd;
+      margin-top: 0.13em;
+      box-sizing: border-box;
+      transition: border 0.2s;
+      appearance: none;
+    }
+    select:focus {
+      border: 1.5px solid #283593;
+      outline: none;
+      background: #fff;
+    }
+    .full {
+      grid-column: span 2;
+    }
+    .btn-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1em;
+      margin-top: 0.7em;
+    }
+    button {
+      background: #283593;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.7em 1.2em;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 6px #0001;
+      transition: background 0.2s;
+    }
+    button:hover, button:focus {
+      background: #1a237e;
+    }
+    .page {
+      display: none;
+    }
+    .active {
+      display: block;
+    }
+    .prod-result, .cost-result, .econ-result {
+      background: #e8eaf6;
+      border-radius: 11px;
+      padding: 1em;
+      margin: 1em 0;
+      font-size: 1.05em;
+      color: #222;
+      box-shadow: 0 1px 7px #0001;
+    }
+
+    /*
+     * Nicely formatted cost summary table for the dragline cost step.
+     * Groups ownership and operating components in separate sections with
+     * alternating row backgrounds for improved readability. The table
+     * inherits the same soft colour palette as the rest of the calculator
+     * but stands out as a structured summary rather than a plain list.
+     */
+    .cost-summary table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+    }
+    .cost-summary th, .cost-summary td {
+      padding: 0.45em 0.6em;
+      text-align: left;
+    }
+    .cost-summary th {
+      background: #c5cae9;
+      font-weight: 600;
+    }
+    .cost-summary tr:nth-child(even) td {
+      background: #f3f4fa;
+    }
+    .cost-summary .section-header td {
+      background: #e8eaf6;
+      font-weight: 600;
+      border-top: 1px solid #c5cae9;
+    }
+    .stepnote {
+      font-size: 0.95em;
+      color: #444;
+      margin-bottom: 0.5em;
+      background: #f5f7fa;
+      border-left: 3px solid #283593;
+      border-radius: 6px;
+      padding: 0.45em 0.8em;
+    }
+    .search-result {
+      background: #f8fafd;
+      border-radius: 8px;
+      padding: 0.9em;
+      margin: 0.7em 0;
+      font-size: 0.99em;
+      border: 1px solid #d3d6e2;
+      color: #222;
+    }
+    .search-result strong {
+      color: #283593;
+    }
+    h3 {
+      color: #283593;
+      font-size: 1.05em;
+      margin-top: 1.1em;
+      margin-bottom: 0.5em;
+      font-weight: 600;
+    }
+    @media (max-width:650px) { .container{padding:0.6em;} }
+    @media (max-width:500px) { .inputs{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Ultimate Dragline Production Calculator</h1>
+
+  <!-- Step 0: Discover Available Draglines -->
+  <div id="step0" class="page active">
+    <h2>Step 0: Discover Available Draglines</h2>
+    <div class="stepnote">
+      Select an OEM and model or enter a query to search for a dragline. Bucket capacities are given in bank cubic metres (BCM) by the OEM. When selected, the model's bucket capacity and cycle time will be pre‑filled for you.
+    </div>
+    <div class="inputs">
+      <label>OEM Supplier
+        <select id="dl_oem">
+          <option value="">-- Select OEM --</option>
+        </select>
+      </label>
+      <label>Model or Query
+        <input type="text" id="dl_query" placeholder="e.g. HS 8300">
+      </label>
+      <button type="button" id="dl_search">Search</button>
+      <button type="button" id="dl_skip">Skip &amp; Enter Manually</button>
+    </div>
+    <div id="dl_suggestions"></div>
+  </div>
+
+  <!-- Step 1: Production Inputs -->
+  <div id="step1" class="page">
+    <h2>Step 1: Dragline Production Parameters</h2>
+    <div class="stepnote">
+      Provide the dragline specifications and production factors to estimate output. Capacities are in BCM; they will be multiplied by the bucket fill factor and swell factor to convert to loose volume. The formula used is:<br>
+      <em>Hourly production = bucket capacity × fill factor × swell factor × machine factor × 3600 / cycle time × availability × utilisation × number of draglines.</em>
+    </div>
+    <form id="prodForm" onsubmit="return false;">
+      <div class="inputs">
+        <label>Dragline Bucket Capacity (m³)
+          <input type="number" id="dl_bucket" min="0" step="0.01">
+        </label>
+        <label>Cycle Time (sec)
+          <input type="number" id="dl_cycle" min="1" step="0.1">
+        </label>
+        <label>Bucket Fill Factor
+          <input type="number" id="dl_fill" value="1.0" step="0.01" min="0">
+        </label>
+        <label>Swell Factor
+          <input type="number" id="dl_swell" value="1.2" step="0.01" min="1">
+        </label>
+        <label>Machine Travel &amp; Positioning Factor (M)
+          <input type="number" id="dl_m" value="1.0" step="0.01" min="0">
+        </label>
+        <label>Availability
+          <input type="number" id="dl_av" value="0.73" step="0.01" min="0" max="1">
+        </label>
+        <label>Utilisation
+          <input type="number" id="dl_ut" value="0.6958" step="0.01" min="0" max="1">
+        </label>
+        <label>Number of Draglines
+          <input type="number" id="dl_count" value="1" min="1" step="1">
+        </label>
+        <label>Hours per Shift
+          <input type="number" id="dl_hours" value="8" step="0.1" min="0">
+        </label>
+        <label>Shifts per Day
+          <input type="number" id="dl_shifts" value="3" min="1" step="1">
+        </label>
+        <label>Total Working Days
+          <input type="number" id="dl_days" value="240" min="1" step="1">
+        </label>
+      </div>
+      <div class="btn-row" style="justify-content:flex-start">
+        <button type="button" id="btnCalcProd">Calculate Production</button>
+        <button type="button" id="btnToCost" disabled>Next: Cost of Ownership</button>
+      </div>
+    </form>
+    <div id="prodResult" class="prod-result" style="display:none;"></div>
+  </div>
+
+  <!-- Step 2: Cost of Ownership -->
+  <div id="step2" class="page">
+    <h2>Step 2: Cost of Ownership</h2>
+    <div class="stepnote">
+      Enter cost and operational parameters to estimate annual ownership and operating costs for the dragline. All costs are on a per‑unit basis; they will be scaled by the number of units specified in Step 1.
+    </div>
+    <form id="costForm" onsubmit="return false;">
+      <div class="inputs">
+        <label>Unit Cost (€)
+          <!-- Default cost based on example: 5 000 000 € per dragline -->
+          <input type="number" id="cost_price" value="5000000" min="0" step="0.01">
+        </label>
+        <label>Service Life (years)
+          <!-- Life of the dragline in years (example: 20.5069 yrs) -->
+          <input type="number" id="cost_life" value="20.50693134" min="1" step="0.001">
+        </label>
+        <label>Salvage Value (€)
+          <!-- Salvage value: set to 0 for example calculations (salvage not used in depreciation) -->
+          <input type="number" id="cost_salvage" value="0" min="0" step="0.01">
+        </label>
+        <label>Interest, Insurance &amp; Tax Rate (%)
+          <input type="number" id="cost_iit" value="15" min="0" step="0.1">
+        </label>
+        <label>Discount Rate (%)
+          <input type="number" id="cost_disc" value="10" min="0" step="0.1">
+        </label>
+        <label>Operators (per unit)
+          <input type="number" id="cost_ops" value="3" min="0" step="1">
+        </label>
+        <label>Operator Monthly Wage (€)
+          <input type="number" id="cost_ops_wage" value="600" min="0" step="0.01">
+        </label>
+        <label>Helpers (per unit)
+          <input type="number" id="cost_helpers" value="3" min="0" step="1">
+        </label>
+        <label>Helper Monthly Wage (€)
+          <input type="number" id="cost_helper_wage" value="400" min="0" step="0.01">
+        </label>
+        <label>Power Requirement (kW per hour)
+          <input type="number" id="cost_power" value="70" min="0" step="0.1">
+        </label>
+        <label>Energy Unit Cost (€ per kWh)
+          <!-- Default 0.95 €/kWh to match typical fuel cost of 70 litres per hour × annual hours -->
+          <input type="number" id="cost_energy" value="0.95" min="0" step="0.01">
+        </label>
+        <label>Lubrication Cost (% of power)
+          <input type="number" id="cost_lube" value="30" min="0" step="0.1">
+        </label>
+        <label>Maintenance Cost (% of depreciation)
+          <input type="number" id="cost_maint" value="20" min="0" step="0.1">
+        </label>
+        <label>Breakdown Cost (% of cost)
+          <input type="number" id="cost_break" value="2" min="0" step="0.1">
+        </label>
+      </div>
+      <div class="btn-row" style="justify-content:flex-start">
+        <button type="button" id="btnCalcCost">Calculate Costs</button>
+        <button type="button" id="btnBackProd">Back</button>
+        <button type="button" id="btnToEcon" disabled>Next: Project Economics</button>
+      </div>
+    </form>
+    <div id="costResult" class="cost-result" style="display:none;"></div>
+  </div>
+
+  <!-- Step 3: Project Economics -->
+  <div id="step3" class="page">
+    <h2>Step 3: Project Economics</h2>
+    <div class="stepnote">
+      Combine annual costs with annual production to estimate cost per m³, revenue and profit. All calculations are based on your inputs and no assumptions are made beyond what you provide.
+    </div>
+    <form id="econForm" onsubmit="return false;">
+      <div class="inputs">
+        <label>Units of Dragline (sets)
+          <input type="number" id="econ_sets" value="1" min="1" step="1">
+        </label>
+        <label>EUR → INR rate
+          <input type="number" id="econ_rate" value="100" min="0" step="0.01">
+        </label>
+        <label>Material Density (t/m³)
+          <input type="number" id="econ_density" value="1.6" min="0.1" step="0.01">
+        </label>
+        <label>Stripping Ratio (waste:ore)
+          <input type="number" id="econ_sr" value="7" min="0.1" step="0.1">
+        </label>
+        <label>Production Basis
+          <select id="econ_basis">
+            <option value="waste">Waste only</option>
+            <option value="total">Total (ore + waste)</option>
+          </select>
+        </label>
+        <label>Ore Price (€/t)
+          <input type="number" id="econ_price" value="10" min="0" step="0.01">
+        </label>
+        <label class="full">Annual Production (m³/year)
+          <input type="number" id="econ_prod" readonly>
+        </label>
+      </div>
+      <div class="btn-row" style="justify-content:flex-start">
+        <button type="button" id="btnCalcEcon">Calculate Economics</button>
+        <button type="button" id="btnBackCost">Back</button>
+        <button type="button" id="btnDownloadReport">Download Project Report</button>
+      </div>
+    </form>
+    <div id="econResult" class="econ-result" style="display:none;"></div>
+  </div>
+</div>
+
+<script>
+// Helper to select element by id
+const $ = (id) => document.getElementById(id);
+
+// Dataset of draglines: bucket capacities in BCM, cycle times in seconds
+const draglineData = {
+  "Liebherr": [
+    { model: "HS 8300", bucket: 11.5, cycle: 45, power: 1675 },
+    { model: "HS 8130", bucket: 5.7, cycle: 45, power: 1000 },
+    { model: "HS 8100", bucket: 4.6, cycle: 45, power: 600 },
+    { model: "HS 8040", bucket: 3.1, cycle: 45, power: 300 }
+  ]
+};
+
+// Populate OEM dropdown on load
+document.addEventListener('DOMContentLoaded', () => {
+  const oemSelect = $('dl_oem');
+  Object.keys(draglineData).forEach(oem => {
+    const opt = document.createElement('option');
+    opt.value = oem;
+    opt.textContent = oem;
+    oemSelect.appendChild(opt);
+  });
+});
+
+// Show suggestions based on OEM and query
+function showDraglineSuggestions() {
+  const oem = $('dl_oem').value;
+  const query = $('dl_query').value.trim().toLowerCase();
+  const suggDiv = $('dl_suggestions');
+  suggDiv.innerHTML = '';
+  if (!oem) return;
+  const models = draglineData[oem] || [];
+  const filtered = models.filter(item => !query || item.model.toLowerCase().includes(query));
+  if (filtered.length) {
+    filtered.forEach(item => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.style.display = 'block';
+      btn.style.margin = '0.3em 0';
+      btn.style.width = '100%';
+      btn.style.border = '1px solid #d3d6e2';
+      btn.style.background = '#f5f7fa';
+      btn.style.borderRadius = '6px';
+      btn.style.padding = '0.6em';
+      btn.textContent = `${item.model} (Bucket: ${item.bucket} m³, Cycle: ${item.cycle}s)`;
+      btn.onclick = () => applyDragline(item);
+      suggDiv.appendChild(btn);
+    });
+  } else {
+    suggDiv.textContent = 'No results found. Try a different query or fill specs manually.';
+  }
+}
+
+// Apply selected dragline specs to Step1 inputs
+function applyDragline(item) {
+  $('dl_bucket').value = item.bucket;
+  $('dl_cycle').value = item.cycle;
+  showPage('step1');
+}
+
+// Search button
+$('dl_search').addEventListener('click', () => {
+  showDraglineSuggestions();
+});
+// OEM change triggers suggestions
+$('dl_oem').addEventListener('change', () => {
+  showDraglineSuggestions();
+});
+// Skip button: move to step1 without suggestions
+$('dl_skip').addEventListener('click', () => {
+  showPage('step1');
+});
+
+// Show page by id
+function showPage(id) {
+  ['step0','step1','step2','step3'].forEach(pid => {
+    const page = $(pid);
+    if (page) page.style.display = pid === id ? 'block' : 'none';
+  });
+}
+
+// Production calculation
+function calculateProduction() {
+  const bucket = parseFloat($('dl_bucket').value) || 0;
+  const cycle = parseFloat($('dl_cycle').value) || 1;
+  const fill = parseFloat($('dl_fill').value) || 1;
+  const swell = parseFloat($('dl_swell').value) || 1;
+  const m = parseFloat($('dl_m').value) || 1;
+  const avail = parseFloat($('dl_av').value) || 0;
+  const util = parseFloat($('dl_ut').value) || 0;
+  const count = parseFloat($('dl_count').value) || 1;
+  const hrs = parseFloat($('dl_hours').value) || 0;
+  const shifts = parseFloat($('dl_shifts').value) || 0;
+  const days = parseFloat($('dl_days').value) || 0;
+  const hourly = (bucket * fill * swell * m * 3600 / cycle) * avail * util * count;
+  const shiftProd = hourly * hrs;
+  const dayProd = shiftProd * shifts;
+  const yearProd = dayProd * days;
+  const resDiv = $('prodResult');
+  resDiv.style.display = 'block';
+  resDiv.innerHTML = `Hourly Production: <b>${hourly.toFixed(2)}</b> m³/hr<br>`+
+    `Per Shift Production: <b>${shiftProd.toFixed(2)}</b> m³<br>`+
+    `Per Day Production: <b>${dayProd.toFixed(2)}</b> m³<br>`+
+    `Annual Production: <b>${yearProd.toFixed(2)}</b> m³`;
+  window.prodData = { hourly, shiftProd, dayProd, yearProd, hrs, shifts, days };
+  $('btnToCost').disabled = false;
+  $('econ_prod').value = yearProd.toFixed(2);
+}
+
+$('btnCalcProd').addEventListener('click', calculateProduction);
+
+// Navigate to cost page
+$('btnToCost').addEventListener('click', () => {
+  showPage('step2');
+});
+
+// Back from cost to production page
+$('btnBackProd').addEventListener('click', () => {
+  showPage('step1');
+});
+
+// Cost calculation
+function calculateCost() {
+  const unitCost = parseFloat($('cost_price').value) || 0;
+  const life = parseFloat($('cost_life').value) || 1;
+  const salvage = parseFloat($('cost_salvage').value) || 0;
+  const iitRate = parseFloat($('cost_iit').value) || 0;
+  const discRate = parseFloat($('cost_disc').value) || 0;
+  const ops = parseFloat($('cost_ops').value) || 0;
+  const opsWage = parseFloat($('cost_ops_wage').value) || 0;
+  const helpers = parseFloat($('cost_helpers').value) || 0;
+  const helperWage = parseFloat($('cost_helper_wage').value) || 0;
+  const powerReq = parseFloat($('cost_power').value) || 0;
+  const energyCost = parseFloat($('cost_energy').value) || 0;
+  const lubePct = parseFloat($('cost_lube').value) || 0;
+  const maintPct = parseFloat($('cost_maint').value) || 0;
+  const breakPct = parseFloat($('cost_break').value) || 0;
+  const units = parseFloat($('dl_count').value) || 1;
+  const annualHours = window.prodData ? window.prodData.hrs * window.prodData.shifts * window.prodData.days : 0;
+  const dep = (unitCost - salvage) / life;
+  const ayInvest = ((life + 1) * unitCost + (life - 1) * salvage) / (2 * life);
+  const iit = ayInvest * iitRate / 100;
+  const own = dep + iit;
+  const manCost = (ops * opsWage + helpers * helperWage) * 12;
+  const powerCost = powerReq * annualHours * energyCost;
+  const lubeCost = powerCost * lubePct / 100;
+  const maintCost = dep * maintPct / 100;
+  const breakCost = unitCost * breakPct / 100;
+  const opCost = manCost + powerCost + lubeCost + maintCost + breakCost;
+  const ownTotal = own * units;
+  const opTotal = opCost * units;
+  const totalCost = ownTotal + opTotal;
+  const costPerHr = annualHours ? totalCost / (annualHours * units) : 0;
+  const r = discRate / 100;
+  const pvf = 1 / Math.pow(1 + r, life);
+  const crf = r * Math.pow(1 + r, life) / (Math.pow(1 + r, life) - 1);
+  const eac = (unitCost - salvage * pvf) * crf + opCost;
+  const payback = (unitCost - salvage) / opCost;
+  // Build a structured cost breakdown. Convert per‑unit values to totals by multiplying by units.
+  const overallCost = (unitCost - salvage) * units;
+  const deprTotal = dep * units;
+  const ayInvestTotal = ayInvest * units;
+  const iitTotal = iit * units;
+  const manTotal = manCost * units;
+  const powTotal = powerCost * units;
+  const lubeTotal = lubeCost * units;
+  const maintTotal = maintCost * units;
+  const breakTotal = breakCost * units;
+  // Compose an HTML table summarizing ownership and operating costs
+  let html = '<div class="cost-summary"><table>';
+  html += '<tr><th colspan="2">A. Cost of Ownership</th></tr>';
+  html += `<tr><td>Overall cost (machine cost − salvage)</td><td>€${overallCost.toFixed(2)}</td></tr>`;
+  html += `<tr><td>Depreciation cost</td><td>€${deprTotal.toFixed(2)}</td></tr>`;
+  html += `<tr><td>Average yearly investment</td><td>€${ayInvestTotal.toFixed(2)}</td></tr>`;
+  html += `<tr><td>Interest/Insurance/Tax per year</td><td>€${iitTotal.toFixed(2)}</td></tr>`;
+  html += `<tr class="section-header"><td>Total ownership cost</td><td>€${ownTotal.toFixed(2)}</td></tr>`;
+  html += '<tr><th colspan="2">B. Operating Cost per Year</th></tr>';
+  html += `<tr><td>Manpower cost</td><td>€${manTotal.toFixed(2)}</td></tr>`;
+  html += `<tr><td>Power consumption cost</td><td>€${powTotal.toFixed(2)}</td></tr>`;
+  html += `<tr><td>Lubrication cost</td><td>€${lubeTotal.toFixed(2)}</td></tr>`;
+  html += `<tr><td>Maintenance cost</td><td>€${maintTotal.toFixed(2)}</td></tr>`;
+  html += `<tr><td>Breakdown cost</td><td>€${breakTotal.toFixed(2)}</td></tr>`;
+  html += `<tr class="section-header"><td>Total operating cost</td><td>€${opTotal.toFixed(2)}</td></tr>`;
+  html += `<tr class="section-header"><td><b>Total annual cost</b></td><td><b>€${totalCost.toFixed(2)}</b></td></tr>`;
+  html += '</table>';
+  // Append summary metrics below the table
+  html += `<p style="margin-top:0.8em;"><b>Annual Hours:</b> ${annualHours.toFixed(2)} &nbsp; | &nbsp; <b>Units:</b> ${units}</p>`;
+  html += `<p><b>Cost per Hour:</b> €${costPerHr.toFixed(2)}</p>`;
+  html += `<p><b>PVF:</b> ${pvf.toFixed(3)} &nbsp; | &nbsp; <b>CRF:</b> ${crf.toFixed(3)}</p>`;
+  html += `<p><b>EAC:</b> €${eac.toFixed(2)} &nbsp; | &nbsp; <b>Payback Period:</b> ${payback.toFixed(2)} years</p>`;
+  html += '</div>';
+  const res = $('costResult');
+  res.style.display = 'block';
+  res.innerHTML = html;
+  window.costData = {
+    ownTotal, opTotal, totalCost, costPerHr, units, annualHours
+  };
+  // enable the Project Economics button once cost results are available
+  $('btnToEcon').disabled = false;
+}
+
+$('btnCalcCost').addEventListener('click', calculateCost);
+$('btnToEcon').addEventListener('click', () => {
+  if (window.prodData) {
+    $('econ_prod').value = window.prodData.yearProd.toFixed(2);
+  }
+  showPage('step3');
+});
+$('btnBackCost').addEventListener('click', () => {
+  showPage('step2');
+});
+
+// Economics calculation
+function calculateEcon() {
+  const sets = parseFloat($('econ_sets').value) || 1;
+  const rate = parseFloat($('econ_rate').value) || 0;
+  const dens = parseFloat($('econ_density').value) || 0;
+  const sr = parseFloat($('econ_sr').value) || 0;
+  const basis = $('econ_basis').value;
+  const price = parseFloat($('econ_price').value) || 0;
+  const annProd = parseFloat($('econ_prod').value) || 0;
+  const totalCost = (window.costData?.totalCost || 0) * sets;
+  const costPerM3 = annProd > 0 ? totalCost / annProd : 0;
+  const costPerM3INR = costPerM3 * rate;
+  const totalTons = annProd * dens;
+  const oreTons = basis === 'total' ? (totalTons / (sr + 1)) : (totalTons / sr);
+  const revenue = oreTons * price;
+  const profit = revenue - totalCost;
+  const res = $('econResult');
+  res.style.display = 'block';
+  res.innerHTML = `<b>Total Cost:</b> €${totalCost.toFixed(2)} / yr<br>`+
+    `<b>Total Production:</b> ${annProd.toFixed(2)} m³/yr<br>`+
+    `<b>Cost per m³:</b> €${costPerM3.toFixed(2)} | ${costPerM3INR.toFixed(2)} INR<br>`+
+    `<b>Total Tons:</b> ${totalTons.toFixed(2)} t/yr<br>`+
+    `<b>Recoverable Ore:</b> ${oreTons.toFixed(2)} t/yr<br>`+
+    `<b>Revenue:</b> €${revenue.toFixed(2)} / yr<br>`+
+    `<b>Estimated Profit:</b> €${profit.toFixed(2)} / yr`;
+  window.econData = { sets, rate, dens, sr, basis, price, annProd, totalCost, costPerM3, costPerM3INR, totalTons, oreTons, revenue, profit };
+}
+
+$('btnCalcEcon').addEventListener('click', calculateEcon);
+
+// Report download
+function downloadReport() {
+  if (!window.econData) calculateEcon();
+  const lines = [];
+  lines.push('Ultimate Dragline Production Calculator Report');
+  lines.push('');
+  lines.push('Step 0 – Selected Dragline');
+  const oem = $('dl_oem').value || 'N/A';
+  const query = $('dl_query').value || '';
+  lines.push(`  OEM: ${oem}`);
+  if (query) lines.push(`  Model search/query: ${query}`);
+  lines.push('');
+  lines.push('Step 1 – Production Inputs');
+  lines.push(`  Bucket capacity (BCM): ${$('dl_bucket').value}`);
+  lines.push(`  Cycle time (sec): ${$('dl_cycle').value}`);
+  lines.push(`  Bucket fill factor: ${$('dl_fill').value}`);
+  lines.push(`  Swell factor: ${$('dl_swell').value}`);
+  lines.push(`  Machine factor: ${$('dl_m').value}`);
+  lines.push(`  Availability: ${$('dl_av').value}`);
+  lines.push(`  Utilisation: ${$('dl_ut').value}`);
+  lines.push(`  Number of draglines: ${$('dl_count').value}`);
+  lines.push(`  Hours per shift: ${$('dl_hours').value}`);
+  lines.push(`  Shifts per day: ${$('dl_shifts').value}`);
+  lines.push(`  Working days per year: ${$('dl_days').value}`);
+  lines.push('');
+  const pd = window.prodData || {};
+  lines.push('  Production Outputs');
+  lines.push(`    Hourly production: ${pd.hourly?.toFixed(2) || 'N/A'} m³/hr`);
+  lines.push(`    Per shift: ${pd.shiftProd?.toFixed(2) || 'N/A'} m³`);
+  lines.push(`    Per day: ${pd.dayProd?.toFixed(2) || 'N/A'} m³`);
+  lines.push(`    Annual: ${pd.yearProd?.toFixed(2) || 'N/A'} m³`);
+  lines.push('');
+  lines.push('  Formula: hourly = bucket × fill × swell × M × 3600 / cycle × availability × utilisation × number');
+  lines.push('  Concept: Multiply bucket capacity by fill factor and swell factor to convert from bank to loose volume, then adjust by machine factor and divide by cycle time. Scale by availability, utilisation and the number of units.');
+  lines.push('');
+  lines.push('Step 2 – Cost of Ownership');
+  lines.push(`  Unit cost: €${$('cost_price').value}`);
+  lines.push(`  Life: ${$('cost_life').value} years`);
+  lines.push(`  Salvage value: €${$('cost_salvage').value}`);
+  lines.push(`  IIT rate: ${$('cost_iit').value}%`);
+  lines.push(`  Discount rate: ${$('cost_disc').value}%`);
+  lines.push(`  Operators: ${$('cost_ops').value} @ €${$('cost_ops_wage').value}/month`);
+  lines.push(`  Helpers: ${$('cost_helpers').value} @ €${$('cost_helper_wage').value}/month`);
+  lines.push(`  Power req: ${$('cost_power').value} kW/h @ €${$('cost_energy').value}/kWh`);
+  lines.push(`  Lube %: ${$('cost_lube').value}%`);
+  lines.push(`  Maintenance %: ${$('cost_maint').value}%`);
+  lines.push(`  Breakdown %: ${$('cost_break').value}%`);
+  lines.push('');
+  const cd = window.costData || {};
+  lines.push('  Cost Outputs');
+  lines.push(`    Annual ownership cost: €${cd.ownTotal?.toFixed(2) || 'N/A'}`);
+  lines.push(`    Annual operating cost: €${cd.opTotal?.toFixed(2) || 'N/A'}`);
+  lines.push(`    Total annual cost: €${cd.totalCost?.toFixed(2) || 'N/A'}`);
+  lines.push(`    Cost per hour: €${cd.costPerHr?.toFixed(2) || 'N/A'}`);
+  lines.push('  Formula: depreciation=(cost-salvage)/life; AYI=((life+1)*cost + (life-1)*salvage)/(2*life); IIT=AYI×IIT%; ownership=depreciation+IIT; operating = manpower + power + lube + maintenance + breakdown; total=ownership+operating.');
+  lines.push('  Concept: Convert capital cost into annual depreciation and average investment, apply interest/insurance/tax, and sum with annual operating costs to obtain total cost per unit.');
+  lines.push('');
+  lines.push('Step 3 – Project Economics');
+  lines.push(`  Sets of dragline: ${$('econ_sets').value}`);
+  lines.push(`  EUR→INR rate: ${$('econ_rate').value}`);
+  lines.push(`  Density: ${$('econ_density').value} t/m³`);
+  lines.push(`  Stripping ratio: ${$('econ_sr').value}:1`);
+  lines.push(`  Basis: ${$('econ_basis').value}`);
+  lines.push(`  Ore price: €${$('econ_price').value}/t`);
+  lines.push(`  Annual production: ${$('econ_prod').value} m³`);
+  lines.push('');
+  const ed = window.econData || {};
+  lines.push('  Economics Outputs');
+  lines.push(`    Total cost: €${ed.totalCost?.toFixed(2) || 'N/A'} / yr`);
+  lines.push(`    Cost per m³: €${ed.costPerM3?.toFixed(2) || 'N/A'} | ${ed.costPerM3INR?.toFixed(2) || 'N/A'} INR`);
+  lines.push(`    Total tons: ${ed.totalTons?.toFixed(2) || 'N/A'} t/yr`);
+  lines.push(`    Recoverable ore: ${ed.oreTons?.toFixed(2) || 'N/A'} t/yr`);
+  lines.push(`    Revenue: €${ed.revenue?.toFixed(2) || 'N/A'} / yr`);
+  lines.push(`    Estimated profit: €${ed.profit?.toFixed(2) || 'N/A'} / yr`);
+  lines.push('  Concept: Multiply annual cost by number of sets to get total cost. Divide by annual production for cost per m³. Convert volume to tonnage using density and stripping ratio. Estimate ore revenue and profit.');
+  lines.push('');
+  lines.push('This report presents a factual, step‑by‑step record of your dragline production calculation. No assumptions beyond your inputs were made.');
+  const blob = new Blob([lines.join('\n')], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dragline_project_report.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+$('btnDownloadReport').addEventListener('click', downloadReport);
+
+</script>
+</body>
+</html>
