@@ -1,0 +1,144 @@
+Shovel–Truck Project Report
+==============================
+
+STEP 0: Equipment Selection
+  Shovel OEM: Komatsu
+  Shovel Model: PC1000-1
+    Bucket Capacity: 5 m³
+    Cycle Time: 30 sec
+    Recommended Truck Capacity: 60 m³
+    Engine Power: 450 hp
+  Truck OEM: Komatsu
+  Truck Model: HD785-7
+    Capacity: 60 m³
+    Engine Power: 1200 hp
+
+STEP 1: Fleet Data & Matching Factor
+  Inputs:
+    Number of shovels: 1
+    Shovel bucket capacity: 5.4 m³
+    Shovel cycle time: 27 sec
+    Truck capacity: 60 m³
+    Haul distance: 0.208 km
+    Haul speed: 10 km/h
+    Return speed: 15 km/h
+    Dump time: 52 sec
+    Idle time: 127 sec
+    Number of trucks: 2
+
+  Calculations & Outputs:
+    Matching Factor (MF): 0.99
+      Classification: Fleet perfectly matched (MF ≈ 1).
+      Suggestion: Your fleet is balanced for optimal productivity.
+    Buckets per truck = truck capacity / shovel bucket capacity = 11.11
+    Load time (sec) = buckets × cycle time = 300.0
+    Haul time (sec) = (haul distance / haul speed) × 3600 = 74.9
+    Return time (sec) = (haul distance / return speed) × 3600 = 49.9
+    Cycle time (sec) = load + haul + dump + idle + return = 603.8
+    Formula: MF = (number of trucks × load time) / (cycle time × number of shovels)
+  Concept: The matching factor compares how well the fleet of trucks is matched to the shovel(s).  A value near 1 means balanced utilisation; values below 1 indicate potential shovel idling (too few trucks or long haul cycles); values above 1 indicate truck idling (excess trucks or slow shovels).
+
+STEP 2: Production Factors & Outputs
+  Inputs:
+    Swell factor: 1.2
+    Machine travel & positioning factor (M): 1
+    Bucket fill factor: 1.15
+    Shovel availability: 0.73
+    Shovel utilisation: 0.6958
+    Truck availability: 0.73
+    Truck utilisation: 0.6958
+    Hours per shift: 8
+    Shifts per day: 3
+    Working days per year: 240
+
+  Calculations & Outputs:
+    Shovel hourly production (adjusted): 504,68 m³/hr
+    Truck hourly production (all trucks): 501,51 m³/hr
+    Shovel shift/day/year production: 4.037,47 / 12.112,4 / 2.906.975,36 m³
+    Truck shift/day/year production: 4.012,06 / 12.036,17 / 2.888.680,39 m³
+    System bottleneck: Truck
+    System-limiting annual production: 2.888.680,39 m³
+    Formulas:
+      Hourly shovel production = bucket × fill factor × swell factor × machine factor × 3600 / cycle time × availability × utilisation × number of shovels
+      Hourly truck production = truck capacity × fill factor × swell factor × machine factor × 3600 / cycle time × availability × utilisation × number of trucks
+      Shift/Day/Year production = hourly production × hours per shift × shifts per day × working days per year
+      System‑limiting production = min(shovel yearly production, truck yearly production)
+  Concept: Production estimates account for bucket fill, material swell, machine travel & positioning (M), equipment availability and utilisation, and shift schedule.  Because OEM capacities are treated as bank volumes (BCM), both shovel and truck capacities are first converted to loose volume (LCM) by multiplying by the swell factor and the fill factor.  The machine factor reduces effective production to reflect time spent repositioning the equipment during each cycle【279026639092705†L101-L105】.  The system bottleneck is whichever equipment (shovel or trucks) has the lower annual production, because production cannot exceed its capacity.
+
+STEP 3: Summary & Fleet Matching
+  System bottleneck: Truck
+  System-limiting production: 2.888.680,39 m³/year
+  Matching Factor classification: Fleet perfectly matched (MF ≈ 1).
+  Suggestion: Your fleet is balanced for optimal productivity.
+  Concept: The summary restates the key performance indicators – the bottleneck and the fleet match.  Adjusting equipment numbers or improving cycle times can shift the bottleneck and improve utilisation.
+
+STEP 4: Cost of Ownership
+  Inputs:
+    PC1000-1:
+      Units: 1
+      Cost per unit: 700.000 €
+      Life: 10 years
+      Salvage per unit: 0 €
+    HD785:
+      Units: 2
+      Cost per unit: 900.000 €
+      Life: 17 years
+      Salvage per unit: 0 €
+    Operating assumptions:
+      Hours per shift: 8
+      Shifts per day: 3
+      Operating days per year: 240
+      Annual hours: 5.760
+      IIT rate: 15 %
+      Discount rate: 10 %
+    Manpower assumptions:
+      Operators per unit (Eq1/Eq2): 3 / 3
+      Helpers per unit (Eq1/Eq2): 3 / 3
+      Operator monthly wage: 600 €
+      Helper monthly wage: 400 €
+    Power & consumption:
+      Power per hour (Eq1/Eq2): 70 / 70
+      Energy unit cost: 1 €/unit
+    Cost percentages:
+      Lubrication: 30 % of power
+      Maintenance: 20 % of depreciation
+      Breakdown: 2 % of cost
+
+  Outputs:
+    Total annual cost for PC1000-1: 715.910 €
+    Total annual cost for HD785: 1.426.320 €
+    Combined annual cost: 2.142.230 €
+    Cost per operating hour (Eq1/Eq2): 124,29 / 247,63 €
+  Concept: Ownership costs comprise depreciation of the purchase price (minus salvage) and interest/insurance/tax on the average annual investment.  Operating costs are labour, power, lubrication, maintenance (as a percentage of depreciation), and breakdown allowances.  Total annual cost is ownership plus operating cost.  Equivalent annual cost (EAC) annualises the capital cost.  Payback period shows how long it takes for operating cost savings to recover the initial outlay.
+
+STEP 5: Project Economics
+  Inputs:
+    Sets of PC1000-1: 1
+    Sets of HD785: 1
+    EUR→INR rate: 100
+    Material density: 1.6 t/m³
+    Stripping ratio: 7
+    Production basis: Waste only
+    Ore price: 10 €/t
+    Annual production: 2888680.39 m³/year
+
+  Outputs:
+    Total annual cost: 2.142.230 €
+    Total annual production: 2.888.680,39 m³
+    Cost per m³: 0,74 €
+    Cost per m³ in INR: 74 INR
+    Total tons: 4.621.888,62 t
+    Recoverable ore: 660.269,8 t
+    Ore revenue: 6.602.698,03 €
+    Estimated annual profit: 4.460.468,03 €
+  Concept: Project economics turn production and cost figures into financial metrics.  Dividing annual cost by annual production yields cost per cubic metre in € and INR.  Using material density converts volume to tons.  Dividing by the stripping ratio (or SR+1 for total basis) estimates recoverable ore.  Multiplying by ore price gives revenue, and subtracting total cost yields profit.
+
+OVERALL SUGGESTIONS:
+  • Balance your fleet by matching truck cycles to shovel cycles (MF ≈ 1); adjust equipment numbers or cycle times accordingly.
+  • Maximise availability and utilisation through preventive maintenance and efficient scheduling.
+  • Optimise bucket fill and minimise swell to enhance volumetric efficiency.
+  • Evaluate equipment life and salvage values to reduce depreciation and ownership costs.
+  • Control power, lubrication, maintenance and breakdown costs via energy efficiency and regular servicing.
+  • Use project economics to assess profitability: adjust production volume, monitor ore price and stripping ratio, and consider sensitivity analyses.
+  • Consider payback, EAC, and system bottleneck together when making investment decisions.
+

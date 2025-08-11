@@ -1,0 +1,67 @@
+Ultimate Dragline Production Calculator Report
+
+Step 0 – Selected Dragline
+  OEM: Liebherr
+
+Step 1 – Production Inputs
+  Bucket capacity (BCM): 10.8
+  Cycle time (sec): 54
+  Bucket fill factor: 1.15
+  Swell factor: 1.2
+  Machine factor: 1.0
+  Availability: 0.9
+  Utilisation: 0.80
+  Number of draglines: 1
+  Hours per shift: 8
+  Shifts per day: 3
+  Working days per year: 240
+
+  Production Outputs
+    Hourly production: 715.39 m³/hr
+    Per shift: 5723.14 m³
+    Per day: 17169.41 m³
+    Annual: 4120657.92 m³
+
+  Formula: hourly = bucket × fill × swell × M × 3600 / cycle × availability × utilisation × number
+  Concept: Multiply bucket capacity by fill factor and swell factor to convert from bank to loose volume, then adjust by machine factor and divide by cycle time. Scale by availability, utilisation and the number of units.
+
+Step 2 – Cost of Ownership
+  Unit cost: €5000000
+  Life: 14 years
+  Salvage value: €0
+  IIT rate: 15%
+  Discount rate: 10%
+  Operators: 3 @ €600/month
+  Helpers: 3 @ €400/month
+  Power req: 70 kW/h @ €1/kWh
+  Lube %: 30%
+  Maintenance %: 20%
+  Breakdown %: 2%
+
+  Cost Outputs
+    Annual ownership cost: €758928.57
+    Annual operating cost: €731588.57
+    Total annual cost: €1490517.14
+    Cost per hour: €258.77
+  Formula: depreciation=(cost-salvage)/life; AYI=((life+1)*cost + (life-1)*salvage)/(2*life); IIT=AYI×IIT%; ownership=depreciation+IIT; operating = manpower + power + lube + maintenance + breakdown; total=ownership+operating.
+  Concept: Convert capital cost into annual depreciation and average investment, apply interest/insurance/tax, and sum with annual operating costs to obtain total cost per unit.
+
+Step 3 – Project Economics
+  Sets of dragline: 1
+  EUR→INR rate: 100
+  Density: 1.1 t/m³
+  Stripping ratio: 7:1
+  Basis: waste
+  Ore price: €10/t
+  Annual production: 4120657.92 m³
+
+  Economics Outputs
+    Total cost: €1490517.14 / yr
+    Cost per m³: €0.36 | 36.17 INR
+    Total tons: 4532723.71 t/yr
+    Recoverable ore: 647531.96 t/yr
+    Revenue: €6475319.59 / yr
+    Estimated profit: €4984802.45 / yr
+  Concept: Multiply annual cost by number of sets to get total cost. Divide by annual production for cost per m³. Convert volume to tonnage using density and stripping ratio. Estimate ore revenue and profit.
+
+This report presents a factual, step‑by‑step record of your dragline production calculation. No assumptions beyond your inputs were made.
