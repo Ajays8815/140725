@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import EquipmentForm from './components/EquipmentForm';
 import Results from './components/Results';
 import EquipmentTable from './components/EquipmentTable';
+import DraglineModal from './components/DraglineModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('selector');
+  const [showDraglineModal, setShowDraglineModal] = useState(false);
 
   const handleSelectionResults = (selectionResults) => {
     setResults(selectionResults);
@@ -66,6 +68,15 @@ function App() {
                   onClick={() => setActiveTab('equipment')}
                 >
                   Equipment Database
+                </button>
+              </li>
+              <li className="nav-item" role="presentation">
+                <button 
+                  className="nav-link"
+                  type="button" 
+                  onClick={() => setShowDraglineModal(true)}
+                >
+                  Dragline Diagram
                 </button>
               </li>
             </ul>
@@ -133,6 +144,12 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {/* Dragline Modal */}
+      <DraglineModal 
+        show={showDraglineModal} 
+        onHide={() => setShowDraglineModal(false)} 
+      />
     </div>
   );
 }
