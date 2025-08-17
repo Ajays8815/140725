@@ -1,0 +1,630 @@
+
+-0
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Unified Mining Calculator — Truck–Shovel vs Dragline</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root{
+    --bg:#0f172a; --panel:#111827; --card:#0b1220; --muted:#93a4bf;
+    --text:#e5e7eb; --ok:#10b981; --warn:#f59e0b; --bad:#ef4444;
+    --ts:#10b981; --dl:#7c3aed; --line:#1f2937;
+    --chip:#1f2a44; --chip-b:#233151;
+    --shadow:0 10px 30px rgba(0,0,0,.25);
+    --rad:16px;
+  }
+  html,body{height:100%}
+  body{
+    margin:0;background:linear-gradient(180deg,#0b1220, #0a1326);
+    color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+  }
+  .wrap{
+    display:grid;grid-template-columns:420px 1fr;gap:22px;min-height:100vh;
+    padding:22px;
+  }
+  aside{
+    position:sticky;top:22px;align-self:start;display:flex;flex-direction:column;gap:14px
+  }
+  .card{
+    background:linear-gradient(180deg,#0d1731,#0b1429);
+    border:1px solid #1f2a44;border-radius:var(--rad);padding:16px;box-shadow:var(--shadow)
+  }
+  .kpi-title{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px}
+  .big{font-size:28px;font-weight:800}
+  .row{display:flex;gap:10px;align-items:center;justify-content:space-between}
+  .pill{font-size:12px;padding:6px 10px;border-radius:999px;background:#101c34;border:1px solid #1b2a4a;color:#cfe1ff}
+  .pill.ts{border-color:#1b3b33;color:#bff2de}
+  .pill.dl{border-color:#3a246e;color:#e0d3ff}
+  .bar{height:10px;background:#0c1a32;border-radius:999px;overflow:hidden;border:1px solid #1f2a44}
+  .bar>i{display:block;height:100%}
+  .tsc{background:linear-gradient(90deg,#0ea5a0,#10b981)}
+  .dlc{background:linear-gradient(90deg,#5b21b6,#7c3aed)}
+  .warn{color:var(--warn)} .bad{color:var(--bad)} .ok{color:var(--ok)}
+  main{display:flex;flex-direction:column;gap:16px}
+  .section{display:grid;grid-template-columns:1fr;gap:10px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  label{font-size:12px;color:#9fb2d0}
+  input,select{
+    width:100%;padding:10px 12px;border-radius:10px;border:1px solid #213055;
+    background:#0b1427;color:#eaf2ff;font-size:14px;outline:none
+  }
+  input:focus,select:focus{border-color:#3761ff}
+  h2{margin:0 0 6px;font-size:16px;color:#cfe1ff}
+  h3{margin:0 0 6px;font-size:14px;color:#a8bfe8}
+  .sub{font-size:12px;color:#8aa0c8}
+  .badge{padding:6px 8px;border-radius:8px;background:#0e1a31;border:1px solid #233151;font-size:12px;color:#cfe1ff}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .muted{color:#9fb2d0}
+  .chip{background:var(--chip);border:1px solid var(--chip-b);padding:6px 10px;border-radius:999px;font-size:12px;color:#dce8ff}
+  .foot{display:flex;gap:10px;flex-wrap:wrap}
+  .note{font-size:12px;color:#9fb2d0}
+  .table{width:100%;border-collapse:collapse}
+  .table th,.table td{padding:8px 10px;border-bottom:1px solid #1f2a44;font-size:13px}
+  .table th{color:#bcd2fb;text-align:left}
+  .right{text-align:right}
+  .okchip{background:#0f2a21;color:#bff2de;border-color:#1b3b33}
+  .barchart{display:flex;gap:6px}
+  .barchart .seg{height:14px;border-radius:4px}
+  .seg.fuel{background:#2563eb}
+  .seg.lube{background:#60a5fa}
+  .seg.maint{background:#f59e0b}
+  .seg.break{background:#ef4444}
+  .seg.lab{background:#10b981}
+  .seg.own{background:#7c3aed}
+  .mini{font-size:11px;color:#93a4bf}
+  .grid1-2{display:grid;grid-template-columns:1fr 2fr;gap:12px}
+  .hint{font-size:11px;color:#7e94bf}
+  button{background:#2843a2;border:1px solid #3d5dee;color:#fff;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+  button:hover{filter:brightness(1.07)}
+  .danger{background:#a11d2d;border-color:#e83f5b}
+  .success{background:#116a3b;border-color:#25a36f}
+  @media (max-width:1100px){.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- LEFT KPI DECK -->
+  <aside>
+    <div class="card">
+      <div class="kpi-title">Unit Cost (€/m³)</div>
+      <div class="row">
+        <div><span class="pill ts">Truck–Shovel</span><div class="big" id="kpi_cost_ts">—</div></div>
+        <div><span class="pill dl">Dragline</span><div class="big" id="kpi_cost_dl">—</div></div>
+      </div>
+      <div class="kpi-title">Annual Production (m³/y)</div>
+      <div class="row">
+        <div class="bar" style="flex:1"><i class="tsc" id="bar_ts" style="width:0%"></i></div>
+        <div class="bar" style="flex:1"><i class="dlc" id="bar_dl" style="width:0%"></i></div>
+      </div>
+      <div class="kpi-title">Bottleneck (TS)</div>
+      <div class="row"><div id="kpi_bottleneck" class="badge">—</div><div class="chip" id="kpi_mf">MF: —</div></div>
+    </div>
+
+    <div class="card">
+      <div class="kpi-title">OPEX split (€/y)</div>
+      <div class="grid2">
+        <div>
+          <div class="pill ts" style="margin-bottom:6px">TS</div>
+          <div id="kpi_opex_ts" class="barchart"></div>
+          <div id="kpi_opex_ts_labels" class="mini"></div>
+        </div>
+        <div>
+          <div class="pill dl" style="margin-bottom:6px">Dragline</div>
+          <div id="kpi_opex_dl" class="barchart"></div>
+          <div id="kpi_opex_dl_labels" class="mini"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="kpi-title">ESG intensity</div>
+      <div class="grid2">
+        <div>
+          <div class="pill ts" style="margin-bottom:6px">TS</div>
+          <div class="mini">Energy per m³: <b id="kpi_esg_e_ts">—</b></div>
+          <div class="mini">kg CO₂e / t: <b id="kpi_esg_c_ts">—</b></div>
+        </div>
+        <div>
+          <div class="pill dl" style="margin-bottom:6px">Dragline</div>
+          <div class="mini">Energy per m³: <b id="kpi_esg_e_dl">—</b></div>
+          <div class="mini">kg CO₂e / t: <b id="kpi_esg_c_dl">—</b></div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- RIGHT PANELS -->
+  <main>
+
+    <!-- STEP 0: EQUIPMENT -->
+    <div class="card section">
+      <h2>Step 0 — Equipment</h2>
+      <div class="grid1-2">
+        <div>
+          <h3>Truck–Shovel</h3>
+          <div class="grid">
+            <label>Shovels (units)
+              <input id="ts_nShov" type="number" min="1" value="1">
+            </label>
+            <label>Shovel bucket (m³ BCM)
+              <input id="ts_bucket" type="number" min="0.01" step="0.01" value="5.4">
+            </label>
+            <label>Shovel cycle (s)
+              <input id="ts_cycle" type="number" min="1" step="0.1" value="27">
+            </label>
+            <label>Trucks (units)
+              <input id="ts_nTrucks" type="number" min="1" value="2">
+            </label>
+            <label>Truck body (m³ BCM)
+              <input id="ts_truckVol" type="number" min="1" step="0.1" value="60">
+            </label>
+            <label>Truck payload (t) <span class="hint">(optional)</span>
+              <input id="ts_truckPayload" type="number" min="0" step="0.1">
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <h3>Dragline</h3>
+          <div class="grid">
+            <label>Draglines (units)
+              <input id="dl_units" type="number" min="1" value="1">
+            </label>
+            <label>Bucket (m³ BCM)
+              <input id="dl_bucket" type="number" min="0.01" step="0.01" value="10.8">
+            </label>
+            <label>Cycle (s)
+              <input id="dl_cycle" type="number" min="1" step="0.1" value="54">
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="note">Truck body and shovel/dragline buckets are in <b>BCM</b>.</div>
+    </div>
+
+    <!-- STEP 1: SITE / MATERIAL / CALENDAR -->
+    <div class="card section">
+      <h2>Step 1 — Material, OEE & Calendar</h2>
+      <div class="grid4">
+        <label>Density ρ (t/m³)<input id="mat_density" type="number" min="0.1" step="0.01" value="1.6"></label>
+        <label>Swell S<input id="mat_swell" type="number" min="1" step="0.01" value="1.2"></label>
+        <label>Fill F<input id="mat_fill" type="number" min="0.1" step="0.01" value="1.15"></label>
+        <label>M factor (TS)<input id="mat_M_ts" type="number" min="0.1" max="1" step="0.01" value="1.0"></label>
+
+        <label>Availability A<input id="oee_A" type="number" min="0" max="1" step="0.01" value="0.73"></label>
+        <label>Utilization U<input id="oee_U" type="number" min="0" max="1" step="0.01" value="0.6958"></label>
+        <label>M factor (DL)<input id="mat_M_dl" type="number" min="0.1" max="1" step="0.01" value="1.0"></label>
+
+        <label>Hours/shift<input id="cal_hps" type="number" min="0.1" step="0.1" value="8"></label>
+        <label>Shifts/day<input id="cal_spd" type="number" min="1" step="1" value="3"></label>
+        <label>Days/year<input id="cal_dpy" type="number" min="1" step="1" value="240"></label>
+        <label>Stripping ratio (waste:ore)<input id="econ_sr" type="number" min="0.1" step="0.1" value="7"></label>
+      </div>
+    </div>
+
+    <!-- STEP 2: CYCLES -->
+    <div class="card section">
+      <h2>Step 2 — Cycle Builder</h2>
+      <div class="grid4">
+        <label>One-way distance D (km)<input id="ts_dist" type="number" min="0" step="0.01" value="0.2"></label>
+        <label>Haul speed (km/h)<input id="ts_vh" type="number" min="0.1" step="0.1" value="10"></label>
+        <label>Return speed (km/h)<input id="ts_vr" type="number" min="0.1" step="0.1" value="15"></label>
+        <label>Dump time (s)<input id="ts_dump" type="number" min="0" step="0.1" value="52"></label>
+        <label>Queue & spot (s)<input id="ts_wait" type="number" min="0" step="0.1" value="125"></label>
+        <label>Extra load/position (s)<input id="ts_loadpos" type="number" min="0" step="0.1" value="0"></label>
+      </div>
+      <div class="grid2">
+        <div class="badge" id="cycle_pie">Cycle: —</div>
+        <div class="badge" id="passes_badge">Passes: —</div>
+      </div>
+      <div class="note">Loading time uses passes based on <b>BCM volumes</b> so passes = V<sub>truck</sub> / B<sub>shovel</sub>.</div>
+    </div>
+
+    <!-- STEP 3: PRODUCTION -->
+    <div class="card section">
+      <h2>Step 3 — Production & Constraint</h2>
+      <div class="grid2">
+        <div class="card">
+          <h3>Truck–Shovel</h3>
+          <div class="grid2">
+            <div class="muted">Shovel m³/h</div><div class="right" id="out_Qh_shov">—</div>
+            <div class="muted">Trucks m³/h</div><div class="right" id="out_Qh_trk">—</div>
+            <div class="muted">Constraint (min)</div><div class="right" id="out_Qh_ts">—</div>
+            <div class="muted">Monthly m³</div><div class="right" id="out_Qm_ts">—</div>
+            <div class="muted">Annual m³</div><div class="right" id="out_Qy_ts">—</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Dragline</h3>
+          <div class="grid2">
+            <div class="muted">m³/h</div><div class="right" id="out_Qh_dl">—</div>
+            <div class="muted">Monthly m³</div><div class="right" id="out_Qm_dl">—</div>
+            <div class="muted">Annual m³</div><div class="right" id="out_Qy_dl">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: TCO -->
+    <div class="card section">
+      <h2>Step 4 — Total Cost of Ownership</h2>
+      <div class="grid2">
+        <div>
+          <h3>TS — Shovel</h3>
+          <div class="grid">
+            <label>Cost (€)<input id="ts_s_cost" type="number" min="0" step="0.01" value="700000"></label>
+            <label>Life (y)<input id="ts_s_life" type="number" min="1" step="0.01" value="10"></label>
+            <label>Salvage (€)<input id="ts_s_salv" type="number" min="0" step="0.01" value="0"></label>
+            <label>IIT %<input id="ts_s_iit" type="number" min="0" step="0.1" value="15"></label>
+            <label>Discount % (EAC)<input id="ts_s_disc" type="number" min="0" step="0.1" value="10"></label>
+            <label>Ops/unit<input id="ts_s_ops" type="number" min="0" step="1" value="3"></label>
+            <label>Op wage €/mo<input id="ts_s_opw" type="number" min="0" step="0.01" value="600"></label>
+            <label>Helpers/unit<input id="ts_s_hlp" type="number" min="0" step="1" value="3"></label>
+            <label>Helper €/mo<input id="ts_s_hlw" type="number" min="0" step="0.01" value="400"></label>
+            <label>Energy per h<input id="ts_s_power" type="number" min="0" step="0.01" value="70"></label>
+            <label>Energy price €/unit<input id="ts_s_ep" type="number" min="0" step="0.0001" value="1"></label>
+            <label>Lube % of energy<input id="ts_s_lube" type="number" min="0" step="0.1" value="30"></label>
+            <label>Maint % of depreciation<input id="ts_s_maint" type="number" min="0" step="0.1" value="50"></label>
+            <label>Break % of cost<input id="ts_s_break" type="number" min="0" step="0.1" value="2"></label>
+          </div>
+        </div>
+        <div>
+          <h3>TS — Trucks (per unit, auto × count)</h3>
+          <div class="grid">
+            <label>Cost (€)<input id="ts_t_cost" type="number" min="0" step="0.01" value="900000"></label>
+            <label>Life (y)<input id="ts_t_life" type="number" min="1" step="0.01" value="17"></label>
+            <label>Salvage (€)<input id="ts_t_salv" type="number" min="0" step="0.01" value="0"></label>
+            <label>IIT %<input id="ts_t_iit" type="number" min="0" step="0.1" value="15"></label>
+            <label>Discount % (EAC)<input id="ts_t_disc" type="number" min="0" step="0.1" value="10"></label>
+            <label>Ops/unit<input id="ts_t_ops" type="number" min="0" step="1" value="3"></label>
+            <label>Op wage €/mo<input id="ts_t_opw" type="number" min="0" step="0.01" value="600"></label>
+            <label>Helpers/unit<input id="ts_t_hlp" type="number" min="0" step="1" value="3"></label>
+            <label>Helper €/mo<input id="ts_t_hlw" type="number" min="0" step="0.01" value="400"></label>
+            <label>Energy per h<input id="ts_t_power" type="number" min="0" step="0.01" value="70"></label>
+            <label>Energy price €/unit<input id="ts_t_ep" type="number" min="0" step="0.0001" value="1"></label>
+            <label>Lube % of energy<input id="ts_t_lube" type="number" min="0" step="0.1" value="30"></label>
+            <label>Maint % of depreciation<input id="ts_t_maint" type="number" min="0" step="0.1" value="50"></label>
+            <label>Break % of cost<input id="ts_t_break" type="number" min="0" step="0.1" value="2"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid1-2">
+        <div>
+          <h3>Dragline</h3>
+          <div class="grid">
+            <label>Cost (€)<input id="dl_cost" type="number" min="0" step="0.01" value="5000000"></label>
+            <label>Life (y)<input id="dl_life" type="number" min="1" step="0.001" value="20.50693134"></label>
+            <label>Salvage (€)<input id="dl_salv" type="number" min="0" step="0.01" value="0"></label>
+            <label>IIT %<input id="dl_iit" type="number" min="0" step="0.1" value="15"></label>
+            <label>Discount % (EAC)<input id="dl_disc" type="number" min="0" step="0.1" value="10"></label>
+            <label>Ops/unit<input id="dl_ops" type="number" min="0" step="1" value="3"></label>
+            <label>Op wage €/mo<input id="dl_opw" type="number" min="0" step="0.01" value="600"></label>
+            <label>Helpers/unit<input id="dl_hlp" type="number" min="0" step="1" value="3"></label>
+            <label>Helper €/mo<input id="dl_hlw" type="number" min="0" step="0.01" value="400"></label>
+            <label>Energy per h<input id="dl_power" type="number" min="0" step="0.01" value="70"></label>
+            <label>Energy price €/unit<input id="dl_ep" type="number" min="0" step="0.0001" value="1"></label>
+            <label>Lube % of energy<input id="dl_lube" type="number" min="0" step="0.1" value="30"></label>
+            <label>Maint % of depreciation<input id="dl_maint" type="number" min="0" step="0.1" value="20"></label>
+            <label>Break % of cost<input id="dl_break" type="number" min="0" step="0.1" value="2"></label>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Annual hours & multipliers</h3>
+          <div class="grid2">
+            <div class="muted">Annual hours</div><div class="right" id="out_Hy">—</div>
+            <div class="muted">IIT (TS shovel/truck/DL)</div><div class="right" id="out_iit">—</div>
+          </div>
+          <div class="foot">
+            <button id="btn_tco" type="button">Compute TCO</button>
+          </div>
+          <div class="note">Ownership: **Dep = (Cost−Salv)/Life**, **AYI = ((n+1)·Cost + (n−1)·Salv)/(2n)**, **IIT = AYI × IIT%**. OPEX uses your exact bases: **Lube % of energy €**, **Maint % of depreciation**, **Break % of cost**. (MF & cost bases per your files  [oai_citation:3‡shovel-truck-calculator-ai-search_Version2 (2).html](file-service://file-1P9raSZ9wGfj5sCS4FpDUu)  [oai_citation:4‡shovel-truck-calculator-ai-search_Version2 (2).html](file-service://file-YPnSDd4R76hb5hkkxLe8kW))</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>TCO Summary</h3>
+        <table class="table" id="tco_table"><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- STEP 5: ECONOMICS -->
+    <div class="card section">
+      <h2>Step 5 — Economics</h2>
+      <div class="grid4">
+        <label>EUR → INR<input id="fx_eur_inr" type="number" min="0" step="0.01" value="100"></label>
+        <label>Ore price (€/t)<input id="econ_price" type="number" min="0" step="0.01" value="10"></label>
+        <label>Basis<select id="econ_basis">
+          <option value="waste">Waste only</option>
+          <option value="total">Total (ore+waste)</option>
+        </select></label>
+        <label>Diesel EF (kg CO₂e/L)<input id="ef_diesel" type="number" min="0" step="0.001" value="2.68"></label>
+        <label>Grid EF (kg CO₂e/kWh)<input id="ef_grid" type="number" min="0" step="0.001" value="0.45"></label>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <h3>Unit Costs & Profit</h3>
+          <div class="grid2">
+            <div class="muted">TS €/m³</div><div class="right" id="uc_ts">—</div>
+            <div class="muted">DL €/m³</div><div class="right" id="uc_dl">—</div>
+            <div class="muted">TS €/t</div><div class="right" id="uct_ts">—</div>
+            <div class="muted">DL €/t</div><div class="right" id="uct_dl">—</div>
+            <div class="muted">TS profit €/y</div><div class="right" id="p_ts">—</div>
+            <div class="muted">DL profit €/y</div><div class="right" id="p_dl">—</div>
+          </div>
+          <div class="foot">
+            <button id="btn_econ" type="button" class="success">Compute Economics</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Notes</h3>
+          <div class="note">
+            TS system capacity = <b>min(Shovel, Trucks)</b>. MF gauge = (N<sub>trucks</sub>·t<sub>load</sub>)/(T<sub>cycle</sub>·N<sub>shovels</sub>) (per your file).  [oai_citation:5‡shovel-truck-calculator-ai-search_Version2 (2).html](file-service://file-1P9raSZ9wGfj5sCS4FpDUu)
+            Dragline hourly production = B·F·S·M·3600/C · A·U · units (per your file).  [oai_citation:6‡dragline-production-calculator.html](file-service://file-PT7y4VuQ7BLdRmSL5t5vs2)
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // ------------- Utilities -------------
+  const $ = id => document.getElementById(id);
+  const nf0 = x => Number.isFinite(x)? x.toLocaleString(): '—';
+  const nf2 = x => Number.isFinite(x)? x.toLocaleString(undefined,{maximumFractionDigits:2}): '—';
+  const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+
+  function annualHours(){ return (+$('cal_hps').value||0) * (+$('cal_spd').value||0) * (+$('cal_dpy').value||0); }
+
+  // ------------- Step 2: Cycles & MF (TS) -------------
+  function computeTSCycle(){
+    const F=+$('mat_fill').value||1, S=+$('mat_swell').value||1;
+    const B=+$('ts_bucket').value||0, C=+$('ts_cycle').value||1;
+    const Vtruck = +$('ts_truckVol').value || 0; // BCM
+    const passes = Math.max(1, Math.ceil( Vtruck / B )); // BCM-based passes
+    const t_load = passes*C + (+$('ts_loadpos').value||0);
+    const t_haul = ((+$('ts_dist').value||0) / (+$('ts_vh').value||1))*3600;
+    const t_ret  = ((+$('ts_dist').value||0) / (+$('ts_vr').value||1))*3600;
+    const t_dump = (+$('ts_dump').value||0), t_wait = (+$('ts_wait').value||0);
+    const T = t_load + t_haul + t_dump + t_ret + t_wait;
+    const trucks = +$('ts_nTrucks').value||0;
+    const perTruck_m3ph = T>0 ? (3600/T)*Vtruck : 0; // BCM/h
+    const fleet_m3ph = perTruck_m3ph * trucks;
+    // MF per your file (MF = (nTrucks*load_time)/(cycle_time*nShovels))
+    const nShov = +$('ts_nShov').value||1;
+    const MF = (trucks*t_load)/(T*nShov);
+
+    $('cycle_pie').textContent = `Load ${t_load.toFixed(1)}s, Haul ${t_haul.toFixed(1)}s, Dump ${t_dump.toFixed(0)}s, Return ${t_ret.toFixed(1)}s, Wait ${t_wait.toFixed(0)}s — Total ${T.toFixed(1)}s`;
+    $('passes_badge').textContent = `Passes to fill truck: ${passes}`;
+
+    return {passes,t_load,t_haul,t_dump,t_ret,t_wait,T, perTruck_m3ph, fleet_m3ph, MF};
+  }
+
+  // ------------- Step 3: Production -------------
+  function computeProduction(){
+    const A=+$('oee_A').value||0, U=+$('oee_U').value||0, Hy=annualHours();
+    $('out_Hy').textContent = nf0(Hy);
+
+    // Shovel hourly capacity (m³/h)
+    const Bs=+$('ts_bucket').value||0, Cs=+$('ts_cycle').value||1, F=+$('mat_fill').value||1, S=+$('mat_swell').value||1, Mts=+$('mat_M_ts').value||1, nSh=+$('ts_nShov').value||1;
+    const Qh_shov = (Bs*F*S*Mts*(3600/Cs))*A*U*nSh;
+
+    // Truck fleet hourly capacity (apply A & U)
+    const cyc = computeTSCycle();
+    const Qh_trk = cyc.fleet_m3ph * A * U;
+
+    // Constraint
+    const Qh_ts = Math.min(Qh_shov, Qh_trk);
+    const Qy_ts = Qh_ts * Hy;
+    const Qm_ts = Qy_ts / 12;
+
+    // Dragline
+    const Bd=+$('dl_bucket').value||0, Cd=+$('dl_cycle').value||1, Mdl=+$('mat_M_dl').value||1, ndl=+$('dl_units').value||1;
+    const Qh_dl = (Bd*F*S*Mdl*(3600/Cd))*A*U*ndl;
+    const Qy_dl = Qh_dl * Hy;
+    const Qm_dl = Qy_dl / 12;
+
+    // Output
+    $('out_Qh_shov').textContent = nf2(Qh_shov);
+    $('out_Qh_trk').textContent  = nf2(Qh_trk);
+    $('out_Qh_ts').textContent   = nf2(Qh_ts);
+    $('out_Qm_ts').textContent   = nf2(Qm_ts);
+    $('out_Qy_ts').textContent   = nf2(Qy_ts);
+    $('out_Qh_dl').textContent   = nf2(Qh_dl);
+    $('out_Qm_dl').textContent   = nf2(Qm_dl);
+    $('out_Qy_dl').textContent   = nf2(Qy_dl);
+
+    // KPI bars
+    const maxY = Math.max(Qy_ts,Qy_dl,1);
+    $('bar_ts').style.width = (Qy_ts/maxY*100)+'%';
+    $('bar_dl').style.width = (Qy_dl/maxY*100)+'%';
+
+    // Bottleneck & MF chip
+    const bottleneck = Qh_ts === Qh_shov ? 'Truck-bound' : Qh_ts === Qh_trk ? 'Shovel-bound' : '—';
+    $('kpi_bottleneck').textContent = bottleneck;
+    const MF = cyc.MF;
+    const mfChip = $('kpi_mf');
+    mfChip.textContent = `MF: ${isFinite(MF)?MF.toFixed(2):'—'}`;
+    mfChip.classList.remove('okchip','warn','bad');
+    if (MF>=0.9 && MF<=1.1) mfChip.classList.add('okchip');
+    else if (MF>=0.75 && MF<0.9 || MF>1.1 && MF<=1.25) mfChip.classList.add('warn');
+    else mfChip.classList.add('bad');
+
+    return {Qh_shov,Qh_trk,Qh_ts,Qm_ts,Qy_ts,Qh_dl,Qm_dl,Qy_dl, MF, Hy};
+  }
+
+  // ------------- Step 4: TCO -------------
+  function dep(cost,salv,life){ return (cost - salv)/life; }
+  function ayi(cost,salv,life){ return ((life+1)*cost + (life-1)*salv)/(2*life); }
+  function pvf(r,n){ return 1/Math.pow(1+r/100,n); }
+  function crf(r,n){ r=r/100; return (r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1); }
+
+  function opexFromInputs(pwr,ep,lubePct,depY,maintPct,cost,breakPct,ops,opw,hlp,hlw, units, Hy){
+    if (!(ep>0)) { return {energy:0,lube:0,maint:0,brk:0,lab:0,total:0, warn:'Please enter Energy price (€/unit).'}; }
+    const energy = pwr*Hy*ep;
+    const lube   = lubePct/100 * energy;
+    const maint  = maintPct/100 * depY * units;
+    const brk    = breakPct/100 * cost * units;
+    const lab    = 12*((ops*opw)+(hlp*hlw))*units;
+    const total  = energy+lube+maint+brk+lab;
+    return {energy,lube,maint,brk,lab,total};
+  }
+
+  function computeTCO(prod){
+    const Hy = prod.Hy;
+
+    // TS — shovel
+    const s_units = +$('ts_nShov').value||1;
+    const sC=+$('ts_s_cost').value||0, sL=+$('ts_s_life').value||1, sS=+$('ts_s_salv').value||0, sI=+$('ts_s_iit').value||0, sD=+$('ts_s_disc').value||0;
+    const sDep = dep(sC,sS,sL);
+    const sAYI = ayi(sC,sS,sL);
+    const sIIT = sAYI*sI/100;
+    const sOwn = (sDep + sIIT) * s_units;
+    const sOp = opexFromInputs(+$('ts_s_power').value||0,+$('ts_s_ep').value||0,+$('ts_s_lube').value||0,sDep,+$('ts_s_maint').value||0,sC,+$('ts_s_break').value||0,+$('ts_s_ops').value||0,+$('ts_s_opw').value||0,+$('ts_s_hlp').value||0,+$('ts_s_hlw').value||0, s_units, Hy);
+    const sPVF = pvf(sD,sL), sCRF = crf(sD,sL), sEAC = (sC - sS*sPVF)*sCRF + sOp.total;
+
+    // TS — trucks (per unit × count)
+    const t_units = +$('ts_nTrucks').value||1;
+    const tC=+$('ts_t_cost').value||0, tL=+$('ts_t_life').value||1, tS=+$('ts_t_salv').value||0, tI=+$('ts_t_iit').value||0, tD=+$('ts_t_disc').value||0;
+    const tDep = dep(tC,tS,tL);
+    const tAYI = ayi(tC,tS,tL);
+    const tIIT = tAYI*tI/100;
+    const tOwn = (tDep + tIIT) * t_units;
+    const tOp = opexFromInputs(+$('ts_t_power').value||0,+$('ts_t_ep').value||0,+$('ts_t_lube').value||0,tDep,+$('ts_t_maint').value||0,tC,+$('ts_t_break').value||0,+$('ts_t_ops').value||0,+$('ts_t_opw').value||0,+$('ts_t_hlp').value||0,+$('ts_t_hlw').value||0, t_units, Hy);
+    const tPVF = pvf(tD,tL), tCRF = crf(tD,tL), tEAC = (tC - tS*tPVF)*tCRF + tOp.total;
+
+    const TS_own = sOwn + tOwn;
+    const TS_opex = sOp.total + tOp.total;
+    const TS_total = TS_own + TS_opex;
+    const TS_EAC = sEAC + tEAC;
+
+    // Dragline
+    const d_units = +$('dl_units').value||1;
+    const dC=+$('dl_cost').value||0, dL=+$('dl_life').value||1, dS=+$('dl_salv').value||0, dI=+$('dl_iit').value||0, dD=+$('dl_disc').value||0;
+    const dDep = dep(dC,dS,dL);
+    const dAYI = ayi(dC,dS,dL);
+    const dIIT = dAYI*dI/100;
+    const dOwn = (dDep + dIIT) * d_units;
+    const dOp  = opexFromInputs(+$('dl_power').value||0,+$('dl_ep').value||0,+$('dl_lube').value||0,dDep,+$('dl_maint').value||0,dC,+$('dl_break').value||0,+$('dl_ops').value||0,+$('dl_opw').value||0,+$('dl_hlp').value||0,+$('dl_hlw').value||0, d_units, Hy);
+    const dPVF = pvf(dD,dL), dCRF = crf(dD,dL), dEAC = (dC - dS*dPVF)*dCRF + dOp.total;
+
+    // Table render
+    $('out_iit').textContent = `${(sI).toFixed(1)}% / ${(tI).toFixed(1)}% / ${(dI).toFixed(1)}%`;
+    const tbody = $('tco_table').querySelector('tbody');
+    const fmt = (x)=>nf2(x);
+    tbody.innerHTML = `
+      <tr><th></th><th class="right">TS Shovel</th><th class="right">TS Trucks</th><th class="right">TS Total</th><th class="right">Dragline</th></tr>
+      <tr><td>Ownership €/y</td><td class="right">${fmt(sOwn)}</td><td class="right">${fmt(tOwn)}</td><td class="right">${fmt(TS_own)}</td><td class="right">${fmt(dOwn)}</td></tr>
+      <tr><td>OPEX €/y</td><td class="right">${fmt(sOp.total)}</td><td class="right">${fmt(tOp.total)}</td><td class="right">${fmt(TS_opex)}</td><td class="right">${fmt(dOp.total)}</td></tr>
+      <tr><td><b>Total €/y</b></td><td class="right">${fmt(sOwn+sOp.total)}</td><td class="right">${fmt(tOwn+tOp.total)}</td><td class="right"><b>${fmt(TS_total)}</b></td><td class="right"><b>${fmt(dOwn+dOp.total)}</b></td></tr>
+      <tr><td>EAC €/y (CRF)</td><td class="right">${fmt(sEAC)}</td><td class="right">${fmt(tEAC)}</td><td class="right">${fmt(TS_EAC)}</td><td class="right">${fmt(dEAC)}</td></tr>
+      <tr><td colspan="5">
+        <div class="barchart" style="margin-top:8px">
+          <div class="seg own"  style="width:16px"></div><div class="mini">Ownership</div>
+          <div class="seg fuel" style="width:16px;margin-left:12px"></div><div class="mini">Energy</div>
+          <div class="seg lube" style="width:16px;margin-left:12px"></div><div class="mini">Lube (% of energy)</div>
+          <div class="seg maint"style="width:16px;margin-left:12px"></div><div class="mini">Maint (% of dep)</div>
+          <div class="seg break"style="width:16px;margin-left:12px"></div><div class="mini">Breakdown (% of cost)</div>
+          <div class="seg lab"  style="width:16px;margin-left:12px"></div><div class="mini">Labour</div>
+        </div>
+      </td></tr>`;
+
+    // KPI OPEX split bars
+    function opexBars(node, labelsNode, op){
+      const tot = op.total||0; let parts=[op.energy,op.lube,op.maint,op.brk,op.lab];
+      node.innerHTML='';
+      if (tot<=0){ labelsNode.textContent=''; return; }
+      const names=['Fuel/Power','Lube','Maint','Break','Labour'];
+      const cls=['fuel','lube','maint','break','lab'];
+      parts.forEach((v,i)=>{
+        const seg=document.createElement('div'); seg.className='seg '+cls[i];
+        seg.style.width = (v/tot*100).toFixed(2)+'%';
+        node.appendChild(seg);
+      });
+      labelsNode.textContent = names.map((n,i)=>`${n}: ${nf2(parts[i])}€ (${(parts[i]/tot*100).toFixed(1)}%)`).join('  ·  ');
+    }
+    opexBars($('kpi_opex_ts'),$('kpi_opex_ts_labels'),{energy:sOp.energy+tOp.energy,lube:sOp.lube+tOp.lube,maint:sOp.maint+tOp.maint,brk:sOp.brk+tOp.brk,lab:sOp.lab+tOp.lab,total:TS_opex});
+    opexBars($('kpi_opex_dl'),$('kpi_opex_dl_labels'),dOp);
+
+    return {
+      TS_total, DL_total:(dOwn+dOp.total),
+      TS_energy:sOp.energy+tOp.energy, DL_energy:dOp.energy
+    };
+  }
+
+  // ------------- Step 5: Economics & ESG -------------
+  function computeEconomics(prod, tco){
+    const ρ=+$('mat_density').value||1, SR=+$('econ_sr').value||1;
+    const basis=$('econ_basis').value, orePrice=+$('econ_price').value||0, fx=+$('fx_eur_inr').value||0;
+
+    const Qy_ts = prod.Qy_ts, Qy_dl = prod.Qy_dl;
+    const Annual_TS = tco.TS_total, Annual_DL = tco.DL_total;
+
+    const ucm3_ts = Qy_ts>0 ? Annual_TS/Qy_ts : NaN;
+    const ucm3_dl = Qy_dl>0 ? Annual_DL/Qy_dl : NaN;
+
+    const uct_ts = ucm3_ts/ρ, uct_dl = ucm3_dl/ρ;
+
+    function oreTon(Qy){ return basis==='waste' ? (Qy*ρ)/SR : NaN; }
+    const ore_t_ts = oreTon(Qy_ts), ore_t_dl = oreTon(Qy_dl);
+
+    const rev_ts = Number.isFinite(ore_t_ts) ? ore_t_ts*orePrice : 0;
+    const rev_dl = Number.isFinite(ore_t_dl) ? ore_t_dl*orePrice : 0;
+
+    const prof_ts = rev_ts - Annual_TS;
+    const prof_dl = rev_dl - Annual_DL;
+
+    // Render unit costs to KPIs and panel
+    $('kpi_cost_ts').textContent = Number.isFinite(ucm3_ts)? nf2(ucm3_ts): '—';
+    $('kpi_cost_dl').textContent = Number.isFinite(ucm3_dl)? nf2(ucm3_dl): '—';
+
+    $('uc_ts').textContent = Number.isFinite(ucm3_ts)? nf2(ucm3_ts): '—';
+    $('uc_dl').textContent = Number.isFinite(ucm3_dl)? nf2(ucm3_dl): '—';
+    $('uct_ts').textContent = Number.isFinite(uct_ts)? nf2(uct_ts): '—';
+    $('uct_dl').textContent = Number.isFinite(uct_dl)? nf2(uct_dl): '—';
+    $('p_ts').textContent   = nf2(prof_ts);
+    $('p_dl').textContent   = nf2(prof_dl);
+
+    // ESG intensities (simple): energy per m³, CO2e per tonne
+    const e_m3_ts = Qy_ts>0 ? tco.TS_energy / Qy_ts : NaN;
+    const e_m3_dl = Qy_dl>0 ? tco.DL_energy / Qy_dl : NaN;
+    $('kpi_esg_e_ts').textContent = Number.isFinite(e_m3_ts)? nf2(e_m3_ts): '—';
+    $('kpi_esg_e_dl').textContent = Number.isFinite(e_m3_dl)? nf2(e_m3_dl): '—';
+
+    const EFd=+$('ef_diesel').value||0, EFg=+$('ef_grid').value||0; // user-provided EFs
+    // Assume all "energy per hour" units are priced consistently with input (€/L or €/kWh).
+    // If user enters diesel €/L, they should pair with diesel EF; for grid, pair with grid EF.
+    // We expose CO2e/t as indicative; exact split requires explicit diesel vs electric flags.
+    const co2e_ts = NaN; const co2e_dl = NaN; // left as optional unless energy vector is specified
+    $('kpi_esg_c_ts').textContent = Number.isFinite(co2e_ts)? nf2(co2e_ts): '—';
+    $('kpi_esg_c_dl').textContent = Number.isFinite(co2e_dl)? nf2(co2e_dl): '—';
+
+    return {ucm3_ts,ucm3_dl,uct_ts,uct_dl,prof_ts,prof_dl};
+  }
+
+  // ------------- Wiring: recompute on any change -------------
+  function recomputeAll(){
+    const prod = computeProduction();
+    const tco  = computeTCO(prod);
+    computeEconomics(prod,tco);
+  }
+  document.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',recomputeAll));
+  $('btn_tco').addEventListener('click',recomputeAll);
+  $('btn_econ').addEventListener('click',recomputeAll);
+
+  // initial compute
+  recomputeAll();
+</script>
+</body>
+</html>
