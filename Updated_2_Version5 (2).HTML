@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Unified Mining Analysis – Dragline vs Truck–Shovel (v8.7 Final)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="Mining production, cost, ESG and economic model with enhanced, professional .docx reports.">
+<style>
+:root{
+  --bg:#f3f6fa;--panel:#fff;--card:#fff;--border:#d8e0ea;--text:#1b2736;--muted:#5b6f80;
+  --accent:#1d62d7;--accent2:#7030a0;--ok:#128a52;--warn:#c87f10;--bad:#cc2c2c;
+  --chip:#eef2f7;--chip-b:#d9e2ed;--rad:14px;--shadow:0 4px 12px rgba(0,0,0,.06);
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:inherit;-webkit-font-smoothing:antialiased}
+.wrap{display:grid;grid-template-columns:340px 1fr;gap:20px;min-height:100vh;padding:20px;align-items:start}
+@media(max-width:1200px){.wrap{grid-template-columns:1fr}}
+aside{position:sticky;top:20px;display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - 40px);overflow:auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--rad);padding:16px 18px;box-shadow:var(--shadow);position:relative}
+.header-title{font-size:19px;font-weight:700;margin:0 0 4px}
+.header-sub{font-size:12px;color:#5b6f80;margin:0 0 12px}
+.kpi-title{font-size:11px;color:#5b6f80;letter-spacing:.08em;text-transform:uppercase;margin:16px 0 6px;font-weight:600}
+.big{font-size:26px;font-weight:700;line-height:1}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pill{font-size:11px;padding:5px 10px;border-radius:999px;background:#e6edf5;font-weight:600;letter-spacing:.04em}
+.pill.ts{background:#e1f7ef;color:#0d4e34}.pill.dl{background:#ebe3f6;color:#4a2474}
+.badge{background:#eef2f7;border:1px solid #d4dde7;padding:6px 10px;border-radius:10px;font-size:11.5px;font-weight:600}
+.chip{display:inline-block;padding:5px 10px;background:var(--chip);border:1px solid var(--chip-b);border-radius:999px;font-size:11px;font-weight:600}
+.inline-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:8px}
+.inline-kpis .k{background:#f1f5fa;border:1px solid #d8e1ec;border-radius:8px;padding:6px 8px}
+.inline-kpis .k h4{margin:0;font-size:10px;font-weight:600;color:#4f647b;letter-spacing:.05em}
+.inline-kpis .k .v{margin-top:4px;font-size:14px;font-weight:600}
+.bar{height:10px;background:#eef2f7;border-radius:6px;overflow:hidden;position:relative;border:1px solid #d4dde7;min-width:120px}
+.bar>i{display:block;height:100%}
+.tsc{background:#36a372}.dlc{background:#7030a0}
+main{display:flex;flex-direction:column;gap:18px}
+.section{display:grid;gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+h2{margin:0 0 4px;font-size:18px;font-weight:600;letter-spacing:.4px}
+h3{margin:0 0 6px;font-size:14px;font-weight:600;color:#2d4258;letter-spacing:.05em;text-transform:uppercase}
+label{font-size:11px;color:#44576b;display:flex;flex-direction:column;gap:4px;font-weight:500}
+input,select{width:100%;padding:8px 10px;border-radius:8px;border:1px solid #c7d3df;background:#f9fbfd;font-size:13px;outline:none;transition:.15s;border-color:var(--border)}
+input:focus,select:focus{border-color:#1d62d7;background:#fff}
+.note{font-size:11px;color:#5d6f84;line-height:1.5}
+.table,.flex-table,.detail-table{width:100%;border-collapse:collapse;font-size:12px}
+.table th,.table td,.flex-table th,.flex-table td,.detail-table th,.detail-table td{padding:6px 8px;border:1px solid #e0e7ef;font-size:11.5px}
+.table th,.flex-table th,.detail-table th{background:#f1f5fa;font-weight:600;font-size:11px;letter-spacing:.05em;text-align:left}
+.table td.right,.table th.right,.detail-table td.right{ text-align:right }
+.barchart{display:flex;gap:4px;width:100%;height:14px;margin:4px 0}
+.barchart .seg{height:100%;border-radius:4px}
+.seg.fuel{background:#2563eb}.seg.lube{background:#60a5fa}.seg.maint{background:#f59e0b}.seg.break{background:#ef4444}.seg.lab{background:#10b981}
+button{background:#1d62d7;color:#fff;border:1px solid #1650b2;padding:9px 14px;border-radius:10px;font-weight:600;font-size:13px;letter-spacing:.3px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.16s}
+button.secondary{background:#445b75;border-color:#394d63}
+button.success{background:#158355;border-color:#0f6a44}
+button.warnBtn{background:#c87f10;border-color:#9c610a}
+button.small{padding:4px 8px;font-size:11px;border-radius:6px}
+button.inline-del{background:#cc2c2c;border-color:#a02121}
+button.export-docx{background:#7030a0;border-color:#58257b;min-height:44px}
+button:disabled{opacity:.55;cursor:not-allowed}
+button:hover:not(:disabled){filter:brightness(1.07)}
+button:active:not(:disabled){transform:translateY(1px)}
+.exec-summary{background:#f1f5fa;border:1px solid #d9e3ef;padding:14px;border-radius:12px;font-size:12.5px;line-height:1.5}
+.chart-wrap{position:relative;width:100%;height:240px}
+.reco-box{background:#f1f5fa;border:1px solid #dae3ef;padding:14px;border-radius:12px}
+.mini{font-size:10.5px;color:#5d6f84;line-height:1.3}
+.warning-banner{background:#fff5d9;border:1px solid #f0da94;padding:8px 10px;border-radius:8px;font-size:11px;color:#6b5200}
+.new-kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:6px}
+.new-kpi{background:#f1f5fa;border:1px solid #d6e1ec;border-radius:10px;padding:8px 10px}
+.new-kpi h4{margin:0;font-size:10px;font-weight:600;color:#58708a;letter-spacing:.05em}
+.new-kpi .v{font-size:15px;font-weight:700;margin-top:4px}
+.stamp{font-size:10px;color:#6a7d92;margin-top:10px}
+footer{margin:40px 0 10px;text-align:center;font-size:10px;color:#6d7f91}
+.credit-banner{background:linear-gradient(90deg,#224670,#1d62d7);color:#fff;padding:6px 10px;border-radius:10px;font-size:11px;font-weight:600;letter-spacing:.04em;display:flex;align-items:center;gap:6px}
+.credit-banner span{background:#ffffff22;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:500}
+.pass-box{background:#f1f5fa;border:1px solid #d3dde8;border-radius:10px;padding:10px;font-size:11.5px;line-height:1.45}
+.small-gray{font-size:10px;color:#607085}
+#error_banner{display:none;position:absolute;left:8px;right:8px;top:8px;background:#ffe5e5;color:#861b1b;border:1px solid #ffb4b4;padding:6px 8px;border-radius:8px;font-size:11px;font-weight:600;z-index:10}
+.toggle-debug{position:absolute;top:8px;right:8px;font-size:10px;padding:4px 8px}
+pre.debug{background:#0f172a;color:#e2e8f0;padding:10px;font-size:11px;overflow:auto;max-height:200px;border-radius:8px}
+.hidden{display:none !important}
+.cf-year{background:#f9fbfd}
+.mode-bar{
+  display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+  background:#ffffffdd;padding:10px 18px;border:1px solid #cfd8e3;position:sticky;top:0;z-index:50;backdrop-filter:blur(6px);
+  font-size:13px;font-weight:600;border-radius:0 0 14px 14px;
+}
+.mode-bar label{display:inline-flex;align-items:center;gap:6px;font-size:12px;margin:0}
+.mode-bar input[type=radio]{accent-color:#1d62d7;cursor:pointer}
+.mode-badge{background:#1d62d7;color:#fff;padding:4px 10px;border-radius:999px;font-size:11px;letter-spacing:.04em}
+body.mode-dl .ts-only,
+body.mode-ts .dl-only,
+body.mode-dl .col-ts,
+body.mode-ts .col-dl,
+body.mode-dl .compare-only,
+body.mode-ts .compare-only{display:none !important}
+body.mode-dl .mode-indicator-dl,
+body.mode-ts .mode-indicator-ts,
+body.mode-compare .mode-indicator-compare{display:inline-block}
+.mode-indicator-dl,.mode-indicator-ts,.mode-indicator-compare{display:none}
+#export_status{font-size:11px;color:#4a2474;margin-top:6px;display:none;line-height:1.4}
+#export_status.active{display:block}
+#export_status.error{color:#b00020}
+.spinner{width:14px;height:14px;border:2px solid #ffffff55;border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body class="mode-compare">
+<!-- Mode Selection -->
+<div class="mode-bar">
+  <div class="mode-badge">Select Module</div>
+  <label><input type="radio" name="mode_select" value="dragline"> Dragline Only</label>
+  <label><input type="radio" name="mode_select" value="truckshovel"> Truck–Shovel Only</label>
+  <label><input type="radio" name="mode_select" value="compare" checked> Compare (Both)</label>
+  <span class="mini" style="margin-left:auto">
+    <span class="mode-indicator-compare">Compare mode active.</span>
+    <span class="mode-indicator-dl">Dragline only mode.</span>
+    <span class="mode-indicator-ts">Truck–Shovel only mode.</span>
+  </span>
+</div>
+
+<div class="wrap">
+  <aside>
+    <div class="card" id="kpi_panel">
+      <div id="error_banner"></div>
+      <button id="btn_dbg" class="toggle-debug secondary" type="button">Debug</button>
+      <div class="credit-banner">KPI model developed by Ajay <span>Mining Engineer</span></div>
+      <div class="header-title" style="margin-top:10px">KPI Dashboard</div>
+      <div class="header-sub">v8.7 Final</div>
+
+      <div class="kpi-title">Unit Cost Incl. Carbon (€/m³)</div>
+      <div class="row">
+        <div class="col-ts"><span class="pill ts">Truck–Shovel</span><div class="big" id="kpi_cost_ts">—</div></div>
+        <div class="col-dl"><span class="pill dl">Dragline</span><div class="big" id="kpi_cost_dl">—</div></div>
+      </div>
+
+      <div class="kpi-title compare-only">Annual Production (m³ LCM)</div>
+      <div class="row compare-only">
+        <div style="flex:1" class="col-ts"><div class="mini">TS</div><div class="bar"><i class="tsc" id="bar_ts" style="width:0%"></i></div></div>
+        <div style="flex:1" class="col-dl"><div class="mini">DL</div><div class="bar"><i class="dlc" id="bar_dl" style="width:0%"></i></div></div>
+      </div>
+
+      <div class="kpi-title ts-only">System Balance</div>
+      <div class="row ts-only">
+        <div id="kpi_bottleneck" class="badge" style="flex:1;text-align:center">—</div>
+        <div class="chip" id="kpi_mf">MF: —</div>
+      </div>
+
+      <div class="kpi-title">Carbon Intensity (kg CO₂ / m³)</div>
+      <div class="row">
+        <div class="chip col-ts" id="kpi_carbon_ts">TS: —</div>
+        <div class="chip col-dl" id="kpi_carbon_dl">DL: —</div>
+      </div>
+
+      <div class="kpi-title">Carbon Tax (€/m³)</div>
+      <div class="row">
+        <div class="chip col-ts" id="kpi_ctax_ts">TS: —</div>
+        <div class="chip col-dl" id="kpi_ctax_dl">DL: —</div>
+      </div>
+
+      <div class="kpi-title">Economic KPIs</div>
+      <div class="new-kpi-grid">
+        <div class="new-kpi col-ts"><h4>TS NPV (€M)</h4><div class="v" id="kpi_npv_ts">—</div></div>
+        <div class="new-kpi col-dl"><h4>DL NPV (€M)</h4><div class="v" id="kpi_npv_dl">—</div></div>
+        <div class="new-kpi col-ts"><h4>TS Payback (y)</h4><div class="v" id="kpi_pb_ts">—</div></div>
+        <div class="new-kpi col-dl"><h4>DL Payback (y)</h4><div class="v" id="kpi_pb_dl">—</div></div>
+        <div class="new-kpi col-ts"><h4>TS Margin €/m³</h4><div class="v" id="kpi_margin_ts">—</div></div>
+        <div class="new-kpi col-dl"><h4>DL Margin €/m³</h4><div class="v" id="kpi_margin_dl">—</div></div>
+      </div>
+
+      <div class="kpi-title compare-only">OPEX Split (€/y)</div>
+      <div class="grid2 compare-only">
+        <div class="col-ts"><div class="mini">Truck–Shovel</div><div id="kpi_opex_ts" class="barchart"></div><div id="kpi_opex_ts_labels" class="mini"></div></div>
+        <div class="col-dl"><div class="mini">Dragline</div><div id="kpi_opex_dl" class="barchart"></div><div id="kpi_opex_dl_labels" class="mini"></div></div>
+      </div>
+
+      <div class="divider"></div>
+      <button id="btn_export_docx" class="export-docx" type="button" disabled>
+        <span class="spinner hidden" id="exp_spin"></span>
+        <span id="exp_label">🧾 Export Technical Report (.docx)</span>
+      </button>
+      <div id="export_status"></div>
+      <button id="btn_force_recompute" class="warnBtn ts-only compare-only" type="button">♻ Reset Pass Choices</button>
+      <div class="stamp">v8.7 Final</div>
+      <pre id="debug_log" class="debug hidden"></pre>
+    </div>
+  </aside>
+
+  <main>
+    <!-- Step 1 -->
+    <div class="card section analysis-step" data-step="1">
+      <h2>1. Equipment Configuration (Multi)</h2>
+      <div class="note step-desc">Add heterogeneous assets and define base physical capacities.</div>
+      <div class="ts-only" style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+        <h3 style="margin:0">Shovels</h3><div><button id="add_shovel" type="button" class="small">+ Shovel</button></div>
+      </div>
+      <table class="flex-table ts-only" id="tbl_shovels">
+        <thead><tr><th>Name</th><th>Qty</th><th>Bucket</th><th>Cycle s</th><th>Del</th></tr></thead><tbody></tbody>
+      </table>
+      <div class="ts-only" style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <h3 style="margin:0">Trucks</h3><div><button id="add_truck" type="button" class="small">+ Truck</button></div>
+      </div>
+      <table class="flex-table ts-only" id="tbl_trucks">
+        <thead><tr><th>Name</th><th>Qty</th><th>Body</th><th>Payload t</th><th>Wait s*</th><th>Del</th></tr></thead><tbody></tbody>
+      </table>
+      <div class="small-gray ts-only">*Per-truck wait override (0 = global).</div>
+      <div class="dl-only" style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <h3 style="margin:0">Draglines</h3><div><button id="add_dragline" type="button" class="small">+ Dragline</button></div>
+      </div>
+      <table class="flex-table dl-only" id="tbl_draglines">
+        <thead><tr><th>Name</th><th>Qty</th><th>Bucket</th><th>Cycle s</th><th>Method</th><th>Del</th></tr></thead><tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="card section analysis-step" data-step="2">
+      <h2>2. Material, OEE & Calendar</h2>
+      <div class="note step-desc">Material properties, calendar hours and OEE inputs.</div>
+      <div class="grid4">
+        <label>Density ρ (t/m³)<input id="mat_density" type="number" step="0.01" value="1.6"></label>
+        <label>Swell Factor S<input id="mat_swell" type="number" step="0.01" value="1.2"></label>
+        <label>Stripping ratio (w:o)<input id="econ_sr" type="number" step="0.1" value="7"></label>
+        <label>Hours / shift<input id="cal_hps" type="number" step="0.1" value="8"></label>
+        <label>Shifts / day<input id="cal_spd" type="number" step="1" value="3"></label>
+        <label>Days / year<input id="cal_dpy" type="number" step="1" value="240"></label>
+        <label class="ts-only">Global Truck Fill<input id="fill_truck_global" type="number" step="0.01" value="1.00"></label>
+        <label class="ts-only">Global Queue & spot (s)<input id="ts_wait" type="number" step="0.1" value="125"></label>
+      </div>
+      <h3 class="ts-only">Shovel Parameters</h3>
+      <table class="flex-table ts-only" id="tbl_shovel_oee"><thead><tr><th>Name</th><th>A</th><th>U</th><th>Fill</th><th>M</th></tr></thead><tbody></tbody></table>
+      <h3 class="ts-only">Truck Parameters</h3>
+      <table class="flex-table ts-only" id="tbl_truck_oee"><thead><tr><th>Name</th><th>A</th><th>U</th><th>Fill</th><th>M</th></tr></thead><tbody></tbody></table>
+      <h3 class="dl-only">Dragline Parameters</h3>
+      <table class="flex-table dl-only" id="tbl_dragline_oee"><thead><tr><th>Name</th><th>A</th><th>U</th><th>Fill</th><th>M</th><th>Reh %</th><th>Reh km</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="card section analysis-step ts-only" data-step="3">
+      <h2>3. Cycle & Pass (Per Truck)</h2>
+      <div class="note step-desc">Haul cycle breakdown & pass rounding.</div>
+      <div class="grid4">
+        <label>One-way distance (km)<input id="ts_dist" type="number" step="0.01" value="0.2"></label>
+        <label>Haul speed (km/h)<input id="ts_vh" type="number" step="0.1" value="10"></label>
+        <label>Return speed (km/h)<input id="ts_vr" type="number" step="0.1" value="15"></label>
+        <label>Dump time (s)<input id="ts_dump" type="number" step="0.1" value="52"></label>
+        <label>Extra load/pos (s)<input id="ts_loadpos" type="number" step="0.1" value="0"></label>
+        <label>Pass Convention
+          <select id="ts_pass_conv"><option value="A" selected>A (Effective)</option><option value="B">B (Nominal)</option></select>
+        </label>
+      </div>
+      <div class="badge" id="cycle_summary">Cycle Summary: —</div>
+      <div class="pass-box">
+        <table class="flex-table" id="tbl_passes">
+          <thead id="pass_head"></thead>
+          <tbody id="pass_body"></tbody>
+        </table>
+        <div class="small-gray">Rule: raw ≥ floor+0.5 → ceil else floor (override via radio).</div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="card section analysis-step" data-step="4">
+      <h2>4. Production (LCM)</h2>
+      <div class="note step-desc">Hourly & annual production plus constraint identification.</div>
+      <div class="grid2">
+        <div class="card ts-only">
+          <h3>Truck–Shovel Aggregate</h3>
+          <table class="table">
+            <tbody>
+              <tr><th>Metric</th><th class="right">Value</th></tr>
+              <tr><td>Total shovel m³/h</td><td class="right" id="out_Qh_shov_eff">—</td></tr>
+              <tr><td>Total truck m³/h</td><td class="right" id="out_Qh_trk">—</td></tr>
+              <tr><td>Constraint m³/h</td><td class="right" id="out_Qh_ts">—</td></tr>
+              <tr><td>Annual m³</td><td class="right" id="out_Qy_ts">—</td></tr>
+              <tr><td>Ore tonnes/y</td><td class="right" id="out_ore_t_ts">—</td></tr>
+              <tr><td>Pass convention</td><td class="right" id="out_pass_conv">—</td></tr>
+              <tr><td>Shovels (spec/units)</td><td class="right" id="out_shovel_count">—</td></tr>
+              <tr><td>Trucks (spec/units)</td><td class="right" id="out_truck_count">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card dl-only">
+          <h3>Dragline Aggregate</h3>
+          <table class="table">
+            <tbody>
+              <tr><th>Metric</th><th class="right">Value</th></tr>
+              <tr><td>Total dragline m³/h</td><td class="right" id="out_Qh_dl">—</td></tr>
+              <tr><td>Annual m³</td><td class="right" id="out_Qy_dl">—</td></tr>
+              <tr><td>Ore tonnes/y</td><td class="right" id="out_ore_t_dl">—</td></tr>
+              <tr><td>Draglines (spec/units)</td><td class="right" id="out_dl_count">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <h3 style="margin-top:18px" class="ts-only">Shovel Production Detail</h3>
+      <table class="detail-table ts-only" id="tbl_shovel_prod"><thead><tr><th>Shovel</th><th class="right">m³/h</th><th class="right">Annual m³</th></tr></thead><tbody></tbody></table>
+      <h3 style="margin-top:14px" class="ts-only">Truck Capacity Detail (Active Convention)</h3>
+      <table class="detail-table ts-only" id="tbl_truck_prod"><thead><tr id="truck_prod_head"><th>Truck</th><th class="right">m³/h (active)</th><th class="right fleet-col hidden">Fleet total m³/h</th></tr></thead><tbody></tbody></table>
+      <h3 style="margin-top:14px" class="dl-only">Dragline Production Detail</h3>
+      <table class="detail-table dl-only" id="tbl_dragline_prod"><thead><tr><th>Dragline</th><th class="right">m³/h</th><th class="right">Annual m³</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="card section analysis-step" data-step="5">
+      <h2>5. Cost Inputs & Ownership (Per Asset)</h2>
+      <div class="note step-desc">Capital, life, operating intensity & maintenance factors.</div>
+      <div class="warning-banner">EAC not a cash cost; use for capital intensity benchmarking only.</div>
+      <h3 class="ts-only">Shovel Cost Params</h3>
+      <table class="flex-table ts-only" id="tbl_shovel_cost">
+        <thead><tr><th>Name</th><th>Cost €</th><th>Life y</th><th>Salv €</th><th>IIT %</th><th>Disc %</th><th>Ops</th><th>Op €/mo</th><th>Helpers</th><th>Help €/mo</th><th>Energy L/h</th><th>Energy €/u</th><th>Lube %</th><th>Maint % Dep</th><th>Break %</th></tr></thead><tbody></tbody>
+      </table>
+      <h3 class="ts-only" style="margin-top:14px">Truck Cost Params</h3>
+      <table class="flex-table ts-only" id="tbl_truck_cost">
+        <thead><tr><th>Name</th><th>Cost €</th><th>Life y</th><th>Salv €</th><th>IIT %</th><th>Disc %</th><th>Ops</th><th>Op €/mo</th><th>Helpers</th><th>Help €/mo</th><th>Energy L/h</th><th>Energy €/u</th><th>Lube %</th><th>Maint % Dep</th><th>Break %</th></tr></thead><tbody></tbody>
+      </table>
+      <h3 class="dl-only" style="margin-top:14px">Dragline Cost Params</h3>
+      <table class="flex-table dl-only" id="tbl_dragline_cost">
+        <thead><tr><th>Name</th><th>Cost €</th><th>Life y</th><th>Salv €</th><th>IIT %</th><th>Disc %</th><th>Ops</th><th>Op €/mo</th><th>Helpers</th><th>Help €/mo</th><th>Energy L/h</th><th>Energy €/u</th><th>Lube %</th><th>Maint % Dep</th><th>Break %</th></tr></thead><tbody></tbody>
+      </table>
+      <div class="divider"></div>
+      <button id="btn_tco" type="button" class="secondary">⚙ Recompute TCO</button>
+      <div class="note">Ownership = Depreciation + IIT (average investment * IIT%).</div>
+      <div class="card" style="margin-top:14px">
+        <h3>Ownership & OPEX Summary</h3>
+        <table class="table" id="tco_table"><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="card section analysis-step" data-step="6">
+      <h2>6. ESG & Unit Economics</h2>
+      <div class="note step-desc">Fuel, emissions, carbon pricing & unit cost integration.</div>
+      <div class="grid4">
+        <label>Carbon emission factor (kg CO₂ / L)<input id="esg_ef_litre" type="number" step="0.0001" value="2.68"></label>
+        <label class="ts-only">TS total fuel override (L/h)<input id="esg_fuel_ts" type="number" step="0.1" placeholder="(auto)"></label>
+        <label class="dl-only">DL total fuel override (L/h)<input id="esg_fuel_dl" type="number" step="0.1" placeholder="(auto)"></label>
+        <label>Carbon cost (€/t CO₂)<input id="esg_carbon_cost" type="number" step="0.1" value="60"></label>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h3>Unit Costs (€/m³ LCM)</h3>
+          <table class="table">
+            <thead><tr><th>Component</th><th class="right col-ts">TS</th><th class="right col-dl">DL</th></tr></thead>
+            <tbody>
+              <tr><td>Production cost</td><td class="right col-ts" id="uc_prod_ts">—</td><td class="right col-dl" id="uc_prod_dl">—</td></tr>
+              <tr><td>Carbon tax</td><td class="right col-ts" id="uc_ctax_ts">—</td><td class="right col-dl" id="uc_ctax_dl">—</td></tr>
+              <tr><td><b>Total incl carbon</b></td><td class="right col-ts" id="uc_total_ts">—</td><td class="right col-dl" id="uc_total_dl">—</td></tr>
+              <tr><td>Carbon intensity (kg/m³)</td><td class="right col-ts" id="ci_ts">—</td><td class="right col-dl" id="ci_dl">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Carbon & Energy Summary</h3>
+          <table class="table">
+            <thead><tr><th>Metric</th><th class="right col-ts">TS</th><th class="right col-dl">DL</th></tr></thead>
+            <tbody>
+              <tr><td>Fuel L/h</td><td class="right col-ts" id="fuel_h_ts">—</td><td class="right col-dl" id="fuel_h_dl">—</td></tr>
+              <tr><td>CO₂ kg/h</td><td class="right col-ts" id="co2_h_ts">—</td><td class="right col-dl" id="co2_h_dl">—</td></tr>
+              <tr><td>Annual CO₂ (t)</td><td class="right col-ts" id="co2_y_ts">—</td><td class="right col-dl" id="co2_y_dl">—</td></tr>
+              <tr><td>Carbon tax €/y</td><td class="right col-ts" id="ctax_y_ts">—</td><td class="right col-dl" id="ctax_y_dl">—</td></tr>
+              <tr><td>Carbon tax €/m³</td><td class="right col-ts" id="ctax_m3_ts">—</td><td class="right col-dl" id="ctax_m3_dl">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h3>Comparison / System Charts</h3>
+          <div class="chart-wrap"><canvas id="chart_cost"></canvas></div>
+          <div class="chart-wrap"><canvas id="chart_carbon"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>Recommendation Engine</h3>
+          <div id="reco_box" class="reco-box"><div class="mini">Awaiting data...</div></div>
+          <div class="divider"></div>
+          <button id="btn_econ" type="button" class="success">📊 Recompute ESG & Economics</button>
+          <div class="note">Score = 0.5·(Cost/Min) + 0.5·(CI/Min).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="card section analysis-step" data-step="7">
+      <h2>7. Economic Evaluation (NPV & Payback)</h2>
+      <div class="note step-desc">Discounted cash flows & value metrics (single-system tables now visible).</div>
+      <div class="grid4">
+        <label>Commodity price (€/t ore)<input id="eco_price_t" type="number" step="0.1" value="25"></label>
+        <label>Project life (y)<input id="eco_life" type="number" step="1" value="15"></label>
+        <label>Discount rate %<input id="eco_disc" type="number" step="0.1" value="10"></label>
+        <label>Include IIT in OPEX?<select id="eco_inc_iit"><option value="no" selected>No</option><option value="yes">Yes</option></select></label>
+        <label>Include salvage?<select id="eco_inc_salv"><option value="yes" selected>Yes</option><option value="no">No</option></select></label>
+        <label>Use carbon-adjusted cost?<select id="eco_use_carbon"><option value="yes" selected>Yes</option><option value="no">No</option></select></label>
+        <label>Escalation % (real)<input id="eco_escal" type="number" step="0.1" value="0"></label>
+        <label>NPV base year<select id="eco_base_year"><option value="0">0</option><option value="1">1</option></select></label>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h3>Cash Flow Summary (Rounded)</h3>
+          <table class="table" id="eco_table"><tbody></tbody></table>
+        </div>
+        <div class="card">
+          <h3>Annual Cash Flow</h3>
+          <table class="table" id="eco_cf_table">
+            <thead>
+            <tr>
+              <th>Year</th>
+              <th class="right col-ts">TS CF €</th>
+              <th class="right col-dl">DL CF €</th>
+              <th class="right col-ts">TS Disc €</th>
+              <th class="right col-dl">DL Disc €</th>
+              <th class="right col-ts">Cum TS €</th>
+              <th class="right col-dl">Cum DL €</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="note">Table always visible; columns auto-empty for inactive system.</div>
+    </div>
+
+    <!-- Step 8 -->
+    <div class="card section analysis-step" data-step="8">
+      <h2>8. Executive Summary Snapshot</h2>
+      <div class="note step-desc">Condensed comparative or single-system overview.</div>
+      <div id="exec_summary" class="exec-summary">KPIs will populate after calculations...</div>
+    </div>
+  </main>
+</div>
+
+<footer>© 2025 Unified Mining Analytical Model – v8.7 (Final)</footer>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+/*
+  ====== Integration Note ======
+  Code refactored for clarity and maintainability. UI/KPIs unchanged.
+  - Initial data now loads correctly into all parameter tables.
+  - DOCX export functionality has been completely overhauled for professional reports.
+    - Normal Click: Comprehensive report with charts, summary, and all data tables.
+    - SHIFT + Click: Clean, stepwise report matching the HTML version.
+    - ALT + Click: Stepwise comparative HTML report in a new window.
+*/
+/* ========= Core Utilities ========= */
+const $=id=>document.getElementById(id);
+const nf2=x=>Number.isFinite(x)?x.toLocaleString(undefined,{maximumFractionDigits:2}):'—';
+const nf3=x=>Number.isFinite(x)?x.toLocaleString(undefined,{maximumFractionDigits:3}):'—';
+const intFmt=x=>Number.isFinite(x)?Math.round(x).toLocaleString():'—';
+function setText(id,val,fmt){const el=$(id); if(!el)return; el.textContent=fmt?fmt(val):val;}
+let debugMode=false;const dbgLog=[];
+function log(m,o){dbgLog.push(m+(o?' :: '+JSON.stringify(o):'')); if(debugMode){const d=$('debug_log'); if(d)d.textContent=dbgLog.slice(-400).join('\\n');}}
+function showError(e){const b=$('error_banner'); if(b){b.style.display='block'; b.textContent='Error: '+(e?.message||e);} console.error(e);}
+
+/* ========= Mode Handling ========= */
+let currentMode='compare';
+document.querySelectorAll('input[name=mode_select]').forEach(r=>{
+  r.addEventListener('change',e=>{
+    if(e.target.checked){
+      currentMode=e.target.value;
+      document.body.classList.remove('mode-dl','mode-ts','mode-compare');
+      document.body.classList.add(currentMode==='dragline'?'mode-dl':currentMode==='truckshovel'?'mode-ts':'mode-compare');
+      safeRecompute();
+    }
+  });
+});
+
+/* ========= Data Structures ========= */
+let shovels=[],trucks=[],draglines=[];
+function uid(){return Math.random().toString(36).slice(2,9);}
+function addShovel(d){shovels.push(Object.assign({id:uid(),name:'pc1000'+(shovels.length+1),qty:1,bucket:5.4,cycle:27,A:0.9,U:0.8,fill:1.15,M:1,cost:700000,life:10,salv:0,iit:15,disc:10,ops:3,opw:600,helpers:3,hlpw:400,energy:70,ep:1,lube:30,maint:50,brk:2},d||{}));renderShovelTables();renderPassMatrix();safeRecompute();}
+function addTruck(d){trucks.push(Object.assign({id:uid(),name:'785',qty:1,body:60,payload:'',waitOverride:0,A:0.9,U:0.8,fill:1.0,M:1,cost:900000,life:17,salv:0,iit:15,disc:10,ops:3,opw:600,helpers:3,hlpw:400,energy:70,ep:1,lube:30,maint:50,brk:2},d||{}));renderTruckTables();renderPassMatrix();safeRecompute();}
+function addDragline(d){draglines.push(Object.assign({id:uid(),name:'DL'+(draglines.length+1),qty:1,bucket:10.8,cycle:54,method:'simple',A:0.88,U:0.78,fill:1.10,M:1,rehandle:0,rehandleDist:0,cost:5000000,life:20.5,salv:0,iit:15,disc:10,ops:3,opw:600,helpers:3,hlpw:400,energy:70,ep:1,lube:30,maint:20,brk:2},d||{}));renderDraglineTables();safeRecompute();}
+
+/* ========= Render Tables (Corrected) ========= */
+function renderShovelTables(){
+  const tb=$('tbl_shovels')?.querySelector('tbody'); if(tb){tb.innerHTML='';
+    shovels.forEach(s=>tb.insertAdjacentHTML('beforeend',`<tr>
+      <td><input data-type="shovel" data-k="name" data-id="${s.id}" value="${s.name}"></td>
+      <td><input data-type="shovel" data-k="qty" data-id="${s.id}" type="number" value="${s.qty}"></td>
+      <td><input data-type="shovel" data-k="bucket" data-id="${s.id}" type="number" step="0.01" value="${s.bucket}"></td>
+      <td><input data-type="shovel" data-k="cycle" data-id="${s.id}" type="number" step="0.1" value="${s.cycle}"></td>
+      <td><button data-del="shovel" data-id="${s.id}" class="inline-del">✕</button></td>
+    </tr>`));
+  }
+  const o=$('tbl_shovel_oee')?.querySelector('tbody'); if(o){o.innerHTML='';
+    shovels.forEach(s=>o.insertAdjacentHTML('beforeend',`<tr><td>${s.name}</td>
+      <td><input data-type="shovel" data-k="A" data-id="${s.id}" type="number" step="0.01" value="${s.A}"></td>
+      <td><input data-type="shovel" data-k="U" data-id="${s.id}" type="number" step="0.01" value="${s.U}"></td>
+      <td><input data-type="shovel" data-k="fill" data-id="${s.id}" type="number" step="0.01" value="${s.fill}"></td>
+      <td><input data-type="shovel" data-k="M" data-id="${s.id}" type="number" step="0.01" value="${s.M}"></td></tr>`));
+  }
+  const c=$('tbl_shovel_cost')?.querySelector('tbody'); if(c){c.innerHTML='';
+    shovels.forEach(s=>c.insertAdjacentHTML('beforeend',tableRowCost('shovel',s)));
+  }
+}
+function tableRowCost(type,obj){
+ return `<tr><td>${obj.name}</td>
+  <td><input data-type="${type}" data-k="cost" data-id="${obj.id}" type="number" step="1000" value="${obj.cost}"></td>
+  <td><input data-type="${type}" data-k="life" data-id="${obj.id}" type="number" step="0.1" value="${obj.life}"></td>
+  <td><input data-type="${type}" data-k="salv" data-id="${obj.id}" type="number" step="1000" value="${obj.salv}"></td>
+  <td><input data-type="${type}" data-k="iit" data-id="${obj.id}" type="number" step="0.1" value="${obj.iit}"></td>
+  <td><input data-type="${type}" data-k="disc" data-id="${obj.id}" type="number" step="0.1" value="${obj.disc}"></td>
+  <td><input data-type="${type}" data-k="ops" data-id="${obj.id}" type="number" value="${obj.ops}"></td>
+  <td><input data-type="${type}" data-k="opw" data-id="${obj.id}" type="number" value="${obj.opw}"></td>
+  <td><input data-type="${type}" data-k="helpers" data-id="${obj.id}" type="number" value="${obj.helpers}"></td>
+  <td><input data-type="${type}" data-k="hlpw" data-id="${obj.id}" type="number" value="${obj.hlpw}"></td>
+  <td><input data-type="${type}" data-k="energy" data-id="${obj.id}" type="number" step="0.1" value="${obj.energy}"></td>
+  <td><input data-type="${type}" data-k="ep" data-id="${obj.id}" type="number" step="0.01" value="${obj.ep}"></td>
+  <td><input data-type="${type}" data-k="lube" data-id="${obj.id}" type="number" step="0.1" value="${obj.lube}"></td>
+  <td><input data-type="${type}" data-k="maint" data-id="${obj.id}" type="number" step="0.1" value="${obj.maint}"></td>
+  <td><input data-type="${type}" data-k="brk" data-id="${obj.id}" type="number" step="0.1" value="${obj.brk}"></td></tr>`;
+}
+function renderTruckTables(){
+  const tb=$('tbl_trucks')?.querySelector('tbody'); if(tb){tb.innerHTML='';
+    trucks.forEach(t=>tb.insertAdjacentHTML('beforeend',`<tr>
+      <td><input data-type="truck" data-k="name" data-id="${t.id}" value="${t.name}"></td>
+      <td><input data-type="truck" data-k="qty" data-id="${t.id}" type="number" value="${t.qty}"></td>
+      <td><input data-type="truck" data-k="body" data-id="${t.id}" type="number" step="0.1" value="${t.body}"></td>
+      <td><input data-type="truck" data-k="payload" data-id="${t.id}" type="number" step="0.1" value="${t.payload}"></td>
+      <td><input data-type="truck" data-k="waitOverride" data-id="${t.id}" type="number" step="0.1" value="${t.waitOverride||0}"></td>
+      <td><button data-del="truck" data-id="${t.id}" class="inline-del">✕</button></td>
+    </tr>`));
+  }
+  const o=$('tbl_truck_oee')?.querySelector('tbody'); if(o){o.innerHTML='';
+    trucks.forEach(t=>o.insertAdjacentHTML('beforeend',`<tr><td>${t.name}</td>
+      <td><input data-type="truck" data-k="A" data-id="${t.id}" type="number" step="0.01" value="${t.A}"></td>
+      <td><input data-type="truck" data-k="U" data-id="${t.id}" type="number" step="0.01" value="${t.U}"></td>
+      <td><input data-type="truck" data-k="fill" data-id="${t.id}" type="number" step="0.01" value="${t.fill}"></td>
+      <td><input data-type="truck" data-k="M" data-id="${t.id}" type="number" step="0.01" value="${t.M}"></td></tr>`));
+  }
+  const c=$('tbl_truck_cost')?.querySelector('tbody'); if(c){c.innerHTML='';
+    trucks.forEach(t=>c.insertAdjacentHTML('beforeend',tableRowCost('truck',t)));
+  }
+  renderPassMatrix();
+}
+function renderDraglineTables(){
+  const tb=$('tbl_draglines')?.querySelector('tbody'); if(tb){tb.innerHTML='';
+    draglines.forEach(d=>tb.insertAdjacentHTML('beforeend',`<tr>
+      <td><input data-type="dragline" data-k="name" data-id="${d.id}" value="${d.name}"></td>
+      <td><input data-type="dragline" data-k="qty" data-id="${d.id}" type="number" value="${d.qty}"></td>
+      <td><input data-type="dragline" data-k="bucket" data-id="${d.id}" type="number" step="0.01" value="${d.bucket}"></td>
+      <td><input data-type="dragline" data-k="cycle" data-id="${d.id}" type="number" step="0.1" value="${d.cycle}"></td>
+      <td><select data-type="dragline" data-k="method" data-id="${d.id}">
+        <option value="simple" ${d.method==='simple'?'selected':''}>Simple</option>
+        <option value="extended" ${d.method==='extended'?'selected':''}>Extended</option>
+        <option value="tandem" ${d.method==='tandem'?'selected':''}>Tandem</option>
+      </select></td>
+      <td><button data-del="dragline" data-id="${d.id}" class="inline-del">✕</button></td>
+    </tr>`));
+  }
+  const o=$('tbl_dragline_oee')?.querySelector('tbody'); if(o){o.innerHTML='';
+    draglines.forEach(d=>o.insertAdjacentHTML('beforeend',`<tr><td>${d.name}</td>
+      <td><input data-type="dragline" data-k="A" data-id="${d.id}" type="number" step="0.01" value="${d.A}"></td>
+      <td><input data-type="dragline" data-k="U" data-id="${d.id}" type="number" step="0.01" value="${d.U}"></td>
+      <td><input data-type="dragline" data-k="fill" data-id="${d.id}" type="number" step="0.01" value="${d.fill}"></td>
+      <td><input data-type="dragline" data-k="M" data-id="${d.id}" type="number" step="0.01" value="${d.M}"></td>
+      <td><input data-type="dragline" data-k="rehandle" data-id="${d.id}" type="number" step="0.1" value="${d.rehandle}"></td>
+      <td><input data-type="dragline" data-k="rehandleDist" data-id="${d.id}" type="number" step="0.01" value="${d.rehandleDist}"></td></tr>`));
+  }
+  const c=$('tbl_dragline_cost')?.querySelector('tbody'); if(c){c.innerHTML='';
+    draglines.forEach(d=>c.insertAdjacentHTML('beforeend',tableRowCost('dragline',d)));
+  }
+}
+
+/* ========= Pass Matrix ========= */
+const passesChoice={};
+function renderPassMatrix(){
+  const head=$('pass_head'), body=$('pass_body');
+  if(!head||!body)return;
+  if(currentMode==='dragline'){head.innerHTML=''; body.innerHTML='<tr><td style="font-size:11px;color:#5d6f84">Pass matrix hidden (Dragline mode).</td></tr>'; return;}
+  const conv=$('ts_pass_conv')?.value||'A';
+  const rep=shovels[0];
+  head.innerHTML=`<tr><th>Truck</th><th>Body m³</th><th>${conv==='A'?'Eff Bucket m³':'Bucket m³'}</th><th>Raw ${conv}</th><th>Passes ${conv}</th><th>Load (s)</th><th>Wait (s)</th><th>T (s)</th></tr>`;
+  body.innerHTML='';
+  if(!shovels.length||!trucks.length){body.innerHTML='<tr><td colspan="8" style="text-align:center;color:#5d6f84">Add shovel & truck.</td></tr>'; return;}
+  const effBucket=rep.bucket*rep.fill;
+  trucks.forEach(t=>{
+    const rawA=effBucket>0?t.body/effBucket:Infinity;
+    const rawB=rep.bucket>0?t.body/rep.bucket:Infinity;
+    const raw=conv==='A'?rawA:rawB;
+    const floor=Math.max(1,Math.floor(raw)), ceil=Math.max(floor,Math.ceil(raw));
+    const sugg=raw>=floor+0.5?ceil:floor;
+    passesChoice[t.id]=passesChoice[t.id]||{A:sugg,B:sugg};
+    if(passesChoice[t.id][conv]==null) passesChoice[t.id][conv]=sugg;
+    const chosen=passesChoice[t.id][conv];
+    const extra=+($('ts_loadpos')?.value||0);
+    const dist=+($('ts_dist')?.value||0);
+    const vh=Math.max(+($('ts_vh')?.value||1),0.0001);
+    const vr=Math.max(+($('ts_vr')?.value||1),0.0001);
+    const t_haul=dist/vh*3600, t_ret=dist/vr*3600, dump=+($('ts_dump')?.value||0);
+    const wait=(t.waitOverride&&t.waitOverride>0)?t.waitOverride:+($('ts_wait')?.value||0);
+    const load=chosen*rep.cycle+extra;
+    const T=load+t_haul+dump+t_ret+wait;
+    body.insertAdjacentHTML('beforeend',`<tr>
+      <td>${t.name}</td>
+      <td>${t.body}</td>
+      <td>${(conv==='A'?effBucket:rep.bucket).toFixed(2)}</td>
+      <td>${raw.toFixed(3)}</td>
+      <td>${[floor,ceil].map(v=>`<label style="display:inline-flex;align-items:center;gap:2px"><input type="radio" name="p_${conv}_${t.id}" data-pass-id="${t.id}" data-conv="${conv}" value="${v}" ${v===chosen?'checked':''}>${v}${v===sugg?'<sup>*</sup>':''}</label>`).join(' ')}</td>
+      <td>${load.toFixed(1)}</td>
+      <td><input data-type="truck" data-k="waitOverride" data-id="${t.id}" type="number" step="0.1" value="${t.waitOverride||0}" style="width:70px"></td>
+      <td>${T.toFixed(1)}</td>
+    </tr>`);
+  });
+  updateCycleSummary();
+}
+
+/* ========= Events ========= */
+document.addEventListener('input',e=>{
+  const el=e.target;
+  if(el.matches('input[data-type],select[data-type]')){
+    const type=el.getAttribute('data-type'), k=el.getAttribute('data-k'), id=el.getAttribute('data-id');
+    const list= type==='shovel'?shovels: type==='truck'?trucks: draglines;
+    const obj=list.find(o=>o.id===id);
+    if(obj){
+      let v=el.value;
+      if(['qty','bucket','cycle','A','U','fill','M','body','payload','waitOverride','cost','life','salv','iit','disc','ops','opw','helpers','hlpw','energy','ep','lube','maint','brk','rehandle','rehandleDist'].includes(k)){
+        v=parseFloat(v); if(!isFinite(v)) v=0;
+      }
+      obj[k]=v;
+      if(k==='name'){renderShovelTables();renderTruckTables();renderDraglineTables();renderPassMatrix();safeRecompute();return;}
+      if(['bucket','fill','cycle','body','waitOverride'].includes(k)) renderPassMatrix();
+      safeRecompute();
+    }
+  }
+  if(el.matches('input[type=radio][data-pass-id]')){
+    const id=el.getAttribute('data-pass-id'), conv=el.getAttribute('data-conv');
+    passesChoice[id]=passesChoice[id]||{A:1,B:1};
+    passesChoice[id][conv]=parseInt(el.value,10);
+    updateCycleSummary(); safeRecompute();
+  }
+});
+document.addEventListener('change',e=>{
+  if(['eco_price_t','eco_life','eco_disc','eco_inc_iit','eco_inc_salv','eco_use_carbon','eco_escal','eco_base_year','ts_pass_conv'].includes(e.target.id)){
+    if(e.target.id==='ts_pass_conv') renderPassMatrix();
+    safeRecompute();
+  }
+});
+document.addEventListener('click',e=>{
+  const del=e.target.getAttribute('data-del');
+  if(del){
+    const id=e.target.getAttribute('data-id');
+    if(del==='shovel') shovels=shovels.filter(s=>s.id!==id);
+    if(del==='truck') trucks=trucks.filter(t=>t.id!==id);
+    if(del==='dragline') draglines=draglines.filter(d=>d.id!==id);
+    renderShovelTables();renderTruckTables();renderDraglineTables();renderPassMatrix();safeRecompute();
+  }
+});
+$('btn_dbg')?.addEventListener('click',()=>{debugMode=!debugMode;$('debug_log')?.classList.toggle('hidden',!debugMode);$('btn_dbg').textContent=debugMode?'Hide Debug':'Debug';});
+$('add_shovel')?.addEventListener('click',()=>addShovel());
+$('add_truck')?.addEventListener('click',()=>addTruck());
+$('add_dragline')?.addEventListener('click',()=>addDragline());
+$('btn_force_recompute')?.addEventListener('click',()=>{Object.keys(passesChoice).forEach(k=>delete passesChoice[k]);renderPassMatrix();safeRecompute();});
+$('btn_tco')?.addEventListener('click',safeRecompute);
+$('btn_econ')?.addEventListener('click',safeRecompute);
+
+/* ========= Cycle Summary ========= */
+function updateCycleSummary(){
+  if(currentMode==='dragline'){setText('cycle_summary','Cycle Summary: (not applicable)');return;}
+  const conv=$('ts_pass_conv')?.value||'A';
+  if(!shovels.length||!trucks.length){setText('cycle_summary','Cycle Summary: —');return;}
+  const rep=shovels[0];
+  const extra=+($('ts_loadpos')?.value||0), dist=+($('ts_dist')?.value||0);
+  const vh=Math.max(+($('ts_vh')?.value||1),0.0001), vr=Math.max(+($('ts_vr')?.value||1),0.0001);
+  const t_haul=dist/vh*3600, t_ret=dist/vr*3600, dump=+($('ts_dump')?.value||0);
+  const parts=trucks.map(t=>{
+    const passes=passesChoice[t.id]?passesChoice[t.id][conv]:1;
+    const wait=(t.waitOverride&&t.waitOverride>0)?t.waitOverride:+($('ts_wait')?.value||0);
+    const load=passes*rep.cycle+extra;
+    const T=load+t_haul+dump+t_ret+wait;
+    return `${t.name}:${passes}p ${T.toFixed(1)}s`;
+  });
+  setText('cycle_summary',`Cycle Summary (${conv}): `+parts.join(' | '));
+}
+
+/* ========= Production / Cost / ESG / Economics ========= */
+function annualHours(){return (+($('cal_hps')?.value||0))* (+($('cal_spd')?.value||0))* (+($('cal_dpy')?.value||0));}
+function dep(c,s,l){return (c-s)/l;}
+function ayi(c,s,l){return ((l+1)*c+(l-1)*s)/(2*l);}
+function opexFromInputs(pwr,ep,lubePct,depY,maintPct,cost,breakPct,ops,opw,hlp,hlw,units,Hy){
+  if(!(ep>0))return {energy:0,lube:0,maint:0,brk:0,lab:0,total:0};
+  const energy=pwr*Hy*ep*units,lube=lubePct/100*energy,maint=maintPct/100*depY*units,brk=breakPct/100*cost*units,lab=12*((ops*opw)+(hlp*hlw))*units;
+  return {energy,lube,maint,brk,lab,total:energy+lube+maint+brk+lab};
+}
+function computeProduction(){
+  const mode=currentMode;
+  const SF=+($('mat_swell')?.value||1), SR=+($('econ_sr')?.value||0), density=+($('mat_density')?.value||0);
+  const Hy=annualHours(), conv=$('ts_pass_conv')?.value||'A';
+  const shList=mode==='dragline'?[]:shovels;
+  const trList=mode==='dragline'?[]:trucks;
+  let shovelSum=0; const rep=shList[0];
+  shList.forEach(s=>shovelSum+=(3600/s.cycle)*s.bucket*s.fill*SF*s.M*s.A*s.U*s.qty);
+  const extra=+($('ts_loadpos')?.value||0), dist=+($('ts_dist')?.value||0);
+  const vh=Math.max(+($('ts_vh')?.value||1),0.0001), vr=Math.max(+($('ts_vr')?.value||1),0.0001);
+  const t_haul=dist/vh*3600, t_ret=dist/vr*3600, dump=+($('ts_dump')?.value||0);
+  let truckTotal=0;
+  trList.forEach(t=>{
+    const passes=passesChoice[t.id]?passesChoice[t.id][conv]:1;
+    const wait=(t.waitOverride&&t.waitOverride>0)?t.waitOverride:+($('ts_wait')?.value||0);
+    const load=passes*(rep?rep.cycle:0)+extra;
+    const T=load+t_haul+dump+t_ret+wait;
+    truckTotal+=(3600/Math.max(T,1))*t.body*SF*t.fill*t.A*t.U*t.M*t.qty;
+  });
+  const Qh_ts=Math.min(shovelSum,truckTotal), Qy_ts=Qh_ts*Hy;
+  let dlSum=0;
+  const dlList=mode==='truckshovel'?[]:draglines;
+  dlList.forEach(d=>{
+    const re=(d.rehandle||0)/100;
+    dlSum+=((3600/d.cycle)*d.bucket*d.fill*SF*d.M*d.A*d.U*d.qty)/(1+re);
+  });
+  const Qy_dl=dlSum*Hy;
+  const oreLCM_ts=Qy_ts/(SR+1), oreLCM_dl=Qy_dl/(SR+1);
+  const oreTon_ts=mode==='dragline'?0:(oreLCM_ts/SF)*density;
+  const oreTon_dl=mode==='truckshovel'?0:(oreLCM_dl/SF)*density;
+
+  /* UI */
+  if(mode!=='dragline'){
+    setText('out_Qh_shov_eff',shovelSum,intFmt); setText('out_Qh_trk',truckTotal,intFmt);
+    setText('out_Qh_ts',Qh_ts,intFmt); setText('out_Qy_ts',Qy_ts,intFmt);
+    setText('out_ore_t_ts',oreTon_ts,intFmt); setText('out_pass_conv',conv);
+    const shUnits=shList.reduce((a,b)=>a+b.qty,0), trUnits=trList.reduce((a,b)=>a+b.qty,0);
+    setText('out_shovel_count',`${shList.length} / ${shUnits}`); setText('out_truck_count',`${trList.length} / ${trUnits}`);
+    setText('kpi_bottleneck',shovelSum||truckTotal?(Qh_ts===shovelSum?'Shovel-bound':'Truck-bound'):'—');
+  } else {
+    ['out_Qh_shov_eff','out_Qh_trk','out_Qh_ts','out_Qy_ts','out_ore_t_ts','out_shovel_count','out_truck_count'].forEach(id=>setText(id,'—'));
+  }
+  if(mode!=='truckshovel'){
+    setText('out_Qh_dl',dlSum,intFmt); setText('out_Qy_dl',Qy_dl,intFmt); setText('out_ore_t_dl',oreTon_dl,intFmt);
+    const dlUnits=dlList.reduce((a,b)=>a+b.qty,0); setText('out_dl_count',`${dlList.length} / ${dlUnits}`);
+  } else {
+    ['out_Qh_dl','out_Qy_dl','out_ore_t_dl','out_dl_count'].forEach(id=>setText(id,'—'));
+  }
+  if(mode==='compare'){
+    const maxY=Math.max(Qy_ts,Qy_dl,1);
+    $('bar_ts').style.width=(Qy_ts/maxY*100)+'%'; $('bar_dl').style.width=(Qy_dl/maxY*100)+'%';
+  }
+
+  /* Detail tables */
+  if(mode!=='dragline'){
+    const shBody=$('tbl_shovel_prod')?.querySelector('tbody'); if(shBody){shBody.innerHTML='';
+      shList.forEach(s=>{
+        const q=(3600/s.cycle)*s.bucket*s.fill*SF*s.M*s.A*s.U*s.qty;
+        shBody.insertAdjacentHTML('beforeend',`<tr><td>Shovel ${s.name}</td><td class="right">${intFmt(q)}</td><td class="right">${intFmt(q*Hy)}</td></tr>`);
+      });
+    }
+    const trBody=$('tbl_truck_prod')?.querySelector('tbody'); if(trBody){
+      trBody.innerHTML='';
+      let total=0;
+      trList.forEach(t=>{
+        const passes=passesChoice[t.id]?passesChoice[t.id][conv]:1;
+        const wait=(t.waitOverride&&t.waitOverride>0)?t.waitOverride:+($('ts_wait')?.value||0);
+        const load=passes*(rep?rep.cycle:0)+(+($('ts_loadpos')?.value||0));
+        const T=load+t_haul+dump+t_ret+wait;
+        const cap=(3600/Math.max(T,1))*t.body*SF*t.fill*t.A*t.U*t.M*t.qty;
+        total+=cap;
+        trBody.insertAdjacentHTML('beforeend',`<tr><td>Truck ${t.name}</td><td class="right">${intFmt(cap)}</td><td class="right fleet-col hidden"></td></tr>`);
+      });
+      if(trList.length>1){
+        const firstRow=trBody.querySelector('tr');
+        if(firstRow){
+          firstRow.children[2].classList.remove('hidden'); firstRow.children[2].textContent=intFmt(total);
+          $('truck_prod_head')?.querySelector('.fleet-col')?.classList.remove('hidden');
+        }
+      } else {
+        $('truck_prod_head')?.querySelector('.fleet-col')?.classList.add('hidden');
+      }
+    }
+  }
+  if(mode!=='truckshovel'){
+    const dlBody=$('tbl_dragline_prod')?.querySelector('tbody'); if(dlBody){dlBody.innerHTML='';
+      draglines.forEach(d=>{
+        const re=(d.rehandle||0)/100;
+        const q=((3600/d.cycle)*d.bucket*d.fill*SF*d.M*d.A*d.U*d.qty)/(1+re);
+        dlBody.insertAdjacentHTML('beforeend',`<tr><td>Dragline ${d.name}</td><td class="right">${intFmt(q)}</td><td class="right">${intFmt(q*Hy)}</td></tr>`);
+      });
+    }
+  }
+  return {Qy_ts:mode==='dragline'?0:Qy_ts,Qy_dl:mode==='truckshovel'?0:Qy_dl,Qh_ts,Qh_dl:dlSum,Hy,oreTon_ts:mode==='dragline'?0:oreTon_ts,oreTon_dl:mode==='truckshovel'?0:oreTon_dl,shovelSum,truckTotal};
+}
+
+function drawOpexBars(barId,labelId,energy,lube,maint,brk,lab,total){
+  const parent=$(barId); if(!parent)return; parent.innerHTML='';
+  const label=$(labelId); if(!(total>0)){if(label)label.textContent='';return;}
+  const parts=[energy,lube,maint,brk,lab], names=['Energy','Lube','Maint','Break','Labour'], cls=['fuel','lube','maint','break','lab'];
+  parts.forEach((v,i)=>{const seg=document.createElement('div');seg.className='seg '+cls[i];seg.style.width=(v/total*100)+'%';parent.appendChild(seg);});
+  if(label) label.textContent=parts.map((v,i)=>`${names[i]} ${nf2(v)}€ ${(v/total*100).toFixed(1)}%`).join(' · ');
+}
+
+function depY(cost,salv,life){return (cost-salv)/life;}
+function ayi(cost,salv,life){return ((life+1)*cost+(life-1)*salv)/(2*life);}
+
+function computeTCO(prod){
+  const Hy=prod.Hy;
+  function fleet(list){
+    let own=0,opex=0,items=[];
+    list.forEach(it=>{
+      const d=depY(it.cost,it.salv,it.life), AYI=ayi(it.cost,it.salv,it.life), IIT=AYI*it.iit/100;
+      const op=opexFromInputs(it.energy,it.ep,it.lube,d,it.maint,it.cost,it.brk,it.ops,it.opw,it.helpers,it.hlpw,it.qty,Hy);
+      own+=(d+IIT)*it.qty; opex+=op.total;
+      items.push({dep:d,IIT,op,units:it.qty,cost:it.cost,salv:it.salv, life: it.life});
+    });
+    return {own,opex,total:own+opex,items};
+  }
+  const shFleet=fleet(currentMode==='dragline'?[]:shovels);
+  const trFleet=fleet(currentMode==='dragline'?[]:trucks);
+  const dlFleet=fleet(currentMode==='truckshovel'?[]:draglines);
+  if(currentMode==='compare'){
+    drawOpexBars('kpi_opex_ts','kpi_opex_ts_labels',
+      shFleet.items.reduce((a,b)=>a+b.op.energy,0)+trFleet.items.reduce((a,b)=>a+b.op.energy,0),
+      shFleet.items.reduce((a,b)=>a+b.op.lube,0)+trFleet.items.reduce((a,b)=>a+b.op.lube,0),
+      shFleet.items.reduce((a,b)=>a+b.op.maint,0)+trFleet.items.reduce((a,b)=>a+b.op.maint,0),
+      shFleet.items.reduce((a,b)=>a+b.op.brk,0)+trFleet.items.reduce((a,b)=>a+b.op.brk,0),
+      shFleet.items.reduce((a,b)=>a+b.op.lab,0)+trFleet.items.reduce((a,b)=>a+b.op.lab,0),
+      shFleet.opex+trFleet.opex);
+    drawOpexBars('kpi_opex_dl','kpi_opex_dl_labels',
+      dlFleet.items.reduce((a,b)=>a+b.op.energy,0),
+      dlFleet.items.reduce((a,b)=>a+b.op.lube,0),
+      dlFleet.items.reduce((a,b)=>a+b.op.maint,0),
+      dlFleet.items.reduce((a,b)=>a+b.op.brk,0),
+      dlFleet.items.reduce((a,b)=>a+b.op.lab,0),
+      dlFleet.opex);
+  }
+  const t=$('tco_table')?.querySelector('tbody');
+  if(t){
+    t.innerHTML=`<tr><th></th><th class="right col-ts">TS Shovels</th><th class="right col-ts">TS Trucks</th><th class="right col-ts">TS Total</th><th class="right col-dl">Dragline</th></tr>
+      <tr><td>Ownership €/y</td><td class="right col-ts">${nf2(shFleet.own)}</td><td class="right col-ts">${nf2(trFleet.own)}</td><td class="right col-ts">${nf2(shFleet.own+trFleet.own)}</td><td class="right col-dl">${nf2(dlFleet.own)}</td></tr>
+      <tr><td>OPEX €/y</td><td class="right col-ts">${nf2(shFleet.opex)}</td><td class="right col-ts">${nf2(trFleet.opex)}</td><td class="right col-ts">${nf2(shFleet.opex+trFleet.opex)}</td><td class="right col-dl">${nf2(dlFleet.opex)}</td></tr>
+      <tr><td><b>Total €/y</b></td><td class="right col-ts">${nf2(shFleet.total)}</td><td class="right col-ts">${nf2(trFleet.total)}</td><td class="right col-ts"><b>${nf2(shFleet.total+trFleet.total)}</b></td><td class="right col-dl"><b>${nf2(dlFleet.total)}</b></td></tr>`;
+  }
+  return {TS_total:shFleet.total+trFleet.total,DL_total:dlFleet.total,components:{shovels:shFleet,trucks:trFleet,draglines:dlFleet}};
+}
+
+let chartCost,chartCarbon;
+function updateCharts(costTS,costDL,ciTS,ciDL,ctaxTS,ctaxDL){
+  if(!window.Chart)return;
+  try{
+    chartCost&&chartCost.destroy(); chartCarbon&&chartCarbon.destroy();
+    const ctx1=$('chart_cost')?.getContext('2d'), ctx2=$('chart_carbon')?.getContext('2d');
+    let labels=[], baseCost=[], carbonTax=[], ciData=[], baseCols=[], carbonCols=[], ciCols=[];
+    if(currentMode==='dragline'){
+      labels=['Dragline']; baseCost=[costDL-ctaxDL]; carbonTax=[ctaxDL]; ciData=[ciDL];
+      baseCols=['#7030a0']; carbonCols=['#9b59d5']; ciCols=['#6d28d9'];
+    } else if(currentMode==='truckshovel'){
+      labels=['Truck–Shovel']; baseCost=[costTS-ctaxTS]; carbonTax=[ctaxTS]; ciData=[ciTS];
+      baseCols=['#36a372']; carbonCols=['#1d62d7']; ciCols=['#0d9488'];
+    } else {
+      labels=['Truck–Shovel','Dragline'];
+      baseCost=[costTS-ctaxTS,costDL-ctaxDL]; carbonTax=[ctaxTS,ctaxDL]; ciData=[ciTS,ciDL];
+      baseCols=['#36a372','#7030a0']; carbonCols=['#1d62d7','#9b59d5']; ciCols=['#0d9488','#6d28d9'];
+    }
+    if(ctx1){
+      chartCost=new Chart(ctx1,{type:'bar',data:{labels,datasets:[
+        {label:'Base Cost €/m³',data:baseCost,backgroundColor:baseCols, stack: 'cost'},
+        {label:'Carbon Tax €/m³',data:carbonTax,backgroundColor:carbonCols, stack: 'cost'}
+      ]},options:{scales: {x:{stacked:true},y:{stacked:true}}, plugins:{legend:{position:'bottom'}},responsive:true, maintainAspectRatio: false}});
+    }
+    if(ctx2){
+      chartCarbon=new Chart(ctx2,{type:'bar',data:{labels,datasets:[
+        {label:'Carbon Intensity kg CO₂/m³',data:ciData,backgroundColor:ciCols}
+      ]},options:{plugins:{legend:{position:'bottom'}},responsive:true, maintainAspectRatio: false}});
+    }
+  }catch(e){log('Chart error',e);}
+}
+
+function computeESG(prod,tco){
+  const {Qy_ts,Qy_dl,Hy}=prod;
+  const ef=+($('esg_ef_litre')?.value||0), carbonCost=+($('esg_carbon_cost')?.value||0);
+  const uc_ts=Qy_ts>0?tco.TS_total/Qy_ts:NaN, uc_dl=Qy_dl>0?tco.DL_total/Qy_dl:NaN;
+  let tsFuel=shovels.reduce((a,b)=>a+b.energy*b.qty,0)+trucks.reduce((a,b)=>a+b.energy*b.qty,0);
+  let dlFuel=draglines.reduce((a,b)=>a+b.energy*b.qty,0);
+  const oTS=+($('esg_fuel_ts')?.value||0); if(oTS>0) tsFuel=oTS;
+  const oDL=+($('esg_fuel_dl')?.value||0); if(oDL>0) dlFuel=oDL;
+  const ts_co2_h=tsFuel*ef, dl_co2_h=dlFuel*ef;
+  const ts_co2_y_t=ts_co2_h*Hy/1000, dl_co2_y_t=dl_co2_h*Hy/1000;
+  const ts_ci=Qy_ts>0?(ts_co2_h*Hy)/Qy_ts:NaN, dl_ci=Qy_dl>0?(dl_co2_h*Hy)/Qy_dl:NaN;
+  const ts_ctax_y=ts_co2_y_t*carbonCost, dl_ctax_y=dl_co2_y_t*carbonCost;
+  const ts_ctax_m3=Qy_ts>0?ts_ctax_y/Qy_ts:NaN, dl_ctax_m3=Qy_dl>0?dl_ctax_y/Qy_dl:NaN;
+  const ts_total_m3=isFinite(uc_ts)?uc_ts+(ts_ctax_m3||0):NaN, dl_total_m3=isFinite(uc_dl)?uc_dl+(dl_ctax_m3||0):NaN;
+
+  if(currentMode!=='dragline'){setText('uc_prod_ts',uc_ts,nf2); setText('uc_ctax_ts',ts_ctax_m3,nf3); setText('uc_total_ts',ts_total_m3,nf2); setText('ci_ts',ts_ci,nf3);}
+  if(currentMode!=='truckshovel'){setText('uc_prod_dl',uc_dl,nf2); setText('uc_ctax_dl',dl_ctax_m3,nf3); setText('uc_total_dl',dl_total_m3,nf2); setText('ci_dl',dl_ci,nf3);}
+  setText('fuel_h_ts',tsFuel,nf2); setText('fuel_h_dl',dlFuel,nf2);
+  setText('co2_h_ts',ts_co2_h,nf2); setText('co2_h_dl',dl_co2_h,nf2);
+  setText('co2_y_ts',ts_co2_y_t,nf2); setText('co2_y_dl',dl_co2_y_t,nf2);
+  setText('ctax_y_ts',ts_ctax_y,nf2); setText('ctax_y_dl',dl_ctax_y,nf2);
+  setText('ctax_m3_ts',ts_ctax_m3,nf3); setText('ctax_m3_dl',dl_ctax_m3,nf3);
+
+  if(currentMode!=='dragline'){setText('kpi_cost_ts',ts_total_m3,nf2); $('kpi_carbon_ts').textContent='TS: '+nf3(ts_ci); $('kpi_ctax_ts').textContent='TS: '+nf3(ts_ctax_m3);}
+  if(currentMode!=='truckshovel'){setText('kpi_cost_dl',dl_total_m3,nf2); $('kpi_carbon_dl').textContent='DL: '+nf3(dl_ci); $('kpi_ctax_dl').textContent='DL: '+nf3(dl_ctax_m3);}
+  const minCost=Math.min(ts_total_m3||Infinity,dl_total_m3||Infinity);
+  const minCI=Math.min(ts_ci||Infinity,dl_ci||Infinity);
+  const ts_score=(isFinite(ts_total_m3)?(ts_total_m3/minCost)*0.5:0)+(isFinite(ts_ci)?(ts_ci/minCI)*0.5:0);
+  const dl_score=(isFinite(dl_total_m3)?(dl_total_m3/minCost)*0.5:0)+(isFinite(dl_ci)?(dl_ci/minCI)*0.5:0);
+  const leader=currentMode==='dragline'?'Dragline':currentMode==='truckshovel'?'Truck–Shovel':(ts_score<dl_score?'Truck–Shovel':dl_score<ts_score?'Dragline':'Tie');
+
+  // Reco
+  const reco=$('reco_box');
+  if(reco){
+    if(currentMode==='dragline'){
+      reco.innerHTML=`<b>Dragline Mode</b><br>Cost ${nf2(dl_total_m3)} €/m³; CI ${nf3(dl_ci)} kg/m³`;
+    } else if(currentMode==='truckshovel'){
+      reco.innerHTML=`<b>Truck–Shovel Mode</b><br>Cost ${nf2(ts_total_m3)} €/m³; CI ${nf3(ts_ci)} kg/m³`;
+    } else {
+      const diffCost=isFinite(ts_total_m3)&&isFinite(dl_total_m3)?(Math.abs(ts_total_m3-dl_total_m3)/Math.min(ts_total_m3,dl_total_m3))*100:NaN;
+      const diffCI=isFinite(ts_ci)&&isFinite(dl_ci)?(Math.abs(ts_ci-dl_ci)/Math.min(ts_ci,dl_ci))*100:NaN;
+      reco.innerHTML=`<b>Preferred:</b> ${leader}<br>Cost Δ ${isFinite(diffCost)?diffCost.toFixed(1)+'%':'—'} | Carbon Δ ${isFinite(diffCI)?diffCI.toFixed(1)+'%':'—'}`;
+    }
+  }
+  updateCharts(ts_total_m3,dl_total_m3,ts_ci,dl_ci,ts_ctax_m3,dl_ctax_m3);
+  return {ts_total_m3,dl_total_m3,ts_ci,dl_ci,leader,ts_ctax_m3,dl_ctax_m3,ts_ctax_y,dl_ctax_y};
+}
+
+function computeEconomics(prod,tco,esg){
+  const price=+($('eco_price_t')?.value||0), life=Math.max(1,parseInt($('eco_life')?.value||'1')||1);
+  const r=(+($('eco_disc')?.value||0))/100;
+  const includeIIT=($('eco_inc_iit')?.value==='yes'), includeSalv=($('eco_inc_salv')?.value==='yes'), useCarbon=($('eco_use_carbon')?.value==='yes');
+  const escal=(+($('eco_escal')?.value||0))/100, escalF=1+escal;
+  const baseYear=parseInt($('eco_base_year')?.value||'0')||0;
+
+  function capexSum(f){return f.items.reduce((a,b)=>a+b.cost*b.units,0);}
+  function salvageSum(f){return f.items.reduce((a,b)=>a+b.salv*b.units,0);}
+  function opexSum(f){return f.items.reduce((a,b)=>a+b.op.total,0);}
+  function iitSum(f){return f.items.reduce((a,b)=>a+b.IIT*b.units,0);}
+  const capex_ts=capexSum(tco.components.shovels)+capexSum(tco.components.trucks),
+        capex_dl=capexSum(tco.components.draglines);
+  const salvage_ts=salvageSum(tco.components.shovels)+salvageSum(tco.components.trucks),
+        salvage_dl=salvageSum(tco.components.draglines);
+  const opex_ts=opexSum(tco.components.shovels)+opexSum(tco.components.trucks),
+        opex_dl=opexSum(tco.components.draglines);
+  const iit_ts=iitSum(tco.components.shovels)+iitSum(tco.components.trucks),
+        iit_dl=iitSum(tco.components.draglines);
+  const carbon_ts=useCarbon?(esg.ts_ctax_y||0):0,
+        carbon_dl=useCarbon?(esg.dl_ctax_y||0):0;
+  const baseRev_ts=prod.oreTon_ts*price, baseRev_dl=prod.oreTon_dl*price;
+
+  const cf_ts=[-(currentMode==='dragline'?0:capex_ts)];
+  const cf_dl=[-(currentMode==='truckshovel'?0:capex_dl)];
+  for(let y=1;y<=life;y++){
+    const rev_ts=(currentMode==='dragline'?0:baseRev_ts)*Math.pow(escalF,y-1);
+    const rev_dl=(currentMode==='truckshovel'?0:baseRev_dl)*Math.pow(escalF,y-1);
+    const cost_ts=((currentMode==='dragline'?0:(opex_ts+(includeIIT?iit_ts:0)+carbon_ts)))*Math.pow(escalF,y-1);
+    const cost_dl=((currentMode==='truckshovel'?0:(opex_dl+(includeIIT?iit_dl:0)+carbon_dl)))*Math.pow(escalF,y-1);
+    let cfts=rev_ts-cost_ts, cfdl=rev_dl-cost_dl;
+    if(includeSalv && y===life){
+      if(currentMode!=='dragline') cfts+=salvage_ts;
+      if(currentMode!=='truckshovel') cfdl+=salvage_dl;
+    }
+    cf_ts.push(cfts); cf_dl.push(cfdl);
+  }
+  function discFactor(i){const shift=baseYear===1?1:0; const t=i-shift; return t<0?1:1/Math.pow(1+r,t);}
+  const npv_ts=cf_ts.reduce((a,v,i)=>a+v*discFactor(i),0);
+  const npv_dl=cf_dl.reduce((a,v,i)=>a+v*discFactor(i),0);
+  function payback(cf){let cum=0;for(let i=0;i<cf.length;i++){cum+=cf[i];if(cum>=0){const prev=cum-cf[i];return (i-1)+(0-prev)/cf[i];}}return NaN;}
+  const pb_ts=currentMode==='dragline'?NaN:payback(cf_ts),
+        pb_dl=currentMode==='truckshovel'?NaN:payback(cf_dl);
+  const margin_ts=(currentMode==='dragline')?0:(baseRev_ts-(opex_ts+(includeIIT?iit_ts:0)+carbon_ts));
+  const margin_dl=(currentMode==='truckshovel')?0:(baseRev_dl-(opex_dl+(includeIIT?iit_dl:0)+carbon_dl));
+  const margin_m3_ts=prod.Qy_ts>0?margin_ts/prod.Qy_ts:NaN;
+  const margin_m3_dl=prod.Qy_dl>0?margin_dl/prod.Qy_dl:NaN;
+
+  if(currentMode!=='dragline'){setText('kpi_npv_ts',npv_ts/1e6,nf2); $('kpi_pb_ts').textContent=isFinite(pb_ts)?pb_ts.toFixed(2):'—'; setText('kpi_margin_ts',margin_m3_ts,nf2);}
+  if(currentMode!=='truckshovel'){setText('kpi_npv_dl',npv_dl/1e6,nf2); $('kpi_pb_dl').textContent=isFinite(pb_dl)?pb_dl.toFixed(2):'—'; setText('kpi_margin_dl',margin_m3_dl,nf2);}
+
+  const ecoBody=$('eco_table')?.querySelector('tbody');
+  function rI(x){return Number.isFinite(x)?Math.round(x).toLocaleString():'—';}
+  if(ecoBody){
+    ecoBody.innerHTML=`<tr><th>Metric</th><th class="right col-ts">Truck–Shovel</th><th class="right col-dl">Dragline</th></tr>
+      <tr><td>Annual Ore t</td><td class="right col-ts">${rI(prod.oreTon_ts)}</td><td class="right col-dl">${rI(prod.oreTon_dl)}</td></tr>
+      <tr><td>Base Revenue €/y</td><td class="right col-ts">${rI(baseRev_ts)}</td><td class="right col-dl">${rI(baseRev_dl)}</td></tr>
+      <tr><td>Base Oper. Cost €/y</td><td class="right col-ts">${rI(opex_ts+(includeIIT?iit_ts:0)+carbon_ts)}</td><td class="right col-dl">${rI(opex_dl+(includeIIT?iit_dl:0)+carbon_dl)}</td></tr>
+      <tr><td>Margin (base) €/y</td><td class="right col-ts">${rI(margin_ts)}</td><td class="right col-dl">${rI(margin_dl)}</td></tr>
+      <tr><td>Initial CAPEX €</td><td class="right col-ts">${rI(capex_ts)}</td><td class="right col-dl">${rI(capex_dl)}</td></tr>
+      <tr><td>Salvage €</td><td class="right col-ts">${includeSalv?rI(salvage_ts):'—'}</td><td class="right col-dl">${includeSalv?rI(salvage_dl):'—'}</td></tr>
+      <tr><td>NPV €</td><td class="right col-ts">${rI(npv_ts)}</td><td class="right col-dl">${rI(npv_dl)}</td></tr>
+      <tr><td>Payback (y)</td><td class="right col-ts">${isFinite(pb_ts)?pb_ts.toFixed(2):'—'}</td><td class="right col-dl">${isFinite(pb_dl)?pb_dl.toFixed(2):'—'}</td></tr>`;
+  }
+  const cfBody=$('eco_cf_table')?.querySelector('tbody');
+  if(cfBody){
+    cfBody.innerHTML='';
+    let cumTS=0,cumDL=0;
+    for(let i=0;i<cf_ts.length;i++){
+      cumTS+=cf_ts[i]; cumDL+=cf_dl[i];
+      cfBody.insertAdjacentHTML('beforeend',`<tr class="cf-year">
+        <td>${i}</td>
+        <td class="right col-ts">${intFmt(cf_ts[i])}</td>
+        <td class="right col-dl">${intFmt(cf_dl[i])}</td>
+        <td class="right col-ts">${intFmt(cf_ts[i]*discFactor(i))}</td>
+        <td class="right col-dl">${intFmt(cf_dl[i]*discFactor(i))}</td>
+        <td class="right col-ts">${intFmt(cumTS)}</td>
+        <td class="right col-dl">${intFmt(cumDL)}</td>
+      </tr>`);
+    }
+  }
+  return {npv_ts,npv_dl,pb_ts,pb_dl,margin_m3_ts,margin_m3_dl,cf_ts,cf_dl,capex_ts,capex_dl,baseRev_ts,baseRev_dl,opex_ts,opex_dl,life};
+}
+
+function updateExecSummary(all){
+  const el=$('exec_summary'); if(!el)return;
+  const {ts_total_m3,dl_total_m3,ts_ci,dl_ci,leader,ts_ctax_m3,dl_ctax_m3,prod,eco}=all;
+  let txt='';
+  if(currentMode==='dragline'){
+    txt=`Dragline: cost ${nf2(dl_total_m3)} €/m³ (carbon ${nf3(dl_ctax_m3)} €/m³) annual ${intFmt(prod.Qy_dl)} m³ Ore ${intFmt(prod.oreTon_dl)} t CI ${nf3(dl_ci)} kg/m³ NPV ${nf2(eco.npv_dl/1e6)} M€ PB ${eco.pb_dl?eco.pb_dl.toFixed(2):'—'} y`;
+  } else if(currentMode==='truckshovel'){
+    txt=`Truck–Shovel: cost ${nf2(ts_total_m3)} €/m³ (carbon ${nf3(ts_ctax_m3)} €/m³) annual ${intFmt(prod.Qy_ts)} m³ Ore ${intFmt(prod.oreTon_ts)} t CI ${nf3(ts_ci)} kg/m³ NPV ${nf2(eco.npv_ts/1e6)} M€ PB ${eco.pb_ts?eco.pb_ts.toFixed(2):'—'} y`;
+  } else {
+    txt=`Leader ${leader}; TS cost ${nf2(ts_total_m3)} vs DL ${nf2(dl_total_m3)} €/m³ | Carbon TS ${nf3(ts_ctax_m3)} vs DL ${nf3(dl_ctax_m3)} €/m³ | Prod TS ${intFmt(prod.Qy_ts)} vs DL ${intFmt(prod.Qy_dl)} m³ | CI TS ${nf3(ts_ci)} vs DL ${nf3(dl_ci)} kg/m³ | NPV TS ${nf2(eco.npv_ts/1e6)} M€ vs DL ${nf2(eco.npv_dl/1e6)} M€ | PB TS ${eco.pb_ts?eco.pb_ts.toFixed(2):'—'} vs DL ${eco.pb_dl?eco.pb_dl.toFixed(2):'—'} y`;
+  }
+  el.textContent=txt;
+}
+
+/* ========= Pipeline ========= */
+let lastProd,lastTCO,lastESG,lastEco,recomputeLock=false;
+function recomputeAll(){
+  if(recomputeLock)return;
+  recomputeLock=true;
+  try{
+    const prod=computeProduction();
+    const tco=computeTCO(prod);
+    const esg=computeESG(prod,tco);
+    const eco=computeEconomics(prod,tco,esg);
+    updateExecSummary({prod,...esg,eco});
+    updateMF(prod);
+    lastProd=prod; lastTCO=tco; lastESG=esg; lastEco=eco;
+  }catch(e){showError(e);}finally{recomputeLock=false;}
+}
+function safeRecompute(){requestAnimationFrame(recomputeAll);}
+
+function updateMF(prod){
+  if(currentMode==='dragline') {
+      const mfEl = $('kpi_mf');
+      if (mfEl) mfEl.textContent='MF: —';
+      return;
+  }
+  
+  const shovel=prod.shovelSum||0, truck=prod.truckTotal||0;
+  const mfEl = $('kpi_mf');
+  if (!mfEl) return;
+
+  if(shovel===0||truck===0){
+      mfEl.textContent='MF: —';
+      return;
+  }
+  const mf=(Math.min(shovel,truck)/Math.max(shovel,truck));
+  mfEl.textContent='MF: '+nf3(mf);
+}
+
+/* ========= DOCX Export (Corrected) ========= */
+let docxReady=false;
+async function loadDocx(){
+  if(window.docx){docxReady=true;return true;}
+  const urls=[
+    "https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js",
+    "https://unpkg.com/docx@8.5.0/build/index.umd.js"
+  ];
+  for(const u of urls){
+    try{
+      await new Promise((res,rej)=>{
+        const s=document.createElement('script');
+        s.src=u; s.onload=()=>window.docx?res():rej(new Error('No docx global'));
+        s.onerror=(err)=>rej(new Error('Load failed '+u, { cause: err }));
+        document.head.appendChild(s);
+      });
+      if(window.docx){docxReady=true;break;}
+    }catch(e){console.warn(e.message);}
+  }
+  return docxReady;
+}
+function setExportStatus(msg,isErr=false){
+  const st=$('export_status'); const spin=$('exp_spin');
+  st.classList.add('active'); st.classList.toggle('error',isErr);
+  st.textContent=msg;
+  spin.classList.toggle('hidden',!(msg.toLowerCase().includes('preparing')||msg.toLowerCase().includes('building')||msg.toLowerCase().includes('stepwise')));
+}
+function collectStepCards(){
+  return [...document.querySelectorAll('.analysis-step')];
+}
+function domTableToArray(tbl){
+    if (!tbl || window.getComputedStyle(tbl).display === 'none') return [];
+    const rows = [];
+    [...tbl.querySelectorAll('tr')].forEach(tr => {
+        if (window.getComputedStyle(tr).display === 'none') return;
+        const cells = [...tr.children]
+            .filter(td => window.getComputedStyle(td).display !== 'none')
+            .map(td => td.textContent.trim());
+        if (cells.length > 0) {
+            rows.push(cells);
+        }
+    });
+    return rows;
+}
+function canvasToBytes(canvas){
+  if(!canvas)return null;
+  const b64=canvas.toDataURL('image/png').split(',')[1];
+  const bin=atob(b64); const len=bin.length; const u8=new Uint8Array(len);
+  for(let i=0;i<len;i++)u8[i]=bin.charCodeAt(i);
+  return u8;
+}
+async function ensureFresh(){return new Promise(r=>{recomputeAll();requestAnimationFrame(()=>setTimeout(r,80));});}
+
+/* ===== Stepwise HTML Report Generation (ALT click) ===== */
+function genSuggestions(category,data){
+  // Lightweight heuristic suggestions (can be expanded)
+  switch(category){
+    case 'step1':
+      return [
+        (data.mf && data.mf<0.92)?'Improve truck dispatching / reduce shovel idle to lift MF.':'Matching factor balanced; maintain fleet ratio.',
+        'Validate payload vs passes to avoid structural fatigue and overloading.'
+      ];
+    case 'step2':
+      return [
+        (data.shovelFill && data.shovelFill<1.1)?'Consider operator coaching to raise shovel fill if telemetry supports.':'Fill factors acceptable; continue monitoring variability.',
+        'Maintain reliability program; current availability supports plan.'
+      ];
+    case 'step3':
+      return [
+        (data.wait > 110)?'Investigate spotting & queue discipline to cut excessive wait time.':'Queue time controlled; preserve current control strategies.',
+        'Pass count closely aligned with raw requirement—keep convention.'
+      ];
+    case 'step4':
+      return ['Production parity supports comparative cost focus.','Confirm swell & density with survey to ensure tonnage accuracy.'];
+    case 'step5':
+      return [
+        (data.costDelta>0.4)?'High TS annual cost—examine energy intensity & maintenance strategy.':'Costs generally aligned; focus on incremental efficiency.',
+        'Dragline ownership share high—optimize life cycle vs rebuild economics.'
+      ];
+    case 'step6':
+      return [
+        (data.ciDelta>0.3)?'Prioritize fuel efficiency retrofits or alternative fuels on higher CI system.':'Carbon intensity gap modest; pursue continuous improvements.',
+        'Run sensitivity on carbon price escalation for strategic planning.'
+      ];
+    case 'step7':
+      return [
+        'Validate CAPEX completeness (support gear & infrastructure).',
+        'Evaluate sequencing reliance on single asset risk profile.'
+      ];
+    case 'step8':
+      return [
+        'Progress preferred concept to next study stage with detailed geotech.',
+        'Initiate stochastic queue simulation to quantify variability risk.'
+      ];
+    default:return [];
+  }
+}
+function escapeHTML(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function generateStepwiseHTML(){
+  if(!lastProd||!lastESG||!lastEco||!lastTCO) recomputeAll();
+  const prod=lastProd, esg=lastESG, eco=lastEco, tco=lastTCO;
+  const conv=$('ts_pass_conv')?.value||'A';
+  const firstTruck=trucks[0];
+  const repShovel=shovels[0];
+  const passesUsed= firstTruck? passesChoice[firstTruck.id]?.[conv] : 0;
+  const rawA = (firstTruck && repShovel)? firstTruck.body/(repShovel.bucket*repShovel.fill) : 0;
+  const rawB = (firstTruck && repShovel)? firstTruck.body/repShovel.bucket : 0;
+  // Cycle components for first truck
+  const dist=+($('ts_dist')?.value||0);
+  const vh=Math.max(+($('ts_vh')?.value||1),0.0001), vr=Math.max(+($('ts_vr')?.value||1),0.0001);
+  const t_haul=dist/vh*3600, t_ret=dist/vr*3600, dump=+($('ts_dump')?.value||0), wait=(firstTruck?.waitOverride>0?firstTruck.waitOverride:+($('ts_wait')?.value||0));
+  const loadTime = (repShovel?repShovel.cycle:0)*passesUsed;
+  const totalCycle = loadTime + t_haul + dump + t_ret + wait;
+  const mf = (prod.shovelSum && prod.truckTotal) ? Math.min(prod.shovelSum, prod.truckTotal)/Math.max(prod.shovelSum, prod.truckTotal) : 0;
+  const costDelta = (isFinite(esg.ts_total_m3)&&isFinite(esg.dl_total_m3))? Math.abs(esg.ts_total_m3-esg.dl_total_m3)/Math.min(esg.ts_total_m3,esg.dl_total_m3):0;
+  const ciDelta = (isFinite(esg.ts_ci)&&isFinite(esg.dl_ci))? Math.abs(esg.ts_ci-esg.dl_ci)/Math.min(esg.ts_ci,esg.dl_ci):0;
+  const nowUTC = new Date().toISOString().replace('T',' ').replace(/\..+/,'')+' UTC';
+  const leader = esg.leader;
+  const costDiffPct = isFinite(costDelta)?(costDelta*100).toFixed(1):'—';
+  const ciDiffPct = isFinite(ciDelta)?(ciDelta*100).toFixed(1):'—';
+  const bottleneck = $('kpi_bottleneck')?.textContent||'—';
+
+  function tableRow(k,v){return `<tr><td>${escapeHTML(k)}</td><td>${escapeHTML(v)}</td></tr>`;}
+  function suggestionsBlock(stepKey,dataObj){
+    const list = genSuggestions(stepKey,dataObj).map(s=>`<li>${escapeHTML(s)}</li>`).join('');
+    return `<h3>Mining Suggestions</h3><ul class="suggestions">${list}</ul>`;
+  }
+
+  // Style from provided template (embedded)
+  const style = `
+  <style>
+  :root{
+    --bg:#f5f7fa;--card:#ffffff;--border:#d8e1eb;--text:#142133;--muted:#5a6b80;
+    --accent:#1d62d7;--accent2:#7030a0;--good:#128a52;--warn:#c87f10;--bad:#cc2c2c;
+    --mono:ui-monospace,Menlo,Consolas,monospace;
+    font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);line-height:1.45}
+  main{max-width:1080px;margin:0 auto;padding:32px 20px 80px}
+  h1,h2,h3{line-height:1.2;font-weight:600;margin:0 0 12px}
+  h1{font-size:30px;letter-spacing:.5px}
+  h2{font-size:21px;margin-top:40px;border-left:6px solid var(--accent);padding-left:10px;background:linear-gradient(90deg,#1d62d711,#0000);border-radius:4px 0 0 4px}
+  h3{font-size:16px;margin-top:30px;color:#22364a}
+  p{margin:0 0 14px}
+  .lead-line{font-size:13px;font-weight:600;color:#24364a;margin-top:4px;padding:10px 12px;border:1px solid #cfd8e3;background:#ffffff;border-radius:10px;display:flex;flex-wrap:wrap;gap:14px}
+  .lead-line span b{color:#0d3f99}
+  .index{background:#ffffff;border:1px solid var(--border);padding:18px 20px;border-radius:14px;margin-top:26px}
+  .index h2{margin:0 0 12px;font-size:18px;border:none;padding:0;background:none}
+  .index ol{margin:0;padding-left:20px;columns:2;column-gap:40px}
+  .index a{color:var(--accent);text-decoration:none;font-weight:500}
+  .index a:hover{text-decoration:underline}
+  .section{background:var(--card);border:1px solid var(--border);padding:22px 24px;border-radius:16px;margin-top:34px;position:relative}
+  .section:first-of-type{margin-top:28px}
+  .meta-table{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 14px}
+  .meta-table th,.meta-table td{padding:7px 10px;border:1px solid #dfe6ee}
+  .meta-table th{background:#f0f5fa;font-weight:600;letter-spacing:.04em;font-size:11px;text-transform:uppercase;color:#42576b}
+  .meta-table td:first-child{width:44%;font-weight:500;color:#284057}
+  .suggestions{margin:0 0 0 0;padding:0 0 0 18px;font-size:13px}
+  .suggestions li{margin:4px 0 0}
+  .footer{margin-top:60px;font-size:11px;color:#58718a;text-align:center}
+  .tagline{font-size:12px;font-weight:600;color:#294568;margin-top:6px}
+  .anchor-link{position:absolute;top:14px;right:16px;font-size:11px;text-decoration:none;color:#5d6d82;background:#edf2f7;padding:4px 8px;border-radius:8px;font-weight:600;opacity:0;transition:.2s}
+  .section:hover .anchor-link{opacity:1}
+  .delta-bad{color:#b01414;font-weight:600}
+  .delta-good{color:#0d7a4a;font-weight:600}
+  @media print{
+    body{background:#fff}
+    .index,.section{page-break-inside:avoid}
+    h1{font-size:24pt} h2{font-size:16pt;border:none;padding:0;background:none} h3{font-size:13pt}
+  }
+  </style>`;
+
+  const costClassDelta = esg.ts_total_m3>esg.dl_total_m3? 'delta-bad':'delta-good';
+  const ciClassDelta = esg.ts_ci>esg.dl_ci? 'delta-bad':'delta-good';
+
+  const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+  <title>Truck–Shovel vs Dragline Stepwise Technical Report</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  ${style}
+  </head><body>
+  <main>
+    <header>
+      <h1>Truck–Shovel vs Dragline Stepwise Technical Report</h1>
+      <div class="lead-line" id="leadLine">
+        <span><b>Generated:</b> ${nowUTC}</span>
+        <span><b>Leader:</b> ${escapeHTML(leader)}</span>
+        <span><b>Cost Δ TS vs DL:</b> <span class="${costClassDelta}">${costDiffPct}%</span></span>
+        <span><b>CI Δ:</b> <span class="${ciClassDelta}">${ciDiffPct}%</span></span>
+      </div>
+      <p class="tagline">Comparative operational, cost, ESG and economic summary for current configuration.</p>
+    </header>
+    <nav class="index" aria-label="Report index">
+      <h2>Index</h2>
+      <ol>
+        <li><a href="#s1">Step 1 – Equipment Configuration</a></li>
+        <li><a href="#s2">Step 2 – Material &amp; OEE</a></li>
+        <li><a href="#s3">Step 3 – Cycle &amp; Pass</a></li>
+        <li><a href="#s4">Step 4 – Production Results</a></li>
+        <li><a href="#s5">Step 5 – Cost &amp; Ownership</a></li>
+        <li><a href="#s6">Step 6 – ESG &amp; Carbon</a></li>
+        <li><a href="#s7">Step 7 – Economics</a></li>
+        <li><a href="#s8">Step 8 – Executive Summary &amp; Recommendation</a></li>
+      </ol>
+    </nav>
+
+    <section id="s1" class="section">
+      <a href="#s1" class="anchor-link">#1</a>
+      <h2>Step 1 – Equipment Configuration</h2>
+      <table class="meta-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>
+        ${tableRow('Shovels', String(shovels.reduce((a,b)=>a+b.qty,0)))}
+        ${tableRow('Trucks', String(trucks.reduce((a,b)=>a+b.qty,0)))}
+        ${tableRow('Draglines', String(draglines.reduce((a,b)=>a+b.qty,0)))}
+        ${tableRow('Shovel bucket (m³ BCM)', repShovel? nf3(repShovel.bucket):'—')}
+        ${tableRow('Truck body (m³ BCM)', firstTruck? nf3(firstTruck.body):'—')}
+        ${tableRow('Pass convention', conv)}
+        ${tableRow('Passes used', passesUsed?String(passesUsed):'—')}
+        ${tableRow('Matching Factor', mf? nf3(mf):'—')}
+        ${tableRow('Bottleneck', bottleneck)}
+      </tbody></table>
+      ${suggestionsBlock('step1',{mf})}
+    </section>
+
+    <section id="s2" class="section">
+      <a href="#s2" class="anchor-link">#2</a>
+      <h2>Step 2 – Material &amp; OEE</h2>
+      <table class="meta-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>
+        ${tableRow('Density t/m³',$('mat_density').value)}
+        ${tableRow('Swell Factor',$('mat_swell').value)}
+        ${tableRow('Fill shovel', repShovel?repShovel.fill:'—')}
+        ${tableRow('Fill truck', firstTruck?firstTruck.fill:'—')}
+        ${tableRow('Fill dragline', draglines[0]?draglines[0].fill:'—')}
+        ${tableRow('Avail Shovel', repShovel?repShovel.A:'—')}
+        ${tableRow('Util Shovel', repShovel?repShovel.U:'—')}
+        ${tableRow('Avail Truck', firstTruck?firstTruck.A:'—')}
+        ${tableRow('Util Truck', firstTruck?firstTruck.U:'—')}
+        ${tableRow('Avail DL', draglines[0]?draglines[0].A:'—')}
+        ${tableRow('Util DL', draglines[0]?draglines[0].U:'—')}
+        ${tableRow('Annual Hours', intFmt(prod.Hy))}
+      </tbody></table>
+      ${suggestionsBlock('step2',{shovelFill:repShovel?repShovel.fill:1})}
+    </section>
+
+    <section id="s3" class="section">
+      <a href="#s3" class="anchor-link">#3</a>
+      <h2>Step 3 – Cycle &amp; Pass</h2>
+      <table class="meta-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>
+        ${tableRow('Load time (s)', nf3(loadTime))}
+        ${tableRow('Haul (s)', nf3(t_haul))}
+        ${tableRow('Dump (s)', dump.toString())}
+        ${tableRow('Return (s)', nf3(t_ret))}
+        ${tableRow('Wait (s)', nf3(wait))}
+        ${tableRow('Total cycle (s)', nf3(totalCycle))}
+        ${tableRow('Raw passes A', nf3(rawA))}
+        ${tableRow('Raw passes B', nf3(rawB))}
+        ${tableRow('Passes used', passesUsed?String(passesUsed):'—')}
+        ${tableRow('MF', mf? nf3(mf):'—')}
+      </tbody></table>
+      ${suggestionsBlock('step3',{wait})}
+    </section>
+
+    <section id="s4" class="section">
+      <a href="#s4" class="anchor-link">#4</a>
+      <h2>Step 4 – Production Results</h2>
+      <table class="meta-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>
+        ${tableRow('TS Shovel m³/h', nf3(prod.shovelSum||0))}
+        ${tableRow('TS Annual m³', nf3(prod.Qy_ts||0))}
+        ${tableRow('TS Ore t/y', intFmt(prod.oreTon_ts||0))}
+        ${tableRow('DL m³/h', nf3(prod.Qh_dl||0))}
+        ${tableRow('DL Annual m³', nf3(prod.Qy_dl||0))}
+        ${tableRow('DL Ore t/y', intFmt(prod.oreTon_dl||0))}
+      </tbody></table>
+      ${suggestionsBlock('step4',{})}
+    </section>
+
+    <section id="s5" class="section">
+      <a href="#s5" class="anchor-link">#5</a>
+      <h2>Step 5 – Cost &amp; Ownership</h2>
+      <table class="meta-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>
+        ${tableRow('TS Ownership €/y', nf2(tco.components.shovels.own + tco.components.trucks.own))}
+        ${tableRow('TS OPEX €/y', nf2(tco.components.shovels.opex + tco.components.trucks.opex))}
+        ${tableRow('TS Total €/y', nf2(tco.TS_total))}
+        ${tableRow('DL Ownership €/y', nf2(tco.components.draglines.own))}
+        ${tableRow('DL OPEX €/y', nf2(tco.components.draglines.opex))}
+        ${tableRow('DL Total €/y', nf2(tco.DL_total))}
+      </tbody></table>
+      ${suggestionsBlock('step5',{costDelta})}
+    </section>
+
+    <section id="s6" class="section">
+      <a href="#s6" class="anchor-link">#6</a>
+      <h2>Step 6 – ESG &amp; Carbon</h2>
+      <table class="meta-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>
+        ${tableRow('TS Cost €/m³ incl carbon', nf2(esg.ts_total_m3))}
+        ${tableRow('DL Cost €/m³ incl carbon', nf2(esg.dl_total_m3))}
+        ${tableRow('TS Carbon Intensity kg/m³', nf3(esg.ts_ci))}
+        ${tableRow('DL Carbon Intensity kg/m³', nf3(esg.dl_ci))}
+        ${tableRow('TS Carbon tax €/m³', nf3(esg.ts_ctax_m3))}
+        ${tableRow('DL Carbon tax €/m³', nf3(esg.dl_ctax_m3))}
+        ${tableRow('Annual CO₂ TS t', nf2(Number($('co2_y_ts').textContent.replace(/,/g,''))||0))}
+        ${tableRow('Annual CO₂ DL t', nf2(Number($('co2_y_dl').textContent.replace(/,/g,''))||0))}
+      </tbody></table>
+      ${suggestionsBlock('step6',{ciDelta})}
+    </section>
+
+    <section id="s7" class="section">
+      <a href="#s7" class="anchor-link">#7</a>
+      <h2>Step 7 – Economics</h2>
+      <table class="meta-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>
+        ${tableRow('TS Revenue €/y', nf2(eco.baseRev_ts||0))}
+        ${tableRow('DL Revenue €/y', nf2(eco.baseRev_dl||0))}
+        ${tableRow('TS Operating cash cost €/y', nf2(eco.opex_ts+( ($('eco_use_carbon').value==='yes')? (lastESG.ts_ctax_y||0):0)))}
+        ${tableRow('DL Operating cash cost €/y', nf2(eco.opex_dl+( ($('eco_use_carbon').value==='yes')? (lastESG.dl_ctax_y||0):0)))}
+        ${tableRow('TS Margin €/m³', nf2(eco.margin_m3_ts))}
+        ${tableRow('DL Margin €/m³', nf2(eco.margin_m3_dl))}
+        ${tableRow('TS NPV €', nf2(eco.npv_ts))}
+        ${tableRow('DL NPV €', nf2(eco.npv_dl))}
+        ${tableRow('TS Payback y', nf3(eco.pb_ts))}
+        ${tableRow('DL Payback y', nf3(eco.pb_dl))}
+      </tbody></table>
+      ${suggestionsBlock('step7',{})}
+    </section>
+
+    <section id="s8" class="section">
+      <a href="#s8" class="anchor-link">#8</a>
+      <h2>Step 8 – Executive Summary &amp; Recommendation</h2>
+      <table class="meta-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>
+        ${tableRow('Preferred System', leader)}
+        ${tableRow('TS Cost (€/m³)', nf2(esg.ts_total_m3))}
+        ${tableRow('DL Cost (€/m³)', nf2(esg.dl_total_m3))}
+        ${tableRow('TS CI (kg/m³)', nf3(esg.ts_ci))}
+        ${tableRow('DL CI (kg/m³)', nf3(esg.dl_ci))}
+        ${tableRow('NPV TS (M€)', nf2(eco.npv_ts/1e6))}
+        ${tableRow('NPV DL (M€)', nf2(eco.npv_dl/1e6))}
+        ${tableRow('Payback TS/DL (y)', (isFinite(eco.pb_ts)?nf3(eco.pb_ts):'—')+' / '+(isFinite(eco.pb_dl)?nf3(eco.pb_dl):'—'))}
+      </tbody></table>
+      ${suggestionsBlock('step8',{})}
+      <h3>Overall Two Point Recommendation</h3>
+      <ol style="margin-top:4px;padding-left:22px;font-size:13px">
+        ${genSuggestions('step8',{}).map(s=>`<li>${escapeHTML(s)}</li>`).join('')}
+      </ol>
+    </section>
+
+    <footer class="footer">© 2025 Unified Mining Analytical Model – Stepwise Technical Export</footer>
+  </main>
+  </body></html>`;
+  return html;
+}
+
+function openStepwiseWindow(){
+  const html=generateStepwiseHTML();
+  const w=window.open('about:blank','_blank');
+  if(!w){alert('Pop-up blocked');return;}
+  w.document.open(); w.document.write(html); w.document.close();
+}
+
+/* ===== Stepwise DOCX (SHIFT click) ===== */
+async function exportStepwiseDocx(){
+  try{
+    setExportStatus("Preparing stepwise DOCX …");
+    await ensureFresh();
+    if(!docxReady){
+      await loadDocx();
+    }
+    if(!docxReady){setExportStatus("DOCX lib load failed.",true);return;}
+    const html = generateStepwiseHTML();
+    // Simple extraction from generated HTML (not full HTML parsing – using DOM in temp iframe)
+    const parser = new DOMParser();
+    const docParsed = parser.parseFromString(html,'text/html');
+    const sectionsDOM = [...docParsed.querySelectorAll('.section')];
+
+    const {Document,Packer,Paragraph,HeadingLevel,TextRun,Table,TableRow,TableCell,WidthType,PageBreak} = window.docx;
+    function H(level,text){return new Paragraph({text,heading:level});}
+    function P(text){return new Paragraph({children:[new TextRun(text)]});}
+    function makeTable(rows){
+      return new Table({
+        width:{size:100,type:WidthType.PERCENTAGE},
+        rows:rows.map(r=>new TableRow({children:r.map(c=>new TableCell({children:[P(c)]}))}))
+      });
+    }
+    const docSections=[];
+    // Cover
+    docSections.push({children:[
+      H(HeadingLevel.HEADING_1,'Truck–Shovel vs Dragline Stepwise Technical Report'),
+      P('Generated: '+new Date().toISOString()),
+      new Paragraph({children:[new PageBreak()]})
+    ]});
+    sectionsDOM.forEach(sec=>{
+      const title=sec.querySelector('h2')?.textContent||'';
+      const rows=[...sec.querySelectorAll('tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent.trim()));
+      const sugg=[...sec.querySelectorAll('.suggestions li')].map(li=>li.textContent.trim());
+      const children=[H(HeadingLevel.HEADING_2,title)];
+      if(rows.length){
+        const header=['Metric','Value'];
+        children.push(makeTable([header,...rows]));
+      }
+      if(sugg.length){
+        children.push(P('Suggestions:'));
+        sugg.forEach(s=>children.push(P(' - '+s)));
+      }
+      children.push(new Paragraph({children:[new PageBreak()]}));
+      docSections.push({children});
+    });
+    const docxDoc=new Document({sections:docSections});
+    const blob=await Packer.toBlob(docxDoc);
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='Stepwise_Report_'+new Date().toISOString().slice(0,10)+'.docx';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove(); setExportStatus("Stepwise DOCX complete ✔");},500);
+  }catch(e){
+    showError(e); setExportStatus("Stepwise export failed: "+e.message,true);
+  }
+}
+
+/* ========= Original Complete DOCX Export ========= */
+async function exportDocx(){
+    try {
+        // Begin new technical report export
+        setExportStatus("Preparing technical report…");
+        // Disable button to prevent double clicks
+        $('btn_export_docx').disabled = true;
+        // Ensure model values are up to date
+        await ensureFresh();
+        // Lazy load docx library if needed
+        if (!docxReady) {
+            setExportStatus("Loading docx…");
+            const ok = await loadDocx();
+            if (!ok) {
+                setExportStatus("docx load failed.", true);
+                $('btn_export_docx').disabled = false;
+                return;
+            }
+        }
+        // Destructure required classes from docx library
+        const {
+            Document, Packer, Paragraph, HeadingLevel, TextRun, Table, TableRow, TableCell,
+            WidthType, AlignmentType, PageBreak, BorderStyle
+        } = window.docx;
+
+        // Helpers for formatting
+        const H1 = HeadingLevel.HEADING_1;
+        const H2 = HeadingLevel.HEADING_2;
+        const H3 = HeadingLevel.HEADING_3;
+        // Helper functions to build paragraphs and tables
+        function H(level, text) {
+            return new Paragraph({ text, heading: level });
+        }
+        function P(text, opts = {}) {
+            return new Paragraph({ children: [ new TextRun({ text: text ?? '', ...opts }) ] });
+        }
+        function makeTable(rows, header = true) {
+            return new Table({
+                width: { size: 100, type: WidthType.PERCENTAGE },
+                rows: rows.map((r, i) => new TableRow({
+                    children: r.map(c => new TableCell({
+                        children: [ new Paragraph({ children: [ new TextRun({ text: String(c ?? ''), bold: header && i === 0 }) ] }) ],
+                    })),
+                    isHeader: header && i === 0
+                }))
+            });
+        }
+        // Safe formatting helpers using existing nf functions
+        function safeNF2(v) { return (isFinite(v) ? nf2(v) : '—'); }
+        function safeNF3(v) { return (isFinite(v) ? nf3(v) : '—'); }
+        function safeInt(v) { return (isFinite(v) ? intFmt(v) : '—'); }
+
+        // Retrieve last computed model results
+        const prod = lastProd || {};
+        const esg  = lastESG  || {};
+        const eco  = lastEco  || {};
+        const tco  = lastTCO  || {};
+
+        // Read material & economic inputs from DOM
+        const SF = parseFloat($('mat_swell')?.value || '1');
+        const density = parseFloat($('mat_density')?.value || '0');
+        const SR = parseFloat($('econ_sr')?.value || '0');
+        // Pass conversion
+        const conv = $('ts_pass_conv')?.value || 'A';
+        const firstTruck = trucks[0];
+        const repShovel = shovels[0];
+        let passesUsed = 0;
+        let rawA = 0, rawB = 0;
+        if (firstTruck && repShovel) {
+            passesUsed = (passesChoice[firstTruck.id]?.[conv]) ?? 1;
+            rawA = repShovel.bucket * repShovel.fill ? firstTruck.body / (repShovel.bucket * repShovel.fill) : 0;
+            rawB = repShovel.bucket ? firstTruck.body / repShovel.bucket : 0;
+        }
+        const distVal = parseFloat($('ts_dist')?.value || '0');
+        const vh = Math.max(parseFloat($('ts_vh')?.value || '1'), 0.0001);
+        const vr = Math.max(parseFloat($('ts_vr')?.value || '1'), 0.0001);
+        const haulTime = distVal / vh * 3600;
+        const returnTime = distVal / vr * 3600;
+        const dumpTimeVal = parseFloat($('ts_dump')?.value || '0');
+        let waitTimeVal = 0;
+        if (firstTruck) {
+            waitTimeVal = (firstTruck.waitOverride && firstTruck.waitOverride > 0) ? firstTruck.waitOverride : parseFloat($('ts_wait')?.value || '0');
+        }
+        let loadTime = 0;
+        if (repShovel) loadTime = repShovel.cycle * passesUsed;
+        const totalCycleTime = loadTime + haulTime + dumpTimeVal + returnTime + waitTimeVal;
+        const rawRequired = conv === 'A' ? rawA : rawB;
+        const passEfficiency = (passesUsed && rawRequired) ? passesUsed / rawRequired : NaN;
+
+        // Compute fleet counts and averages
+        const totShovels = shovels.reduce((a,b) => a + b.qty, 0);
+        const totTrucks  = trucks.reduce((a,b) => a + b.qty, 0);
+        const totDraglines = draglines.reduce((a,b) => a + b.qty, 0);
+        const avgBucketSh = totShovels ? (shovels.reduce((a,b) => a + b.bucket * b.qty, 0) / totShovels) : NaN;
+        const avgCycleSh  = totShovels ? (shovels.reduce((a,b) => a + b.cycle * b.qty, 0) / totShovels) : NaN;
+        const avgBodyTr   = totTrucks  ? (trucks.reduce((a,b) => a + b.body * b.qty, 0) / totTrucks) : NaN;
+        const avgBucketDl = totDraglines ? (draglines.reduce((a,b) => a + b.bucket * b.qty, 0) / totDraglines) : NaN;
+        const avgCycleDl  = totDraglines ? (draglines.reduce((a,b) => a + b.cycle * b.qty, 0) / totDraglines) : NaN;
+        // Matching factor for TS
+        const mfVal = (prod.shovelSum && prod.truckTotal) ? Math.min(prod.shovelSum, prod.truckTotal) / Math.max(prod.shovelSum, prod.truckTotal) : NaN;
+        // Cost & carbon differences for comparison mode
+        const costDelta = (currentMode === 'compare' && isFinite(esg.ts_total_m3) && isFinite(esg.dl_total_m3)) ? Math.abs(esg.ts_total_m3 - esg.dl_total_m3) / Math.min(esg.ts_total_m3, esg.dl_total_m3) : 0;
+        const ciDelta   = (currentMode === 'compare' && isFinite(esg.ts_ci) && isFinite(esg.dl_ci)) ? Math.abs(esg.ts_ci - esg.dl_ci) / Math.min(esg.ts_ci, esg.dl_ci) : 0;
+        const prodDelta = (currentMode === 'compare' && prod.Qy_ts && prod.Qy_dl) ? Math.abs(prod.Qy_ts - prod.Qy_dl) / Math.min(prod.Qy_ts, prod.Qy_dl) : 0;
+        const npvDelta  = (currentMode === 'compare' && eco.npv_ts && eco.npv_dl) ? Math.abs(eco.npv_ts - eco.npv_dl) / Math.min(eco.npv_ts, eco.npv_dl) : 0;
+        const marginDelta = (currentMode === 'compare' && eco.margin_m3_ts && eco.margin_m3_dl) ? Math.abs(eco.margin_m3_ts - eco.margin_m3_dl) / Math.min(eco.margin_m3_ts, eco.margin_m3_dl) : 0;
+
+        // Compute weighted averages for OEE (A, U, fill, M)
+        const totalQtyTS = totShovels + totTrucks;
+        const sumATS = shovels.reduce((a,b) => a + (b.A || 0) * b.qty, 0) + trucks.reduce((a,b) => a + (b.A || 0) * b.qty, 0);
+        const sumUTS = shovels.reduce((a,b) => a + (b.U || 0) * b.qty, 0) + trucks.reduce((a,b) => a + (b.U || 0) * b.qty, 0);
+        const sumFillTS = shovels.reduce((a,b) => a + (b.fill || 0) * b.qty, 0) + trucks.reduce((a,b) => a + (b.fill || 0) * b.qty, 0);
+        const sumMTS = shovels.reduce((a,b) => a + (b.M || 0) * b.qty, 0) + trucks.reduce((a,b) => a + (b.M || 0) * b.qty, 0);
+        const weightedA_TS = totalQtyTS ? sumATS / totalQtyTS : NaN;
+        const weightedU_TS = totalQtyTS ? sumUTS / totalQtyTS : NaN;
+        const weightedFill_TS = totalQtyTS ? sumFillTS / totalQtyTS : NaN;
+        const weightedM_TS = totalQtyTS ? sumMTS / totalQtyTS : NaN;
+        const oee_TS = (weightedA_TS && weightedU_TS && weightedM_TS) ? (weightedA_TS * weightedU_TS * weightedM_TS) : NaN;
+
+        const totalQtyDL = totDraglines;
+        const sumADL = draglines.reduce((a,b) => a + (b.A || 0) * b.qty, 0);
+        const sumUDL = draglines.reduce((a,b) => a + (b.U || 0) * b.qty, 0);
+        const sumFillDL = draglines.reduce((a,b) => a + (b.fill || 0) * b.qty, 0);
+        const sumMDL = draglines.reduce((a,b) => a + (b.M || 0) * b.qty, 0);
+        const weightedA_DL = totalQtyDL ? sumADL / totalQtyDL : NaN;
+        const weightedU_DL = totalQtyDL ? sumUDL / totalQtyDL : NaN;
+        const weightedFill_DL = totalQtyDL ? sumFillDL / totalQtyDL : NaN;
+        const weightedM_DL = totalQtyDL ? sumMDL / totalQtyDL : NaN;
+        const oee_DL = (weightedA_DL && weightedU_DL && weightedM_DL) ? (weightedA_DL * weightedU_DL * weightedM_DL) : NaN;
+        const avgRehandle = totalQtyDL ? draglines.reduce((a,b) => a + ((b.rehandle || 0) * b.qty), 0) / totalQtyDL : 0;
+        const avgRehandleDist = totalQtyDL ? draglines.reduce((a,b) => a + ((b.rehandleDist || 0) * b.qty), 0) / totalQtyDL : 0;
+
+        // Compute cost breakdowns
+        const ownSh = tco.components?.shovels?.own || 0;
+        const opexSh = tco.components?.shovels?.opex || 0;
+        const totalSh = tco.components?.shovels?.total || 0;
+        const ownTr = tco.components?.trucks?.own || 0;
+        const opexTr = tco.components?.trucks?.opex || 0;
+        const totalTr = tco.components?.trucks?.total || 0;
+        const ownTs  = ownSh + ownTr;
+        const opexTs = opexSh + opexTr;
+        const totalTs = totalSh + totalTr;
+        const ownDl  = tco.components?.draglines?.own || 0;
+        const opexDl = tco.components?.draglines?.opex || 0;
+        const totalDl= tco.components?.draglines?.total || 0;
+        // Compute unit costs (excluding carbon) per m³
+        const ucProdTs = prod.Qy_ts && prod.Qy_ts > 0 ? totalTs / prod.Qy_ts : NaN;
+        const ucProdDl = prod.Qy_dl && prod.Qy_dl > 0 ? totalDl / prod.Qy_dl : NaN;
+
+        // Fuel and emissions
+        const EF = parseFloat($('esg_ef_litre')?.value || '0');
+        let tsFuel = shovels.reduce((a,b) => a + (b.energy || 0) * b.qty, 0) + trucks.reduce((a,b) => a + (b.energy || 0) * b.qty, 0);
+        let dlFuel = draglines.reduce((a,b) => a + (b.energy || 0) * b.qty, 0);
+        const overrideFuelTs = parseFloat($('esg_fuel_ts')?.value || '0');
+        const overrideFuelDl = parseFloat($('esg_fuel_dl')?.value || '0');
+        if (overrideFuelTs > 0) tsFuel = overrideFuelTs;
+        if (overrideFuelDl > 0) dlFuel = overrideFuelDl;
+        const ts_co2_h = tsFuel * EF;
+        const dl_co2_h = dlFuel * EF;
+        const Hy = prod.Hy || 0;
+        const ts_co2_y_t = ts_co2_h * Hy / 1000;
+        const dl_co2_y_t = dl_co2_h * Hy / 1000;
+        // Carbon cost
+        const carbonCostRate = parseFloat($('esg_carbon_cost')?.value || '0');
+        const tsCarbonCostY  = ts_co2_y_t * carbonCostRate;
+        const dlCarbonCostY  = dl_co2_y_t * carbonCostRate;
+        const tsCarbonCostM3 = prod.Qy_ts && prod.Qy_ts > 0 ? tsCarbonCostY / prod.Qy_ts : NaN;
+        const dlCarbonCostM3 = prod.Qy_dl && prod.Qy_dl > 0 ? dlCarbonCostY / prod.Qy_dl : NaN;
+        // Unit total costs (includes carbon cost)
+        const tsUnitTotal = prod.Qy_ts && prod.Qy_ts > 0 ? (totalTs + tsCarbonCostY) / prod.Qy_ts : NaN;
+        const dlUnitTotal = prod.Qy_dl && prod.Qy_dl > 0 ? (totalDl + dlCarbonCostY) / prod.Qy_dl : NaN;
+
+        // Salvage values from input arrays
+        const salvageTs = shovels.reduce((a,b) => a + (b.salv || 0) * b.qty, 0) + trucks.reduce((a,b) => a + (b.salv || 0) * b.qty, 0);
+        const salvageDl = draglines.reduce((a,b) => a + (b.salv || 0) * b.qty, 0);
+
+        // Suggestions generation using existing genSuggestions helper
+        const step1Suggestions = genSuggestions('step1', { mf: mfVal });
+        const step2Suggestions = genSuggestions('step2', { shovelFill: currentMode === 'dragline' ? weightedFill_DL : weightedFill_TS });
+        const step3Suggestions = genSuggestions('step3', { wait: waitTimeVal });
+        const step4Suggestions = genSuggestions('step4', {});
+        const step5Suggestions = genSuggestions('step5', { costDelta });
+        const step6Suggestions = genSuggestions('step6', { ciDelta });
+        const step7Suggestions = genSuggestions('step7', {});
+        const step8Suggestions = genSuggestions('step8', {});
+
+        // Prepare sections array
+        const sections = [];
+        // Cover Page
+        const dateStr = new Date().toISOString().slice(0, 10);
+        const reportTitle = currentMode === 'dragline' ? 'Dragline Mining Technical Report' :
+            currentMode === 'truckshovel' ? 'Truck–Shovel Mining Technical Report' : 'Dragline vs Truck–Shovel Comparative Report';
+        const coverChildren = [];
+        coverChildren.push(P(reportTitle, { bold: true, size: 48 }));
+        coverChildren.push(P('Generated: ' + dateStr, { size: 24 }));
+        coverChildren.push(P('Mode: ' + currentMode, { size: 24 }));
+        coverChildren.push(P('Author: Ajay Sahu', { size: 24 }));
+        coverChildren.push(P('Confidential – For Internal Use Only', { italics: true, size: 20 }));
+        coverChildren.push(new Paragraph({ children: [ new PageBreak() ] }));
+        sections.push({ children: coverChildren });
+
+        // Index Page
+        const indexChildren = [];
+        indexChildren.push(H(H1, 'Index'));
+        // Create a simple index listing steps
+        const indexList = [
+            'Step 1 – Equipment Configuration',
+            'Step 2 – Material & OEE',
+            'Step 3 – Cycle & Pass Analysis',
+            'Step 4 – Production & Output',
+            'Step 5 – Cost & Ownership',
+            'Step 6 – ESG & Unit Economics',
+            'Step 7 – Economic Evaluation',
+            'Step 8 – Executive Summary'
+        ];
+        indexList.forEach(item => {
+            indexChildren.push(new Paragraph({ text: item, bullet: { level: 0 } }));
+        });
+        indexChildren.push(new Paragraph({ children: [ new PageBreak() ] }));
+        sections.push({ children: indexChildren });
+
+        // Step 1 – Equipment Configuration
+        const step1Children = [];
+        step1Children.push(H(H1, 'Step 1 – Equipment Configuration'));
+        step1Children.push(P('This section lists the equipment deployed under the selected module.'));
+        // Truck–Shovel details
+        if (currentMode !== 'dragline') {
+            step1Children.push(H(H2, 'Truck–Shovel Equipment'));
+            // Build table for TS equipment
+            const tsEquipRows = [[ 'Type', 'Name', 'Qty', 'Capacity (m³)', 'Cycle (s)' ]];
+            shovels.forEach(s => {
+                tsEquipRows.push(['Shovel', s.name, String(s.qty), safeNF2(s.bucket), safeNF2(s.cycle)]);
+            });
+            trucks.forEach(t => {
+                tsEquipRows.push(['Truck', t.name, String(t.qty), safeNF2(t.body), '—']);
+            });
+            step1Children.push(makeTable(tsEquipRows));
+            // KPI table for TS
+            const tsKpiRows = [[ 'KPI', 'Value' ]];
+            tsKpiRows.push(['Total Shovels', String(totShovels)]);
+            tsKpiRows.push(['Total Trucks', String(totTrucks)]);
+            tsKpiRows.push(['Matching Factor', isFinite(mfVal) ? mfVal.toFixed(3) : '—']);
+            tsKpiRows.push(['Avg Shovel Bucket (m³)', isFinite(avgBucketSh) ? avgBucketSh.toFixed(2) : '—']);
+            tsKpiRows.push(['Avg Shovel Cycle (s)', isFinite(avgCycleSh) ? avgCycleSh.toFixed(1) : '—']);
+            tsKpiRows.push(['Avg Truck Body (m³)', isFinite(avgBodyTr) ? avgBodyTr.toFixed(2) : '—']);
+            step1Children.push(H(H3, 'TS Equipment KPIs'));
+            step1Children.push(makeTable(tsKpiRows));
+        }
+        // Dragline details
+        if (currentMode !== 'truckshovel') {
+            step1Children.push(H(H2, 'Dragline Equipment'));
+            const dlEquipRows = [[ 'Name', 'Qty', 'Bucket (m³)', 'Cycle (s)', 'Method' ]];
+            draglines.forEach(d => {
+                dlEquipRows.push([ d.name, String(d.qty), safeNF2(d.bucket), safeNF2(d.cycle), d.method ]);
+            });
+            step1Children.push(makeTable(dlEquipRows));
+            // KPI table for DL
+            const dlKpiRows = [[ 'KPI', 'Value' ]];
+            dlKpiRows.push(['Total Draglines', String(totDraglines)]);
+            dlKpiRows.push(['Avg Dragline Bucket (m³)', isFinite(avgBucketDl) ? avgBucketDl.toFixed(2) : '—']);
+            dlKpiRows.push(['Avg Dragline Cycle (s)', isFinite(avgCycleDl) ? avgCycleDl.toFixed(1) : '—']);
+            step1Children.push(H(H3, 'DL Equipment KPIs'));
+            step1Children.push(makeTable(dlKpiRows));
+        }
+        // Suggestions for Step 1
+        if (step1Suggestions && step1Suggestions.length > 0) {
+            step1Children.push(H(H3, 'Key Points'));
+            step1Suggestions.forEach(s => {
+                step1Children.push(new Paragraph({ text: s, bullet: { level: 0 } }));
+            });
+        }
+        step1Children.push(new Paragraph({ children: [ new PageBreak() ] }));
+        sections.push({ children: step1Children });
+
+        // Step 2 – Material & OEE
+        const step2Children = [];
+        step2Children.push(H(H1, 'Step 2 – Material, OEE & Calendar'));
+        step2Children.push(P('This step summarises key material properties and fleet utilisation parameters.'));
+        // TS material & OEE
+        if (currentMode !== 'dragline') {
+            step2Children.push(H(H2, 'Truck–Shovel Inputs'));
+            const tsMatRows = [[ 'Metric', 'Value' ]];
+            tsMatRows.push(['Swell Factor', safeNF2(SF)]);
+            tsMatRows.push(['Density (t/m³)', safeNF2(density)]);
+            tsMatRows.push(['Strip Ratio', safeNF2(SR)]);
+            tsMatRows.push(['Availability (A)', isFinite(weightedA_TS) ? weightedA_TS.toFixed(2) : '—']);
+            tsMatRows.push(['Utilisation (U)', isFinite(weightedU_TS) ? weightedU_TS.toFixed(2) : '—']);
+            tsMatRows.push(['Fill Factor', isFinite(weightedFill_TS) ? weightedFill_TS.toFixed(2) : '—']);
+            tsMatRows.push(['Maintenance Factor (M)', isFinite(weightedM_TS) ? weightedM_TS.toFixed(2) : '—']);
+            tsMatRows.push(['Overall OEE (A*U*M)', isFinite(oee_TS) ? oee_TS.toFixed(3) : '—']);
+            step2Children.push(makeTable(tsMatRows));
+        }
+        // DL material & OEE
+        if (currentMode !== 'truckshovel') {
+            step2Children.push(H(H2, 'Dragline Inputs'));
+            const dlMatRows = [[ 'Metric', 'Value' ]];
+            dlMatRows.push(['Swell Factor', safeNF2(SF)]);
+            dlMatRows.push(['Density (t/m³)', safeNF2(density)]);
+            dlMatRows.push(['Strip Ratio', safeNF2(SR)]);
+            dlMatRows.push(['Availability (A)', isFinite(weightedA_DL) ? weightedA_DL.toFixed(2) : '—']);
+            dlMatRows.push(['Utilisation (U)', isFinite(weightedU_DL) ? weightedU_DL.toFixed(2) : '—']);
+            dlMatRows.push(['Fill Factor', isFinite(weightedFill_DL) ? weightedFill_DL.toFixed(2) : '—']);
+            dlMatRows.push(['Maintenance Factor (M)', isFinite(weightedM_DL) ? weightedM_DL.toFixed(2) : '—']);
+            dlMatRows.push(['Overall OEE (A*U*M)', isFinite(oee_DL) ? oee_DL.toFixed(3) : '—']);
+            dlMatRows.push(['Rehandle (%)', isFinite(avgRehandle) ? avgRehandle.toFixed(1) : '—']);
+            dlMatRows.push(['Rehandle Distance (m)', isFinite(avgRehandleDist) ? avgRehandleDist.toFixed(1) : '—']);
+            step2Children.push(makeTable(dlMatRows));
+        }
+        // Suggestions for Step 2
+        if (step2Suggestions && step2Suggestions.length > 0) {
+            step2Children.push(H(H3, 'Key Points'));
+            step2Suggestions.forEach(s => {
+                step2Children.push(new Paragraph({ text: s, bullet: { level: 0 } }));
+            });
+        }
+        step2Children.push(new Paragraph({ children: [ new PageBreak() ] }));
+        sections.push({ children: step2Children });
+
+        // Step 3 – Cycle & Pass Analysis
+        const step3Children = [];
+        step3Children.push(H(H1, 'Step 3 – Cycle & Pass Analysis'));
+        step3Children.push(P('Cycle time components and pass analysis for haulage.') );
+        if (currentMode !== 'dragline') {
+            step3Children.push(H(H2, 'Truck–Shovel Cycle'));
+            const tsCycleRows = [[ 'Metric', 'Value' ]];
+            tsCycleRows.push(['Pass Conversion', conv]);
+            tsCycleRows.push(['Raw Passes', isFinite(rawRequired) ? rawRequired.toFixed(2) : '—']);
+            tsCycleRows.push(['Chosen Passes', isFinite(passesUsed) ? passesUsed.toFixed(0) : '—']);
+            tsCycleRows.push(['Pass Efficiency (chosen/raw)', isFinite(passEfficiency) ? passEfficiency.toFixed(2) : '—']);
+            tsCycleRows.push(['Load Time (s)', isFinite(loadTime) ? loadTime.toFixed(1) : '—']);
+            tsCycleRows.push(['Haul Time (s)', isFinite(haulTime) ? haulTime.toFixed(1) : '—']);
+            tsCycleRows.push(['Dump Time (s)', isFinite(dumpTimeVal) ? dumpTimeVal.toFixed(1) : '—']);
+            tsCycleRows.push(['Return Time (s)', isFinite(returnTime) ? returnTime.toFixed(1) : '—']);
+            tsCycleRows.push(['Wait Time (s)', isFinite(waitTimeVal) ? waitTimeVal.toFixed(1) : '—']);
+            tsCycleRows.push(['Total Cycle (s)', isFinite(totalCycleTime) ? totalCycleTime.toFixed(1) : '—']);
+            step3Children.push(makeTable(tsCycleRows));
+        }
+        if (currentMode !== 'truckshovel') {
+            step3Children.push(H(H2, 'Dragline Cycle'));
+            const dlCycleRows = [[ 'Metric', 'Value' ]];
+            dlCycleRows.push(['Avg Cycle Time (s)', isFinite(avgCycleDl) ? avgCycleDl.toFixed(1) : '—']);
+            step3Children.push(makeTable(dlCycleRows));
+        }
+        // Suggestions for Step 3
+        if (step3Suggestions && step3Suggestions.length > 0) {
+            step3Children.push(H(H3, 'Key Points'));
+            step3Suggestions.forEach(s => {
+                step3Children.push(new Paragraph({ text: s, bullet: { level: 0 } }));
+            });
+        }
+        step3Children.push(new Paragraph({ children: [ new PageBreak() ] }));
+        sections.push({ children: step3Children });
+
+        // Step 4 – Production & Output
+        const step4Children = [];
+        step4Children.push(H(H1, 'Step 4 – Production & Output'));
+        step4Children.push(P('Summary of production capacity and output.'));
+        if (currentMode !== 'dragline') {
+            step4Children.push(H(H2, 'Truck–Shovel Production'));
+            const tsProdRows = [[ 'Metric', 'Value' ]];
+            tsProdRows.push(['Shovel Hourly Capacity (m³/h)', isFinite(prod.shovelSum) ? safeInt(prod.shovelSum) : '—']);
+            tsProdRows.push(['Truck Hourly Capacity (m³/h)', isFinite(prod.truckTotal) ? safeInt(prod.truckTotal) : '—']);
+            tsProdRows.push(['Hourly Production (m³/h)', isFinite(prod.Qh_ts) ? safeInt(prod.Qh_ts) : '—']);
+            tsProdRows.push(['Annual Production (m³/y)', isFinite(prod.Qy_ts) ? safeInt(prod.Qy_ts) : '—']);
+            tsProdRows.push(['Ore Production (t/y)', isFinite(prod.oreTon_ts) ? safeInt(prod.oreTon_ts) : '—']);
+            tsProdRows.push(['Matching Factor', isFinite(mfVal) ? mfVal.toFixed(3) : '—']);
+            tsProdRows.push(['Bottleneck', $('kpi_bottleneck')?.textContent || '—']);
+            step4Children.push(makeTable(tsProdRows));
+        }
+        if (currentMode !== 'truckshovel') {
+            step4Children.push(H(H2, 'Dragline Production'));
+            const dlProdRows = [[ 'Metric', 'Value' ]];
+            dlProdRows.push(['Hourly Production (m³/h)', isFinite(prod.Qh_dl) ? safeInt(prod.Qh_dl) : '—']);
+            dlProdRows.push(['Annual Production (m³/y)', isFinite(prod.Qy_dl) ? safeInt(prod.Qy_dl) : '—']);
+            dlProdRows.push(['Ore Production (t/y)', isFinite(prod.oreTon_dl) ? safeInt(prod.oreTon_dl) : '—']);
+            step4Children.push(makeTable(dlProdRows));
+        }
+        // Suggestions for Step 4
+        if (step4Suggestions && step4Suggestions.length > 0) {
+            step4Children.push(H(H3, 'Key Points'));
+            step4Suggestions.forEach(s => {
+                step4Children.push(new Paragraph({ text: s, bullet: { level: 0 } }));
+            });
+        }
+        step4Children.push(new Paragraph({ children: [ new PageBreak() ] }));
+        sections.push({ children: step4Children });
+
+        // Step 5 – Cost & Ownership
+        const step5Children = [];
+        step5Children.push(H(H1, 'Step 5 – Cost & Ownership'));
+        step5Children.push(P('Breakdown of ownership, operating expenditure and unit costs.'));
+        if (currentMode !== 'dragline') {
+            step5Children.push(H(H2, 'Truck–Shovel Cost'));
+            const tsCostRows = [[ 'Metric', 'Value' ]];
+            tsCostRows.push(['Ownership Cost (€/y)', safeInt(ownTs)]);
+            tsCostRows.push(['OPEX (€/y)', safeInt(opexTs)]);
+            tsCostRows.push(['Total Cost (€/y)', safeInt(totalTs)]);
+            tsCostRows.push(['Unit Cost (without carbon, €/m³)', safeNF2(ucProdTs)]);
+            tsCostRows.push(['Unit Cost (with carbon, €/m³)', safeNF2(esg.ts_total_m3)]);
+            if (currentMode === 'compare') tsCostRows.push(['Cost Difference (%)', isFinite(costDelta) ? (costDelta * 100).toFixed(1) + '%' : '—']);
+            step5Children.push(makeTable(tsCostRows));
+        }
+        if (currentMode !== 'truckshovel') {
+            step5Children.push(H(H2, 'Dragline Cost'));
+            const dlCostRows = [[ 'Metric', 'Value' ]];
+            dlCostRows.push(['Ownership Cost (€/y)', safeInt(ownDl)]);
+            dlCostRows.push(['OPEX (€/y)', safeInt(opexDl)]);
+            dlCostRows.push(['Total Cost (€/y)', safeInt(totalDl)]);
+            dlCostRows.push(['Unit Cost (without carbon, €/m³)', safeNF2(ucProdDl)]);
+            dlCostRows.push(['Unit Cost (with carbon, €/m³)', safeNF2(esg.dl_total_m3)]);
+            step5Children.push(makeTable(dlCostRows));
+        }
+        // Suggestions for Step 5
+        if (step5Suggestions && step5Suggestions.length > 0) {
+            step5Children.push(H(H3, 'Key Points'));
+            step5Suggestions.forEach(s => {
+                step5Children.push(new Paragraph({ text: s, bullet: { level: 0 } }));
+            });
+        }
+        step5Children.push(new Paragraph({ children: [ new PageBreak() ] }));
+        sections.push({ children: step5Children });
+
+        // Step 6 – ESG & Unit Economics
+        const step6Children = [];
+        step6Children.push(H(H1, 'Step 6 – ESG & Unit Economics'));
+        step6Children.push(P('Environmental metrics, carbon emissions and total unit economics.'));
+        if (currentMode !== 'dragline') {
+            step6Children.push(H(H2, 'Truck–Shovel ESG'));
+            const tsEsgRows = [[ 'Metric', 'Value' ]];
+            tsEsgRows.push(['Fuel Consumption (L/h)', safeNF2(tsFuel)]);
+            tsEsgRows.push(['CO₂ Emissions (kg/h)', safeNF2(ts_co2_h)]);
+            tsEsgRows.push(['CO₂ Emissions (t/y)', safeNF2(ts_co2_y_t)]);
+            tsEsgRows.push(['Carbon Intensity (kg/m³)', safeNF3(esg.ts_ci)]);
+            tsEsgRows.push(['Carbon Tax (€/m³)', safeNF3(esg.ts_ctax_m3)]);
+            tsEsgRows.push(['Total Unit Cost (€/m³)', safeNF2(esg.ts_total_m3)]);
+            step6Children.push(makeTable(tsEsgRows));
+        }
+        if (currentMode !== 'truckshovel') {
+            step6Children.push(H(H2, 'Dragline ESG'));
+            const dlEsgRows = [[ 'Metric', 'Value' ]];
+            dlEsgRows.push(['Fuel Consumption (L/h)', safeNF2(dlFuel)]);
+            dlEsgRows.push(['CO₂ Emissions (kg/h)', safeNF2(dl_co2_h)]);
+            dlEsgRows.push(['CO₂ Emissions (t/y)', safeNF2(dl_co2_y_t)]);
+            dlEsgRows.push(['Carbon Intensity (kg/m³)', safeNF3(esg.dl_ci)]);
+            dlEsgRows.push(['Carbon Tax (€/m³)', safeNF3(esg.dl_ctax_m3)]);
+            dlEsgRows.push(['Total Unit Cost (€/m³)', safeNF2(esg.dl_total_m3)]);
+            step6Children.push(makeTable(dlEsgRows));
+        }
+        // Suggestions for Step 6
+        if (step6Suggestions && step6Suggestions.length > 0) {
+            step6Children.push(H(H3, 'Key Points'));
+            step6Suggestions.forEach(s => {
+                step6Children.push(new Paragraph({ text: s, bullet: { level: 0 } }));
+            });
+        }
+        step6Children.push(new Paragraph({ children: [ new PageBreak() ] }));
+        sections.push({ children: step6Children });
+
+        // Step 7 – Economic Evaluation
+        const step7Children = [];
+        step7Children.push(H(H1, 'Step 7 – Economic Evaluation'));
+        step7Children.push(P('Financial analysis and project feasibility.'));
+        if (currentMode !== 'dragline') {
+            step7Children.push(H(H2, 'Truck–Shovel Economics'));
+            const tsEcoRows = [[ 'Metric', 'Value' ]];
+            tsEcoRows.push(['NPV (€)', safeInt(eco.npv_ts)]);
+            tsEcoRows.push(['Payback Period (y)', isFinite(eco.pb_ts) ? eco.pb_ts.toFixed(2) : '—']);
+            tsEcoRows.push(['Margin (€/m³)', safeNF2(eco.margin_m3_ts)]);
+            tsEcoRows.push(['CAPEX (€)', safeInt(eco.capex_ts)]);
+            tsEcoRows.push(['OPEX (€/y)', safeInt(eco.opex_ts)]);
+            tsEcoRows.push(['Revenue (€/y)', safeInt(eco.baseRev_ts)]);
+            tsEcoRows.push(['Project Life (years)', eco.life ? String(eco.life) : '—']);
+            tsEcoRows.push(['Include IIT?', $('eco_inc_iit')?.value === 'yes' ? 'Yes' : 'No']);
+            tsEcoRows.push(['Include Salvage?', $('eco_inc_salv')?.value === 'yes' ? 'Yes' : 'No']);
+            tsEcoRows.push(['Include Carbon?', $('eco_use_carbon')?.value === 'yes' ? 'Yes' : 'No']);
+            step7Children.push(makeTable(tsEcoRows));
+        }
+        if (currentMode !== 'truckshovel') {
+            step7Children.push(H(H2, 'Dragline Economics'));
+            const dlEcoRows = [[ 'Metric', 'Value' ]];
+            dlEcoRows.push(['NPV (€)', safeInt(eco.npv_dl)]);
+            dlEcoRows.push(['Payback Period (y)', isFinite(eco.pb_dl) ? eco.pb_dl.toFixed(2) : '—']);
+            dlEcoRows.push(['Margin (€/m³)', safeNF2(eco.margin_m3_dl)]);
+            dlEcoRows.push(['CAPEX (€)', safeInt(eco.capex_dl)]);
+            dlEcoRows.push(['OPEX (€/y)', safeInt(eco.opex_dl)]);
+            dlEcoRows.push(['Revenue (€/y)', safeInt(eco.baseRev_dl)]);
+            dlEcoRows.push(['Project Life (years)', eco.life ? String(eco.life) : '—']);
+            dlEcoRows.push(['Include IIT?', $('eco_inc_iit')?.value === 'yes' ? 'Yes' : 'No']);
+            dlEcoRows.push(['Include Salvage?', $('eco_inc_salv')?.value === 'yes' ? 'Yes' : 'No']);
+            dlEcoRows.push(['Include Carbon?', $('eco_use_carbon')?.value === 'yes' ? 'Yes' : 'No']);
+            step7Children.push(makeTable(dlEcoRows));
+        }
+        // Suggestions for Step 7
+        if (step7Suggestions && step7Suggestions.length > 0) {
+            step7Children.push(H(H3, 'Key Points'));
+            step7Suggestions.forEach(s => {
+                step7Children.push(new Paragraph({ text: s, bullet: { level: 0 } }));
+            });
+        }
+        step7Children.push(new Paragraph({ children: [ new PageBreak() ] }));
+        sections.push({ children: step7Children });
+
+        // Step 8 – Executive Summary
+        const step8Children = [];
+        step8Children.push(H(H1, 'Step 8 – Executive Summary'));
+        step8Children.push(P('Overall comparison, key indicators and recommendation.'));
+        if (currentMode !== 'dragline') {
+            step8Children.push(H(H2, 'Truck–Shovel Summary'));
+            const tsSummaryRows = [[ 'Metric', 'Value' ]];
+            tsSummaryRows.push(['Unit Cost (€/m³)', safeNF2(esg.ts_total_m3)]);
+            tsSummaryRows.push(['Carbon Intensity (kg/m³)', safeNF3(esg.ts_ci)]);
+            tsSummaryRows.push(['Annual Production (m³/y)', safeInt(prod.Qy_ts)]);
+            tsSummaryRows.push(['NPV (€)', safeInt(eco.npv_ts)]);
+            tsSummaryRows.push(['Payback (y)', isFinite(eco.pb_ts) ? eco.pb_ts.toFixed(2) : '—']);
+            tsSummaryRows.push(['Margin (€/m³)', safeNF2(eco.margin_m3_ts)]);
+            step8Children.push(makeTable(tsSummaryRows));
+        }
+        if (currentMode !== 'truckshovel') {
+            step8Children.push(H(H2, 'Dragline Summary'));
+            const dlSummaryRows = [[ 'Metric', 'Value' ]];
+            dlSummaryRows.push(['Unit Cost (€/m³)', safeNF2(esg.dl_total_m3)]);
+            dlSummaryRows.push(['Carbon Intensity (kg/m³)', safeNF3(esg.dl_ci)]);
+            dlSummaryRows.push(['Annual Production (m³/y)', safeInt(prod.Qy_dl)]);
+            dlSummaryRows.push(['NPV (€)', safeInt(eco.npv_dl)]);
+            dlSummaryRows.push(['Payback (y)', isFinite(eco.pb_dl) ? eco.pb_dl.toFixed(2) : '—']);
+            dlSummaryRows.push(['Margin (€/m³)', safeNF2(eco.margin_m3_dl)]);
+            step8Children.push(makeTable(dlSummaryRows));
+        }
+        // If comparison mode, add comparative insights
+        if (currentMode === 'compare') {
+            step8Children.push(H(H2, 'Comparison Highlights'));
+            const compRows = [[ 'Metric', 'Difference (%)' ]];
+            compRows.push(['Unit Cost Δ', isFinite(costDelta) ? (costDelta * 100).toFixed(1) + '%' : '—']);
+            compRows.push(['Carbon Intensity Δ', isFinite(ciDelta) ? (ciDelta * 100).toFixed(1) + '%' : '—']);
+            compRows.push(['Production Δ', isFinite(prodDelta) ? (prodDelta * 100).toFixed(1) + '%' : '—']);
+            compRows.push(['NPV Δ', isFinite(npvDelta) ? (npvDelta * 100).toFixed(1) + '%' : '—']);
+            compRows.push(['Margin Δ', isFinite(marginDelta) ? (marginDelta * 100).toFixed(1) + '%' : '—']);
+            step8Children.push(makeTable(compRows));
+            // Recommended system
+            step8Children.push(P('Preferred System: ' + (esg.leader || '—'), { bold: true }));
+        }
+        // Suggestions for Step 8
+        if (step8Suggestions && step8Suggestions.length > 0) {
+            step8Children.push(H(H3, 'Key Points'));
+            step8Suggestions.forEach(s => {
+                step8Children.push(new Paragraph({ text: s, bullet: { level: 0 } }));
+            });
+        }
+        sections.push({ children: step8Children });
+
+        // Assemble document
+        setExportStatus('Building document…');
+        const doc = new Document({ sections });
+        setExportStatus('Packaging .docx…');
+        const blob = await Packer.toBlob(doc);
+        const anchor = document.createElement('a');
+        anchor.href = URL.createObjectURL(blob);
+        anchor.download = `${reportTitle.replace(/\s+/g, '_')}_${currentMode}_${dateStr}.docx`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        setTimeout(() => {
+            URL.revokeObjectURL(anchor.href);
+            anchor.remove();
+            setExportStatus('Export complete ✔');
+            $('btn_export_docx').disabled = false;
+        }, 700);
+    } catch (e) {
+        showError(e);
+        setExportStatus('Export failed: ' + e.message, true);
+        $('btn_export_docx').disabled = false;
+    }
+}
+
+
+/* ========= Export Button (multi-mode) ========= */
+$('btn_export_docx').addEventListener('click',(e)=>{
+  if($('btn_export_docx').disabled)return;
+  if(e.altKey){
+    // ALT => open stepwise HTML window
+    openStepwiseWindow();
+  } else if(e.shiftKey){
+    // SHIFT => stepwise DOCX
+    exportStepwiseDocx();
+  } else {
+    exportDocx();
+  }
+});
+
+/* Pre-load docx (non-blocking) */
+(async function preloadDocx(){
+  await loadDocx().catch((e)=>{ console.error("Could not preload docx library", e)});
+  $('btn_export_docx').disabled=false;
+  setExportStatus(docxReady?"docx library loaded – ready":"Will load docx on demand");
+})();
+
+/* ========= Initialization ========= */
+function initializeApp() {
+    addShovel();
+    addTruck();
+    addTruck({name:'789', body:55, cost: 950000, life: 16});
+    addDragline();
+
+    // The add functions already call the render and recompute functions.
+    // However, to ensure everything is rendered correctly after all initial data is added,
+    // we can do a final pass.
+    renderShovelTables();
+    renderTruckTables();
+    renderDraglineTables();
+    renderPassMatrix();
+    safeRecompute();
+}
+
+initializeApp();
+
+</script>
+</body>
+</html>
