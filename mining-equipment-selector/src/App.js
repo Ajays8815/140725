@@ -10,7 +10,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('strata');
   const publicUrl = (process.env.PUBLIC_URL || '').replace(/\/$/, '');
-  const cadUrl = `${publicUrl}/strata-cad-3d.html`;
+  const cadUrl = `${publicUrl}/strata-cad-3d-v11.html`;
 
   const handleSelectionResults = (selectionResults) => {
     setResults(selectionResults);

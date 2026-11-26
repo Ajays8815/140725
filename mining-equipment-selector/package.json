@@ -8,6 +8,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "validate:strata": "node scripts/validate-strata-v11.js",
     "eject": "react-scripts eject"
   },
   "keywords": ["mining", "equipment", "selector", "react"],

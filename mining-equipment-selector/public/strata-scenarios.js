@@ -1,10 +1,17 @@
 (() => {
   const storageKey = 'strata-cad-scenarios-v1';
+  const draftKey = 'strata-cad-last-session-v1';
+  const rememberKey = 'strata-cad-remember-session-v1';
   const allowedInputs = new Set(fields.map(([key]) => key));
   const tools = document.createElement('section');
   tools.className = 'scenario-tools';
   tools.innerHTML = `
     <h3>Scenario tools</h3>
+    <label class="scenario-remember" for="scenarioRemember">
+      <input id="scenarioRemember" type="checkbox">
+      <span>Remember my last run on this device</span>
+    </label>
+    <p class="scenario-hint">Only saved in this browser. Shared links and named scenarios are managed separately.</p>
     <label for="scenarioName">Scenario name</label>
     <input id="scenarioName" type="text" maxlength="60" placeholder="e.g. East pit — 20 m strip">
     <div class="scenario-actions">
@@ -29,6 +36,9 @@
     .scenario-tools h3{margin:0 0 8px}
     .scenario-tools>input[type=text],.scenario-tools select,.scenario-tools textarea{width:100%;padding:7px 8px;border:1px solid #cdd8d1;border-radius:6px;background:#fff;color:#24352e;font:inherit}
     .scenario-tools label{margin:9px 0 5px}
+    .scenario-tools .scenario-remember{justify-content:flex-start;align-items:flex-start;margin:0;font-size:11px}
+    .scenario-tools .scenario-remember input{margin:2px 3px 0 0}
+    .scenario-hint{margin:4px 0 9px;color:#65776e;font-size:10px;line-height:1.4}
     .scenario-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
     .scenario-actions button{font-size:11px;padding:6px 8px}
     #scenarioLink{margin-top:8px;min-height:64px;font-size:11px;overflow-wrap:anywhere}
@@ -100,6 +110,25 @@
     setInputs({ ...DEFAULT, ...PRESETS[scenario.preset], ...scenario.inputs });
     run();
     if (dirty) throw new Error('These settings could not be calculated; check the input validation message.');
+    persistDraft();
+  }
+
+  function rememberEnabled() {
+    return $('scenarioRemember').checked;
+  }
+
+  function persistDraft() {
+    if (!rememberEnabled() || dirty) return;
+    localStorage.setItem(draftKey, JSON.stringify(currentScenario()));
+  }
+
+  function reportDraftSave() {
+    try {
+      persistDraft();
+      if (rememberEnabled() && !dirty) announce('Last run saved on this device.');
+    } catch (error) {
+      announce(`Could not save this device’s last run: ${error.message}`, true);
+    }
   }
 
   function saveFile(name, value) {
@@ -207,9 +236,29 @@
 
   try {
     renderSavedScenarios();
+    $('scenarioRemember').checked = localStorage.getItem(rememberKey) !== 'false';
   } catch (error) {
-    announce(`Saved scenarios could not be read: ${error.message}`, true);
+    $('scenarioRemember').checked = false;
+    announce(`Local scenario storage is unavailable: ${error.message}`, true);
   }
+
+  $('scenarioRemember').addEventListener('change', () => {
+    try {
+      localStorage.setItem(rememberKey, String(rememberEnabled()));
+      if (rememberEnabled()) {
+        reportDraftSave();
+        if (dirty) announce('Your next successful run will be remembered on this device.');
+      } else {
+        localStorage.removeItem(draftKey);
+        announce('Automatic session saving is off. Named scenarios are unchanged.');
+      }
+    } catch (error) {
+      announce(`Could not update the local save setting: ${error.message}`, true);
+    }
+  });
+
+  $('run').addEventListener('click', () => queueMicrotask(reportDraftSave));
+  $('preset').addEventListener('change', () => queueMicrotask(reportDraftSave));
 
   const shared = new URL(location.href).searchParams.get('scenario');
   if (shared) {
@@ -219,6 +268,16 @@
       announce('Shared scenario loaded from this link.');
     } catch (error) {
       announce(`Could not load the shared scenario: ${error.message}`, true);
+    }
+  } else if ($('scenarioRemember').checked) {
+    try {
+      const raw = localStorage.getItem(draftKey);
+      if (raw) {
+        applyScenario(normalizeScenario(JSON.parse(raw)));
+        announce('Restored your last successful run from this device.');
+      }
+    } catch (error) {
+      announce(`Could not restore the last run: ${error.message}`, true);
     }
   }
 })();
