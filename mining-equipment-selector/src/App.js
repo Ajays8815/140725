@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import EquipmentForm from './components/EquipmentForm';
 import Results from './components/Results';
 import EquipmentTable from './components/EquipmentTable';
+import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('selector');
+  const [activeTab, setActiveTab] = useState('strata');
+  const publicUrl = (process.env.PUBLIC_URL || '').replace(/\/$/, '');
+  const cadUrl = `${publicUrl}/strata-cad-3d.html`;
 
   const handleSelectionResults = (selectionResults) => {
     setResults(selectionResults);
@@ -20,15 +23,31 @@ function App() {
         <div className="container">
           <a className="navbar-brand" href="#home">
             <i className="fas fa-hard-hat me-2"></i>
-            Mining Equipment Selector
+            STRATA Engineering Lab
           </a>
+          <span className="navbar-text text-light d-none d-md-inline">
+            Dozer + Dragline · Concept Planning
+          </span>
         </div>
       </nav>
 
-      <div className="container mt-4">
+      <div className="container-fluid mt-3 px-3">
         <div className="row">
           <div className="col-12">
             <ul className="nav nav-tabs" id="mainTabs" role="tablist">
+              <li className="nav-item" role="presentation">
+                <button
+                  className={`nav-link ${activeTab === 'strata' ? 'active' : ''}`}
+                  id="strata-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'strata'}
+                  aria-controls="strata"
+                  onClick={() => setActiveTab('strata')}
+                >
+                  STRATA CAD 3D
+                </button>
+              </li>
               <li className="nav-item" role="presentation">
                 <button 
                   className={`nav-link ${activeTab === 'selector' ? 'active' : ''}`}
@@ -71,6 +90,19 @@ function App() {
             </ul>
 
             <div className="tab-content" id="mainTabContent">
+              <div
+                className={`tab-pane fade ${activeTab === 'strata' ? 'show active' : ''}`}
+                id="strata"
+                role="tabpanel"
+                aria-labelledby="strata-tab"
+              >
+                <iframe
+                  className="strata-cad-frame"
+                  src={cadUrl}
+                  title="STRATA 3D dozer and dragline engineering simulator"
+                  allow="clipboard-read; clipboard-write"
+                />
+              </div>
               <div 
                 className={`tab-pane fade ${activeTab === 'selector' ? 'show active' : ''}`}
                 id="selector" 
@@ -81,11 +113,19 @@ function App() {
                     <h5 className="card-title mb-0">Mining Requirements</h5>
                   </div>
                   <div className="card-body">
-                    <EquipmentForm 
-                      onResults={handleSelectionResults} 
-                      loading={loading} 
-                      setLoading={setLoading} 
-                    />
+                    {!process.env.REACT_APP_API_URL && (
+                      <div className="alert alert-info" role="note">
+                        Equipment recommendations need a deployed Flask API configured with
+                        <code> REACT_APP_API_URL</code>. The STRATA CAD simulator runs without a backend.
+                      </div>
+                    )}
+                    {activeTab === 'selector' && (
+                      <EquipmentForm
+                        onResults={handleSelectionResults}
+                        loading={loading}
+                        setLoading={setLoading}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
@@ -115,7 +155,7 @@ function App() {
                     <h5 className="card-title mb-0">Available Equipment</h5>
                   </div>
                   <div className="card-body">
-                    <EquipmentTable />
+                    {activeTab === 'equipment' && <EquipmentTable />}
                   </div>
                 </div>
               </div>
@@ -128,7 +168,9 @@ function App() {
         <div className="container">
           <div className="row">
             <div className="col-12 text-center">
-              <p className="mb-0">&copy; 2024 Mining Equipment Selector. All rights reserved.</p>
+              <p className="mb-0">
+                STRATA Engineering Lab · Concept planning only. Validate designs with qualified mine-planning, geotechnical, and OEM teams.
+              </p>
             </div>
           </div>
         </div>
